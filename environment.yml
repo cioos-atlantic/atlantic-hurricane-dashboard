@@ -1,0 +1,17 @@
+name: hurricane
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy<1.20
+  - tropycal
+  - erddapy
+  - jupyter
+  - cartopy
+  - matplotlib
+  - shapely
+  - pandas
+  - pip
+  - python
+
+
