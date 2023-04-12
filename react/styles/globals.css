@@ -1,0 +1,93 @@
+body {
+  padding: 0;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+}
+
+header {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  background-color: #e55162;
+  z-index: 8000;
+  height: 75px;
+}
+
+header img.logo {
+  float: left;
+  background-color: white;
+  height: 75px;
+  width: 202px;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+header nav {
+  float: left;
+  font-size: 1.25rem;
+}
+
+header nav ul {
+
+}
+
+header nav ul li {
+  float: left;
+  margin-right: 0.5rem;
+  list-style-type: none;
+}
+
+header nav ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+header nav ul li a:hover {
+  text-decoration: underline;
+}
+
+header nav ul li a::after {
+  content: " /";
+}
+
+header nav ul li:last-child a::after {
+  content: "";
+}
+
+footer {
+  position: absolute;
+  width: 100%;
+  height: 50px;
+  bottom: 0;
+  z-index: 8000;
+  background-color: black;
+}
+
+
+.map_container {
+  height: 100vh;
+  margin-left: 15%;
+  margin-top: 75px;
+  /* margin-bottom: 75px; */
+  overflow: hidden;
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  width: 15%;
+  height: 100vh;
+  background-color: white;
+  z-index: 7000;
+}
+
+.drawer.left {
+  left: 0;
+  border-right: 2px solid darkgrey;
+}
+
+.drawer.right {
+  right: 0;
+  border-left: 2px solid darkgrey;
+}
