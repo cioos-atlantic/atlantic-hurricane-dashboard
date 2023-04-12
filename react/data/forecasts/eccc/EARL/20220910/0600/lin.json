@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"STORMNAME": "EARL", "STORMTYPE": 0, "BASIN": "al"}, "geometry": {"type": "LineString", "coordinates": [[-54.5, 39.4], [-52.9, 42.1], [-52.0, 43.2], [-51.2, 43.9], [-50.2, 44.4], [-48.8, 44.6], [-44.4, 45.1], [-40.2, 45.4]]}}], "bbox": [-54.5, 39.4, -40.2, 45.4]}

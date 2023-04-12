@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"STORMNAME": "FIONA", "STORMTYPE": 0, "BASIN": "al"}, "geometry": {"type": "LineString", "coordinates": [[-70.6, 28.0], [-68.8, 30.9], [-65.2, 34.7], [-62.5, 39.7], [-61.5, 44.6], [-60.9, 47.9], [-60.3, 51.6], [-59.6, 54.1], [-58.6, 59.3]]}}], "bbox": [-70.6, 28.0, -58.6, 59.3]}
