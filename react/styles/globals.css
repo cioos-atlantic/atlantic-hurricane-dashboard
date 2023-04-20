@@ -72,22 +72,3 @@ footer {
   /* margin-bottom: 75px; */
   overflow: hidden;
 }
-
-.drawer {
-  position: absolute;
-  top: 0;
-  width: 15%;
-  height: 100vh;
-  background-color: white;
-  z-index: 7000;
-}
-
-.drawer.left {
-  left: 0;
-  border-right: 2px solid darkgrey;
-}
-
-.drawer.right {
-  right: 0;
-  border-left: 2px solid darkgrey;
-}

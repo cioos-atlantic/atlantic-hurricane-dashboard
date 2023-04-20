@@ -3,5 +3,8 @@
     { "name": "EARL", "year": 2022, "source":"eccc" },
     { "name": "DORIAN", "year": 2016, "source":"ibtracs" },
     { "name": "BLAMMO", "year": 1999, "source":"ibtracs" },
-    { "name": "FRANK", "year": 1979, "source":"ibtracs" }
+    { "name": "FRANK", "year": 1979, "source":"ibtracs" },
+    { "name": "GORP", "year": 1979, "source":"ibtracs" },
+    { "name": "LOUIS", "year": 1979, "source":"ibtracs" },
+    { "name": "DIP", "year": 1979, "source":"ibtracs" }
 ]

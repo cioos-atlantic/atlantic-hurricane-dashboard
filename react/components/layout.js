@@ -27,7 +27,7 @@ export default function Layout({ children, home, topNav, logo }) {
         <meta name="og:title" content={siteTitle} />
       </Head>
       <header className={styles.header}>
-        <a href={logo.href}><Image src={logo.src} width={200} height={100} className='logo' /></a>
+        <a href={logo.href}><Image src={logo.src} width={200} height={100} className='logo' alt="logo" /></a>
         {home ? (
           <>
             {/* Home Page Header Content */}
@@ -39,7 +39,7 @@ export default function Layout({ children, home, topNav, logo }) {
         )}
         <HeaderNav navItems={topNav}></HeaderNav>
       </header>
-      <main>
+      <main className="body">
         {children}
         <MapWithNoSSR />
       </main>
