@@ -36,8 +36,9 @@ def dl_shapefile(shapefile_name):
         u = urlparse(r.url)
         file_name = os.path.basename(u.path)
         if file_name:
-            print(file_name)
             file_path = os.path.join(SHAPE_DIR, file_name)
             if not os.path.exists(file_path):
-                open(file_path, 'wb').write(r.content)                
+                open(file_path, 'wb').write(r.content)
+            return(file_path)
+    return('')
 
