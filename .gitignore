@@ -1,4 +1,4 @@
-jupyter/data/
+data/
 react/node_modules/
 react/.next/**/*.*
 react/package-lock.json
