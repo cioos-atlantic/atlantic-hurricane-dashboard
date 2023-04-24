@@ -4,9 +4,6 @@ storm_lowerLat= 40
 storm_basin = 'north_atlantic'
 storm_source = 'ibtracs'
 
-# How many days before / after the storm to also get data from (useful for graphing)
-dateExtension = 5
-
 # Stations to exclude
 exclude= []
 
@@ -24,10 +21,12 @@ import argparse
 # Get datasets matching time and location criteria, plus a buffer zone
 
 parser = argparse.ArgumentParser(description='Arguments for collecting storm data')
+parser.add_argument("--e", "--extend-dates", action='store', dest='date_ext', type=int, help="Number of days before and after the storm's listed range to get data from", default=0)
 parser.add_argument("--n", "--new_data", action='store_true', dest='new_data', help="Only download new station data files")
-parser.add_argument("--s", "--storm", action="store", dest="storm_arg", type=str, help="Download data for single storm. Format as name-year", default=None)
+parser.add_argument("--s", "--storm", action="store", dest="storm", type=str, help="Download data for single storm. Format as name-year", default=None)
 args = parser.parse_args()
-arg_storm = args.storm_arg
+arg_date_extension = args.date_ext
+arg_storm = args.storm
 arg_new_data= args.new_data
 
 e = ERDDAP(
@@ -85,8 +84,8 @@ for storm_name in storm_dict:
     )
 
     e.constraints = {
-        "time<=": end_date + timedelta(days = dateExtension),
-        "time>=": start_date- timedelta(days = dateExtension)
+        "time<=": end_date + timedelta(days = arg_date_extension),
+        "time>=": start_date- timedelta(days = arg_date_extension)
     }
         
     standard_vars = ["time", "longitude", "latitude"]
@@ -105,4 +104,3 @@ for storm_name in storm_dict:
             buoy_data.to_csv(output_directory / dataset, mode='w')
         except:
             print("Data could not be found for that time")
-
