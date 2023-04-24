@@ -1,2 +1,3 @@
 jupyter/data/
-station-data/
+station-data/*
+!station-data/storm_list.csv
