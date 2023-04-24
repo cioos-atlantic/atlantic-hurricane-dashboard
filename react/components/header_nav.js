@@ -4,7 +4,7 @@ export default function HeaderNav({children, navItems}){
             <ul>
             {navItems.map(link => {
                 return(
-                    <li><a href={link.href}>{link.name}</a></li>
+                    <li key={link.href}><a href={link.href}>{link.name}</a></li>
                 )
             })}
             </ul>

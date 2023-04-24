@@ -10,13 +10,13 @@
 // }
 // <a href={validateURL(url) ? url : ''}>This is a link!</a>
 
-import React from "react";
+import React, { useState } from "react";
 import Head from 'next/head'
 import Layout, { siteTitle } from '../components/layout'
 import utilStyles from '../styles/utils.module.css'
-import StormDetails from "@/lib/storms"
-import dynamic from "next/dynamic";
 import Drawer from '../components/drawer'
+import StormSearch from "@/components/storm_search";
+import { getAllStormData } from '../lib/storms'
 
 const top_nav = [
   { name: "Home", href: "/" },
@@ -25,21 +25,32 @@ const top_nav = [
   { name: "About Hurricanes", href: "/hurricanes" },
 ]
 
-const logo = { 
-  src: "/cioos-atlantic_EN.svg", 
-  alt: "CIOOS Atlantic - Hurricane Dashboard", 
-  href: "https://cioosatlantic.ca/" 
+const logo = {
+  src: "/cioos-atlantic_EN.svg",
+  alt: "CIOOS Atlantic - Hurricane Dashboard",
+  href: "https://cioosatlantic.ca/"
 }
 
-export default function StormDashboard(props) {
-  const the_props = props === undefined ? props : {}
+export async function getStaticProps() {
+  // Get external data from the file system, API, DB, etc.
+  const forecast_sources = getAllStormData();
 
+  // The value of the `props` key will be
+  //  passed to the `Home` component
+  return {
+    props: {
+      forecast_sources
+    }
+  }
+}
+
+
+export default function StormDashboard({forecast_sources}) {
+  console.log(forecast_sources[0].storm[0])
   return (
     <Layout topNav={top_nav} logo={logo}>
       <Drawer element_id="left-side" classes="left">
-        <div className="">
-
-        </div>
+        <StormSearch />
       </Drawer>
     </Layout>
   )
