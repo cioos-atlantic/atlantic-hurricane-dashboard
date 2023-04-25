@@ -26,6 +26,20 @@ export default function StormSearch({ forecasts }) {
         setStormTimeline(filtered);
     }
 
+
+    function getStormInfo(event, storm_obj){
+        console.log(event, storm_obj)
+        const url = `/api/forecast_info?path=${storm_obj.path}`
+        fetch(url).then(res => {
+            if(res.ok){
+                return res.json();
+            }
+            throw res;
+        }).then(data => {
+            console.log(data);
+        });
+    }
+
     return (
         <>
             <div className="">
@@ -54,7 +68,7 @@ export default function StormSearch({ forecasts }) {
                     // storm_timeline &&
                     storm_timeline.map(storm => {
                         return (
-                            <div>{storm.storm_date} {storm.storm_time}</div>
+                            <div onClick={(e) => { getStormInfo(e, storm) }}>{storm.storm_date} {storm.storm_time}</div>
                         )
                     })
                 }

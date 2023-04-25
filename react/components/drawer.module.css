@@ -1,12 +1,12 @@
 .drawer {
     position: absolute;
     top: 0;
-    width: 15%;
-    height: 100vh;
+    width: 23%;
+    height: 95%;
     background-color: white;
     z-index: 7000;
-    margin-top:75px;
-    padding: 1rem;
+    margin-top:3%;
+    padding: 1%;
 }
 
 .drawer.left {

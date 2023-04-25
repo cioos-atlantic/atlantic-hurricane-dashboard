@@ -17,7 +17,7 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
   });
 
   return (
-    <div className={styles.container}>
+    <div className={styles.body}>
       <Head>
         <link rel="icon" href="/favicon.ico" />
         <meta
@@ -41,7 +41,7 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
       </header>
       <main className="body">
         {children}
-        <MapWithNoSSR forecasts={forecasts} />
+        <MapWithNoSSR forecasts={forecasts} error_cone="" points="" track="" storm_radius=""></MapWithNoSSR>
       </main>
       <footer>
         <FooterNav></FooterNav>

@@ -4,28 +4,10 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
 
-import fiona from '../data/forecasts/eccc/FIONA/index.json'
-
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 5
 
-// function map_ready(){
-//   fetch('/api/storm_list').then(res => {
-//     res.json().then(data => ({
-//       data: data,
-//       status: res.status
-//     })).then(final_res => {
-//       let storm_list = document.getElementsByClassName("storm_list")
-//       final_res.data.map(storm => {       
-//         console.log(storm)
-//       })
-//     })
-//   })
-// }
-
-// const fs = require('fs')
-
-export default function Map (forecasts) {
+export default function Map({ children, error_cone, points, track, storm_radius }) {
   // console.log(forecasts)
   // const points = forecasts[0].filter(storm => storm.file_type == "pts")
   return (
@@ -40,19 +22,29 @@ export default function Map (forecasts) {
           attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
         />
 
-        {/* <LayersControl position="topright">
-          <LayersControl.Overlay checked name="ECCC Forecasts">
+        <LayersControl position="topright">
+          <LayersControl.Overlay name="Error Cone">
             <LayerGroup>
 
             </LayerGroup>
-            <FeatureGroup>
-
-            </FeatureGroup>
           </LayersControl.Overlay>
-        </LayersControl> */}
+          <LayersControl.Overlay name="Points">
+            <LayerGroup>
+
+            </LayerGroup>
+          </LayersControl.Overlay>
+          <LayersControl.Overlay name="Track Line">
+            <LayerGroup>
+
+            </LayerGroup>
+          </LayersControl.Overlay>
+          <LayersControl.Overlay name="Storm Radius">
+            <LayerGroup>
+
+            </LayerGroup>
+          </LayersControl.Overlay>
+        </LayersControl>
       </MapContainer>
     </div>
   )
 }
-
-// export default Map
