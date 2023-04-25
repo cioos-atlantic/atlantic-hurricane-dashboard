@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import storm_list from '../data/forecasts/list.json'
 
-export default function StormSearch({ }) {
+export default function StormSearch({ forecasts }) {
     const [storms, setStorms] = useState([]);
     const [selected_storm, setSelectedStorm] = useState({});
+    const [storm_timeline, setStormTimeline] = useState([]);
     // const data = get_forecast_sources();
 
     function updateStormList(event) {
@@ -17,8 +18,12 @@ export default function StormSearch({ }) {
     }
 
     function populateStormDetails(event, storm_obj) {
+
         console.log(event, storm_obj);
         setSelectedStorm(storm_obj);
+        const filtered = forecasts.map(source => { return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") })[0];
+        console.log(filtered[0]);
+        setStormTimeline(filtered);
     }
 
     return (
@@ -45,7 +50,14 @@ export default function StormSearch({ }) {
                 }
             </div>
             <div id="storm_timeline">
-
+                {
+                    // storm_timeline &&
+                    storm_timeline.map(storm => {
+                        return (
+                            <div>{storm.storm_date} {storm.storm_time}</div>
+                        )
+                    })
+                }
             </div>
         </>
     )

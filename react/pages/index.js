@@ -48,9 +48,9 @@ export async function getStaticProps() {
 export default function StormDashboard({forecast_sources}) {
   console.log(forecast_sources[0].storm[0])
   return (
-    <Layout topNav={top_nav} logo={logo}>
+    <Layout topNav={top_nav} logo={logo} forecasts={forecast_sources}>
       <Drawer element_id="left-side" classes="left">
-        <StormSearch />
+        <StormSearch forecasts={forecast_sources} />
       </Drawer>
     </Layout>
   )

@@ -11,7 +11,7 @@ import dynamic from "next/dynamic";
 
 export const siteTitle = 'Atlantic Hurricane Dashboard'
 
-export default function Layout({ children, home, topNav, logo }) {
+export default function Layout({ children, home, topNav, logo, forecasts }) {
   const MapWithNoSSR = dynamic(() => import("../components/map"), {
     ssr: false
   });
@@ -41,7 +41,7 @@ export default function Layout({ children, home, topNav, logo }) {
       </header>
       <main className="body">
         {children}
-        <MapWithNoSSR />
+        <MapWithNoSSR forecasts={forecasts} />
       </main>
       <footer>
         <FooterNav></FooterNav>

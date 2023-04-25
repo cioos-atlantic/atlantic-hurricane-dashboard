@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup } from 'react-leaflet'
 import { useMap, useMapEvent, useMapEvents } from 'react-leaflet/hooks'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
@@ -25,8 +25,9 @@ const defaultZoom = 5
 
 // const fs = require('fs')
 
-const Map = () => {
-
+export default function Map (forecasts) {
+  // console.log(forecasts)
+  // const points = forecasts[0].filter(storm => storm.file_type == "pts")
   return (
     <div className="map_container">
       <MapContainer
@@ -34,14 +35,24 @@ const Map = () => {
         zoom={defaultZoom}
         style={{ height: "100%", width: "100%" }}
       >
-
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
         />
+
+        {/* <LayersControl position="topright">
+          <LayersControl.Overlay checked name="ECCC Forecasts">
+            <LayerGroup>
+
+            </LayerGroup>
+            <FeatureGroup>
+
+            </FeatureGroup>
+          </LayersControl.Overlay>
+        </LayersControl> */}
       </MapContainer>
     </div>
   )
 }
 
-export default Map
+// export default Map
