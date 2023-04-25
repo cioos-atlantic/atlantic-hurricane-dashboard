@@ -5,6 +5,7 @@ export default function StormSearch({ forecasts }) {
     const [storms, setStorms] = useState([]);
     const [selected_storm, setSelectedStorm] = useState({});
     const [storm_timeline, setStormTimeline] = useState([]);
+    const [storm_points, setStormPoints] = useState([]);
     // const data = get_forecast_sources();
 
     function updateStormList(event) {
@@ -37,6 +38,7 @@ export default function StormSearch({ forecasts }) {
             throw res;
         }).then(data => {
             console.log(data);
+            setStormPoints(data);
         });
     }
 
