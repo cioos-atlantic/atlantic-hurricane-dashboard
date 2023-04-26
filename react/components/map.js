@@ -1,4 +1,6 @@
-import { MapContainer, TileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, PolygonProps, Polyline } from 'react-leaflet'
+// https://iconoir.com/ icon library that can be installed via npm
+import { parseISO, format } from 'date-fns';
+import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, PolygonProps, Polyline } from 'react-leaflet'
 import { useMap, useMapEvent, useMapEvents } from 'react-leaflet/hooks'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
@@ -45,6 +47,16 @@ export default function Map({ children, storm_data }) {
           attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
         />
 
+        <WMSTileLayer
+          url="https://geo.weather.gc.ca/geomet"
+          layers='HURRICANE_RESPONSE_ZONE'
+          format='image/png'
+          transparent='true'
+          styles='HURRICANE_LINE_BLACK_DASHED'
+          attribution='ECCC'
+          version='1.3.0'
+        />
+
         <LayersControl position="topright">
           <LayersControl.Overlay checked name="Error Cone">
             <LayerGroup>
@@ -68,7 +80,7 @@ export default function Map({ children, storm_data }) {
                       <Popup>
                         <h3>{point.properties.STORMNAME}</h3>
                         <p>Coordinate Type: {point.geometry.type}</p>
-                        <p>Timestamp: {point.properties.TIMESTAMP}</p>
+                        <p>Timestamp: {format(parseISO(point.properties.TIMESTAMP), 'PP pp X')}</p>
                         <p>Lat/Long: {point.properties.LAT} {point.properties.LON}</p>
                         <p>Max Windspeed: {point.properties.MAXWIND}</p>
                         <p>Pressure: {point.properties.MSLP}</p>
@@ -93,14 +105,14 @@ export default function Map({ children, storm_data }) {
                 storm_data.rad.features.length > 0 &&
                 storm_data.rad.features.map(radii => {
                   const fixed_coords = remap_coord_array(radii.geometry.coordinates[0]);
-                  const path_options = {className: 'eccc-rad-'.concat(radii.properties.WINDFORCE)};
+                  const path_options = { className: 'eccc-rad-'.concat(radii.properties.WINDFORCE) };
                   console.log(path_options)
-                  return(
+                  return (
                     <Polygon
-                     positions={fixed_coords}
-                     pathOptions={path_options}
-                     
-                     >
+                      positions={fixed_coords}
+                      pathOptions={path_options}
+
+                    >
                       <Popup>
                         <h3>{radii.properties.STORMNAME}</h3>
                         <p>Wind force: {radii.properties.WINDFORCE}</p>

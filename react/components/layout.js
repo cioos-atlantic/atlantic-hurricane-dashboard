@@ -63,7 +63,7 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
   }
 
   function populateTimeline(event, storm_obj) {
-    console.log(event, storm_obj)
+    console.log(event.target.style)
     const url = `/api/forecast_info?path=${storm_obj.path}`
     fetch(url).then(res => {
       if (res.ok) {
