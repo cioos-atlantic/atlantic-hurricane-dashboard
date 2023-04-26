@@ -5,7 +5,7 @@ import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
-const defaultZoom = 5
+const defaultZoom = 4
 
 export default function Map({ children, error_cone, points, track, storm_radius }) {
   // console.log(forecasts)
@@ -28,9 +28,29 @@ export default function Map({ children, error_cone, points, track, storm_radius 
 
             </LayerGroup>
           </LayersControl.Overlay>
-          <LayersControl.Overlay name="Points">
+          <LayersControl.Overlay checked name="Points">
             <LayerGroup>
-
+              {
+                points.map(point => {
+                  console.log(point);
+                  const position = [point.geometry.coordinates[1], point.geometry.coordinates[0]];
+                  return(
+                    <Marker
+                      key={point.properties.TIMESTAMP}
+                      position={position}
+                    >
+                      <Popup>
+                        <p>Coordinate Type: {point.geometry.type}</p>
+                        <p>Timestamp: {point.properties.TIMESTAMP}</p>
+                        <p>Storm Name: {point.properties.STORMNAME}</p>
+                        <p>Lat/Long: {point.properties.LAT} {point.properties.LON}</p>
+                        <p>Max Windspeed: {point.properties.MAXWIND}</p>
+                        <p>Pressure: {point.properties.MSLP}</p>
+                      </Popup>
+                    </Marker>
+                  );
+                })
+              }
             </LayerGroup>
           </LayersControl.Overlay>
           <LayersControl.Overlay name="Track Line">

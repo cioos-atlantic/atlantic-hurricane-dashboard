@@ -1,58 +1,18 @@
 import React, { useState } from "react";
-import storm_list from '../data/forecasts/list.json'
 
-export default function StormSearch({ forecasts }) {
-    const [storms, setStorms] = useState([]);
-    const [selected_storm, setSelectedStorm] = useState({});
-    const [storm_timeline, setStormTimeline] = useState([]);
-    const [storm_points, setStormPoints] = useState([]);
-    // const data = get_forecast_sources();
-
-    function updateStormList(event) {
-        const filtered_storms = event.target.value != "" ? storm_list.filter(storm => {
-            const storm_index = storm.name + storm.year;
-            return (
-                storm_index.toLowerCase().indexOf(event.target.value.toLowerCase()) > -1)
-        }) : [];
-
-        setStorms(filtered_storms);
-    }
-
-    function populateStormDetails(event, storm_obj) {
-
-        console.log(event, storm_obj);
-        setSelectedStorm(storm_obj);
-        const filtered = forecasts.map(source => { return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") })[0];
-        console.log(filtered[0]);
-        setStormTimeline(filtered);
-    }
-
-
-    function getStormInfo(event, storm_obj){
-        console.log(event, storm_obj)
-        const url = `/api/forecast_info?path=${storm_obj.path}`
-        fetch(url).then(res => {
-            if(res.ok){
-                return res.json();
-            }
-            throw res;
-        }).then(data => {
-            console.log(data);
-            setStormPoints(data);
-        });
-    }
+export default function StormSearch({ forecasts, onSearch, onPopulateStormDetails, onPopulateTimeline, storms, selected_storm, storm_timeline }) {
 
     return (
         <>
             <div className="">
-                Find Storm: <input name="storm_search" type="text" onChange={updateStormList} />
+                Find Storm: <input name="storm_search" type="text" onChange={onSearch} />
             </div>
             <div id="storm_search_result">
                 <ul className="results">
                     {storms.map(storm => {
                         return (
                             <li key={storm.name + storm.year} >
-                                <a onClick={(e) => { populateStormDetails(e, storm) }}>{storm.name} ({storm.year})</a>
+                                <a onClick={(e) => {onPopulateStormDetails(e, storm)}}>{storm.name} ({storm.year})</a>
                             </li>
                         );
                     })}
@@ -69,8 +29,9 @@ export default function StormSearch({ forecasts }) {
                 {
                     // storm_timeline &&
                     storm_timeline.map(storm => {
+                        const key = storm.storm_date + storm.storm_time;
                         return (
-                            <div onClick={(e) => { getStormInfo(e, storm) }}>{storm.storm_date} {storm.storm_time}</div>
+                            <div key={ key } onClick={(e) => {onPopulateTimeline(e, storm)}}>{storm.storm_date} {storm.storm_time}</div>
                         )
                     })
                 }
