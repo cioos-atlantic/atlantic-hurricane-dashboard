@@ -66,9 +66,9 @@ export default function Map({ children, storm_data }) {
                       position={position}
                     >
                       <Popup>
+                        <h3>{point.properties.STORMNAME}</h3>
                         <p>Coordinate Type: {point.geometry.type}</p>
                         <p>Timestamp: {point.properties.TIMESTAMP}</p>
-                        <p>Storm Name: {point.properties.STORMNAME}</p>
                         <p>Lat/Long: {point.properties.LAT} {point.properties.LON}</p>
                         <p>Max Windspeed: {point.properties.MAXWIND}</p>
                         <p>Pressure: {point.properties.MSLP}</p>
@@ -92,8 +92,22 @@ export default function Map({ children, storm_data }) {
               {
                 storm_data.rad.features.length > 0 &&
                 storm_data.rad.features.map(radii => {
+                  const fixed_coords = remap_coord_array(radii.geometry.coordinates[0]);
+                  const path_options = {className: 'eccc-rad-'.concat(radii.properties.WINDFORCE)};
+                  console.log(path_options)
                   return(
-                    <Polygon positions={remap_coord_array(radii.geometry.coordinates[0])}/>
+                    <Polygon
+                     positions={fixed_coords}
+                     pathOptions={path_options}
+                     
+                     >
+                      <Popup>
+                        <h3>{radii.properties.STORMNAME}</h3>
+                        <p>Wind force: {radii.properties.WINDFORCE}</p>
+                        <p>Timestamp: {radii.properties.TIMESTAMP}</p>
+                      </Popup>
+
+                    </Polygon>
                   );
                 })
               }

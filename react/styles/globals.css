@@ -72,3 +72,18 @@ footer {
   /* margin-bottom: 75px; */
   overflow: hidden;
 }
+
+.eccc-rad-34 {
+  stroke: yellow;
+  fill: yellow;
+}
+
+.eccc-rad-48 {
+  stroke: orange;
+  fill: orange;
+}
+
+.eccc-rad-64 {
+  stroke: red;
+  fill: red;
+}
