@@ -10,12 +10,10 @@
 // }
 // <a href={validateURL(url) ? url : ''}>This is a link!</a>
 
-import React, { useState } from "react";
+
 import Head from 'next/head'
 import Layout, { siteTitle } from '../components/layout'
 import utilStyles from '../styles/utils.module.css'
-import Drawer from '../components/drawer'
-import StormSearch from "@/components/storm_search";
 import { getAllStormData } from '../lib/storms'
 
 const top_nav = [
@@ -45,13 +43,13 @@ export async function getStaticProps() {
 }
 
 
-export default function StormDashboard({forecast_sources}) {
-  console.log(forecast_sources[0].storm[0])
+
+export default function StormDashboard({ forecast_sources: forecasts }) {
+
+  
   return (
-    <Layout topNav={top_nav} logo={logo}>
-      <Drawer element_id="left-side" classes="left">
-        <StormSearch />
-      </Drawer>
+    <Layout topNav={top_nav} logo={logo} forecasts={forecasts} >
+
     </Layout>
   )
 }

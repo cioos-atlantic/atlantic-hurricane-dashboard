@@ -2,9 +2,10 @@ data/
 
 react/node_modules/
 react/.next/**/*.*
-react/package-lock.json
-react/package-lock.json
 react/.next/trace
 react/package-lock.json
 
 __pycache__/
+
+station-data/*
+!station-data/storm_list.csv
