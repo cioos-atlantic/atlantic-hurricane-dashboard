@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
 
-export default function StormSearch({ forecasts, onSearch, onPopulateStormDetails, onPopulateTimeline, storms, selected_storm, storm_timeline }) {
+export default function StormSearch({ onSearch, onPopulateStormDetails, onPopulateTimeline, storms, selected_storm, storm_timeline }) {
 
     return (
         <>

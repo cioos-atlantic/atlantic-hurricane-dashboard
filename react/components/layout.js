@@ -16,10 +16,17 @@ import storm_list from '../data/forecasts/list.json'
 export const siteTitle = 'Atlantic Hurricane Dashboard'
 
 export default function Layout({ children, home, topNav, logo, forecasts }) {
+  const empty_storm_obj = {
+    pts:{features:[]},
+    err:{features:[]},
+    lin:{features:[]},
+    rad:{features:[]},
+  };
+
   const [storms, setStorms] = useState([]);
   const [selected_storm, setSelectedStorm] = useState({});
   const [storm_timeline, setStormTimeline] = useState([]);
-  const [storm_points, setStormPoints] = useState([]);
+  const [storm_points, setStormPoints] = useState(empty_storm_obj);
 
   // useMemo() tells React to "memorize" the map component.
   // Wthout this, the map will get redrawn by many interactions 
@@ -65,7 +72,7 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
       throw res;
     }).then(data => {
       console.log("Storm Data: ", data);
-      setStormPoints(data.storm_data.features);
+      setStormPoints(data);
     });
   }
 
@@ -105,7 +112,7 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
             storm_timeline={storm_timeline}
           />
         </Drawer>
-        <MapWithNoSSR error_cone="An error cone string" points={storm_points} track="A track line string" storm_radius="A storm radius"></MapWithNoSSR>
+        <MapWithNoSSR storm_data={storm_points}></MapWithNoSSR>
       </main>
       <footer>
         <FooterNav></FooterNav>
