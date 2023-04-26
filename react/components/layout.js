@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from './layout.module.css'
@@ -21,9 +21,16 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
   const [storm_timeline, setStormTimeline] = useState([]);
   const [storm_points, setStormPoints] = useState([]);
 
-  const MapWithNoSSR = dynamic(() => import("../components/map"), {
-    ssr: false
-  });
+  // useMemo() tells React to "memorize" the map component.
+  // Wthout this, the map will get redrawn by many interactions 
+  // and cause flashing - this lets us update map layers without
+  // the map constant flashing with each change and click.
+  const MapWithNoSSR = useMemo(
+    () => (dynamic(() => import("../components/map"), {
+      ssr: false
+    })),
+    [],
+  );
 
   console.log(forecasts[0].storm[0])
 
