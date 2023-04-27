@@ -14,8 +14,10 @@ export default function Drawer({children, element_id, classes}){
     }
 
     return(
-        <div id={element_id} className={styles.drawer + " " + other}>
-            {children}
+        <div id={element_id} className={styles.drawer + " h-100 " + other}>
+            <div className={styles.drawer_interior}>
+                {children}
+            </div>
         </div>
     )
 }

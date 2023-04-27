@@ -15,13 +15,14 @@ import storm_list from '../data/forecasts/list.json'
 
 export const siteTitle = 'Atlantic Hurricane Dashboard'
 
+export const empty_storm_obj = {
+  pts:{features:[]},
+  err:{features:[]},
+  lin:{features:[]},
+  rad:{features:[]},
+};
+
 export default function Layout({ children, home, topNav, logo, forecasts }) {
-  const empty_storm_obj = {
-    pts:{features:[]},
-    err:{features:[]},
-    lin:{features:[]},
-    rad:{features:[]},
-  };
 
   const [storms, setStorms] = useState([]);
   const [selected_storm, setSelectedStorm] = useState({});
@@ -54,7 +55,6 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
   }
 
   function populateStormDetails(event, storm_obj) {
-
     console.log(event, storm_obj);
     setSelectedStorm(storm_obj);
     const filtered = forecasts.map(source => { return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") })[0];
@@ -65,6 +65,9 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
   function populateTimeline(event, storm_obj) {
     console.log(event.target.style)
     const url = `/api/forecast_info?path=${storm_obj.path}`
+    
+    setStormPoints(empty_storm_obj);
+
     fetch(url).then(res => {
       if (res.ok) {
         return res.json();
