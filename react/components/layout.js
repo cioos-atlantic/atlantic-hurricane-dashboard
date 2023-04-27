@@ -26,6 +26,7 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
 
   const [storms, setStorms] = useState([]);
   const [selected_storm, setSelectedStorm] = useState({});
+  const [selected_forecast, setSelectedForecast] = useState({});
   const [storm_timeline, setStormTimeline] = useState([]);
   const [storm_points, setStormPoints] = useState(empty_storm_obj);
 
@@ -55,17 +56,20 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
   }
 
   function populateStormDetails(event, storm_obj) {
-    console.log(event, storm_obj);
+    // console.log(event, storm_obj);
     setSelectedStorm(storm_obj);
-    const filtered = forecasts.map(source => { return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") })[0];
+
+    const filtered = forecasts.map(source => {
+       return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") 
+    })[0];
     console.log(filtered[0]);
     setStormTimeline(filtered);
   }
 
   function populateTimeline(event, storm_obj) {
-    console.log(event.target.style)
+    // console.log(event.target.style)
     const url = `/api/forecast_info?path=${storm_obj.path}`
-    
+    setSelectedForecast(storm_obj);
     setStormPoints(empty_storm_obj);
 
     fetch(url).then(res => {
@@ -112,6 +116,7 @@ export default function Layout({ children, home, topNav, logo, forecasts }) {
             forecasts={forecasts}
             storms={storms}
             selected_storm={selected_storm}
+            selected_forecast={selected_forecast}
             storm_timeline={storm_timeline}
           />
         </Drawer>

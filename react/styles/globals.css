@@ -109,3 +109,11 @@ footer {
   z-index: 500;
   padding: 1rem;
 }
+
+#storm_timeline ul li.selected {
+  font-weight: bold;
+}
+
+#storm_timeline ul li.selected::after {
+  content: ' !!'
+}

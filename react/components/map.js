@@ -33,22 +33,24 @@ function flip_coords(coordinates) {
 }
 
 
-const empty_point_obj = {properties:{}, geometry:{}}
+const empty_point_obj = { properties: {}, geometry: {} }
 
-function PointDetails(point){
-  
-  if(point == empty_point_obj){
+function PointDetails(point) {
+
+  if (point == empty_point_obj) {
     return (<></>);
   }
 
   return (
-    <div>
-      <h3>{point.properties.STORMNAME}</h3>
-      <p>Coordinate Type: {point.geometry.type}</p>
-      <p>Timestamp: {format(parseISO(point.properties.TIMESTAMP), 'PP pp X')}</p>
-      <p>Lat/Long: {point.properties.LAT} {point.properties.LON}</p>
-      <p>Max Windspeed: {point.properties.MAXWIND}</p>
-      <p>Pressure: {point.properties.MSLP}</p>
+    <div className="info_pane">
+      <div>
+        <h3>{point.properties.STORMNAME}</h3>
+        <p>Coordinate Type: {point.geometry.type}</p>
+        <p>Timestamp: {format(parseISO(point.properties.TIMESTAMP), 'PP pp X')}</p>
+        <p>Lat/Long: {point.properties.LAT} {point.properties.LON}</p>
+        <p>Max Windspeed: {point.properties.MAXWIND}</p>
+        <p>Pressure: {point.properties.MSLP}</p>
+      </div>
     </div>
   )
 }
@@ -79,9 +81,8 @@ export default function Map({ children, storm_data }) {
   return (
     <div className="map_container">
       <div className='inner_container'>
-        <div className="info_pane">
-          { PointDetails(hover_marker) }
-        </div>
+        { PointDetails(hover_marker) }
+
         <MapContainer
           center={defaultPosition}
           zoom={defaultZoom}
@@ -115,7 +116,7 @@ export default function Map({ children, storm_data }) {
               <LayerGroup>
                 {
                   storm_data.pts.features.map(point => {
-                    console.log(point);
+                    // console.log(point);
                     const position = flip_coords(point.geometry.coordinates);
                     return (
                       <Marker
@@ -144,9 +145,9 @@ export default function Map({ children, storm_data }) {
                 {
                   storm_data.rad.features.length > 0 &&
                   storm_data.rad.features.map(radii => {
-                    
+
                     let fixed_coords = remap_coord_array(radii.geometry.coordinates[0]);
-                    if(hover_marker.properties.TIMESTAMP != radii.properties.TIMESTAMP){
+                    if (hover_marker.properties.TIMESTAMP != radii.properties.TIMESTAMP) {
                       fixed_coords = false;
                     }
 
@@ -157,7 +158,7 @@ export default function Map({ children, storm_data }) {
                         key={radii.properties.TIMESTAMP + radii.properties.WINDFORCE}
                         positions={fixed_coords}
                         pathOptions={path_options}
-                        
+
                       >
                         <Popup>
                           <h3>{radii.properties.STORMNAME}</h3>
