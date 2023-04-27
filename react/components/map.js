@@ -32,9 +32,13 @@ function flip_coords(coordinates) {
   return ([coordinates[1], coordinates[0]]);
 }
 
+
+const empty_point_obj = {properties:{}, geometry:{}}
+
 function PointDetails(point){
-  if(point == {}) {
-    return null;
+  
+  if(point == empty_point_obj){
+    return (<></>);
   }
 
   return (
@@ -50,7 +54,7 @@ function PointDetails(point){
 }
 
 export default function Map({ children, storm_data }) {
-  const [hover_marker, setHoverMarker] = useState({});
+  const [hover_marker, setHoverMarker] = useState(empty_point_obj);
 
   // Define error cone object and populate it if the appropriate object is 
   // defined in storm_data, Leaflet requires the coordinates be flipped from 
