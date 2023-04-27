@@ -1,4 +1,5 @@
 // https://iconoir.com/ icon library that can be installed via npm
+import React, { useState, useMemo } from "react";
 import { parseISO, format } from 'date-fns';
 import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, PolygonProps, Polyline } from 'react-leaflet'
 import { useMap, useMapEvent, useMapEvents } from 'react-leaflet/hooks'
@@ -31,7 +32,26 @@ function flip_coords(coordinates) {
   return ([coordinates[1], coordinates[0]]);
 }
 
+function PointDetails(point){
+  if(point == {}) {
+    return null;
+  }
+
+  return (
+    <div>
+      <h3>{point.properties.STORMNAME}</h3>
+      <p>Coordinate Type: {point.geometry.type}</p>
+      <p>Timestamp: {format(parseISO(point.properties.TIMESTAMP), 'PP pp X')}</p>
+      <p>Lat/Long: {point.properties.LAT} {point.properties.LON}</p>
+      <p>Max Windspeed: {point.properties.MAXWIND}</p>
+      <p>Pressure: {point.properties.MSLP}</p>
+    </div>
+  )
+}
+
 export default function Map({ children, storm_data }) {
+  const [hover_marker, setHoverMarker] = useState({});
+
   // Define error cone object and populate it if the appropriate object is 
   // defined in storm_data, Leaflet requires the coordinates be flipped from 
   // the way it is encoded in the ECCC data.
@@ -55,6 +75,9 @@ export default function Map({ children, storm_data }) {
   return (
     <div className="map_container">
       <div className='inner_container'>
+        <div className="info_pane">
+          { PointDetails(hover_marker) }
+        </div>
         <MapContainer
           center={defaultPosition}
           zoom={defaultZoom}
@@ -71,7 +94,7 @@ export default function Map({ children, storm_data }) {
             format='image/png'
             transparent='true'
             styles='HURRICANE_LINE_BLACK_DASHED'
-            attribution='ECCC'
+            attribution='<a href=&quot;https://www.canada.ca/en/environment-climate-change.html&quot;>ECCC</a>'
             version='1.3.0'
           />
 
@@ -94,15 +117,10 @@ export default function Map({ children, storm_data }) {
                       <Marker
                         key={point.properties.TIMESTAMP}
                         position={position}
+                        eventHandlers={{
+                          mouseover: (event) => setHoverMarker(point),
+                        }}
                       >
-                        <Popup>
-                          <h3>{point.properties.STORMNAME}</h3>
-                          <p>Coordinate Type: {point.geometry.type}</p>
-                          <p>Timestamp: {format(parseISO(point.properties.TIMESTAMP), 'PP pp X')}</p>
-                          <p>Lat/Long: {point.properties.LAT} {point.properties.LON}</p>
-                          <p>Max Windspeed: {point.properties.MAXWIND}</p>
-                          <p>Pressure: {point.properties.MSLP}</p>
-                        </Popup>
                       </Marker>
                     );
                   })
@@ -122,7 +140,12 @@ export default function Map({ children, storm_data }) {
                 {
                   storm_data.rad.features.length > 0 &&
                   storm_data.rad.features.map(radii => {
-                    const fixed_coords = remap_coord_array(radii.geometry.coordinates[0]);
+                    
+                    let fixed_coords = remap_coord_array(radii.geometry.coordinates[0]);
+                    if(hover_marker.properties.TIMESTAMP != radii.properties.TIMESTAMP){
+                      fixed_coords = false;
+                    }
+
                     const path_options = { className: 'eccc-rad-'.concat(radii.properties.WINDFORCE) };
 
                     return (
@@ -130,6 +153,7 @@ export default function Map({ children, storm_data }) {
                         key={radii.properties.TIMESTAMP + radii.properties.WINDFORCE}
                         positions={fixed_coords}
                         pathOptions={path_options}
+                        
                       >
                         <Popup>
                           <h3>{radii.properties.STORMNAME}</h3>

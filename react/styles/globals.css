@@ -18,9 +18,9 @@ header img.logo {
   float: left;
   background-color: white;
   height: 75px;
-  width: 202px;
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
+  width: 15%;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 header nav {
@@ -96,4 +96,16 @@ footer {
 .eccc-rad-64 {
   stroke: red;
   fill: red;
+}
+
+.info_pane {
+  position: absolute;
+  top: 0;
+  margin-top: 10%;
+  right: 0%;
+  background-color: white;
+  color: black;
+  border: 3px solid gray;
+  z-index: 500;
+  padding: 1rem;
 }
