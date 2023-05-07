@@ -1,11 +1,15 @@
 // https://iconoir.com/ icon library that can be installed via npm
 import React, { useState, useMemo } from "react";
 import { parseISO, format } from 'date-fns';
-import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, PolygonProps, Polyline } from 'react-leaflet'
+import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, Polyline } from 'react-leaflet'
 import { useMap, useMapEvent, useMapEvents } from 'react-leaflet/hooks'
+import { Icon, DivIcon } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
+
+import HurricaneIcon from '../public/hurricane.svg'
+import TropicalStormIcon from '../public/tropical-storm.svg'
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
@@ -58,6 +62,20 @@ function PointDetails(point) {
 export default function Map({ children, storm_data }) {
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
 
+  const hurricon = new Icon({
+    iconUrl: HurricaneIcon.src,
+    iconRetinaUrl: HurricaneIcon.src,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+
+  const tropstrmicon = new Icon({
+    iconUrl: TropicalStormIcon.src,
+    iconRetinaUrl: TropicalStormIcon.src,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+
   // Define error cone object and populate it if the appropriate object is 
   // defined in storm_data, Leaflet requires the coordinates be flipped from 
   // the way it is encoded in the ECCC data.
@@ -78,10 +96,14 @@ export default function Map({ children, storm_data }) {
     storm_radius = remap_coord_array(storm_data.rad.features[0].geometry.coordinates);
   }
 
+  console.log("hurricane_icon: ", HurricaneIcon.src)
+  // console.log("hurricon_div: ", hurricon_div)
+  // console.log("hurricon: ", hurricon)
+
   return (
     <div className="map_container">
       <div className='inner_container'>
-        { PointDetails(hover_marker) }
+        {PointDetails(hover_marker)}
 
         <MapContainer
           center={defaultPosition}
@@ -125,6 +147,7 @@ export default function Map({ children, storm_data }) {
                         eventHandlers={{
                           mouseover: (event) => setHoverMarker(point),
                         }}
+                        icon={hurricon}
                       >
                       </Marker>
                     );
