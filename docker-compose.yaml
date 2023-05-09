@@ -1,0 +1,14 @@
+version: "2"
+services:
+  node:
+    image: "node:lts-buster"
+    #build: .
+    ports:
+      - "3500:8081"
+    user: "node"
+    working_dir: /react
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./react:/react
+    command: "tail -f /dev/null"
