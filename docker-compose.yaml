@@ -11,4 +11,6 @@ services:
       - NODE_ENV=production
     volumes:
       - ./react:/react
-    command: "tail -f /dev/null"
+    command: >
+      sh -c "npm install && npm run dev"
+
