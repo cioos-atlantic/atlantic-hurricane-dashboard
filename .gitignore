@@ -11,3 +11,4 @@ station-data/*
 !station-data/storm_list.csv
 
 venv/
+jupyter/postgis_schemas/.env
