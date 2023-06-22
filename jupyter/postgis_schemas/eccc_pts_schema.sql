@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS "public"."eccc_storm_points" (gid serial,
 "R64NE" INT4 NOT NULL,
 "R64SE" INT4 NOT NULL,
 "R64SW" INT4 NOT NULL,
-"R64NW" INT4 NOT NULL);
-ALTER TABLE "public"."eccc_storm_points" ADD PRIMARY KEY (gid);
+"R64NW" INT4 NOT NULL,
+PRIMARY KEY(gid));
+
 SELECT AddGeometryColumn('public','eccc_storm_points','geom','4326','POINT',2);
