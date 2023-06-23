@@ -54,8 +54,6 @@ export default function StormSearch({ onSearch, onPopulateStormDetails, onPopula
                 return (
                   <li
                     key={key}
-                    onMouseEnter={(e) => { e.target.style.background = 'red' }}
-                    onMouseLeave={(e) => { e.target.style.background = '' }}
                     onClick={(e) => { onPopulateTimeline(e, storm) }}
                     className={item_class}
                   >{format(forecast_dt, 'HH:mm X')} ({storm.storm_time} UTC)</li>

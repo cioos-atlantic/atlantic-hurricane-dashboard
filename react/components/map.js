@@ -40,6 +40,12 @@ function flip_coords(coordinates) {
 const empty_point_obj = { properties: {}, geometry: {} }
 
 function PointDetails(point) {
+  const storm_types = [
+    "Tropical Depression",
+    "Tropical Storm",
+    "Hurricane",
+    "Post-Tropical",
+  ];
 
   if (point == empty_point_obj) {
     return (<></>);
@@ -49,11 +55,14 @@ function PointDetails(point) {
     <div className="info_pane">
       <div>
         <h3>{point.properties.STORMNAME}</h3>
-        <p>Coordinate Type: {point.geometry.type}</p>
-        <p>Timestamp: {format(parseISO(point.properties.TIMESTAMP), 'PP pp X')}</p>
-        <p>Lat/Long: {point.properties.LAT} {point.properties.LON}</p>
-        <p>Max Windspeed: {point.properties.MAXWIND}</p>
-        <p>Pressure: {point.properties.MSLP}</p>
+        <p><strong>Storm Type:</strong> {storm_types[point.properties.STORMTYPE]}</p>
+        <p><strong>Storm Status:</strong> {point.properties.TCDVLP}</p>
+        <p><strong>Storm Force:</strong> {point.properties.STORMFORCE}</p>
+        <p><strong>Timestamp:</strong> {format(parseISO(point.properties.TIMESTAMP), 'PP pp X')}</p>
+        <p><strong>Lat/Long:</strong> {point.properties.LAT}&deg; N, {point.properties.LON}&deg; W</p>
+        <p><strong>Max Windspeed:</strong> {point.properties.MAXWIND} knots ({(point.properties.MAXWIND * 1.84).toFixed(2)} km/h)</p>
+        <p><strong>Pressure:</strong> {point.properties.MSLP}mb</p>
+        <p><strong>Error radius :</strong> {point.properties.ERRCT} nmi ({(point.properties.ERRCT * 1.852).toFixed(2)} km)</p>
       </div>
     </div>
   )
@@ -65,15 +74,15 @@ export default function Map({ children, storm_data }) {
   const hurricon = new Icon({
     iconUrl: HurricaneIcon.src,
     iconRetinaUrl: HurricaneIcon.src,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
   });
 
   const tropstrmicon = new Icon({
     iconUrl: TropicalStormIcon.src,
     iconRetinaUrl: TropicalStormIcon.src,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
   });
 
   // Define error cone object and populate it if the appropriate object is 
@@ -96,7 +105,7 @@ export default function Map({ children, storm_data }) {
     storm_radius = remap_coord_array(storm_data.rad.features[0].geometry.coordinates);
   }
 
-  console.log("hurricane_icon: ", HurricaneIcon.src)
+  // console.log("hurricane_icon: ", HurricaneIcon.src)
   // console.log("hurricon_div: ", hurricon_div)
   // console.log("hurricon: ", hurricon)
 
