@@ -1,5 +1,28 @@
 # PostGIS and GeoServer
 
+## Modify Geoserver docker-compose.yml
+
+By default, the docker compose file will have a flag **FORCE_SSL=TRUE** for the PostgreSQL (db) container.
+
+Unless you create the appropriate certificates this will prevent you from connecting to PostgreSQL/PostGIS without an encrypted connection.
+
+We will be using Apache to reverse proxy the containers to the outside world and PostgreSQL will not have access so we can disable these settings, at least in a development environment.
+
+Setting this value to **FALSE** will allow Geoserver to connect without setting up SSL/TLS certificates.
+
+## Modify Geoserver .env values
+
+The default **.env.template** file will also need modifications
+
+Set SSL to false and HTTP_SCHEME to "http" rather than the default "https"
+
+```
+SSL=false
+HTTP_SCHEME=http
+```
+
+This will prevent geoserver from explicitly setting links to use the https protocol.
+
 ## Ports and Containers
 
 The docker-compose will create a group of containers, one will be Geoserver and the other will be PostgreSQL/PostGIS
@@ -28,10 +51,16 @@ Schemas are a way of partitioning tables inside of a database.  By deafult all d
 
 PostGIS is an extension to an existing PostgreSQL database.  Geoserver requires PostGIS enabled in order to read from a PostgreSQL database.
 
-The default postgres database will have PostGIS enabled already.
+Log in to the PostgreSQL docker container with psql and enable the postgis extension on the target database. (default: **postgres**)
 
-If you create a new database you will need to enable PostGIS by executing the following statement:
+```
+docker exec -it <container_name> psql -h localhost -p 5432 -d <database_name> -U <username>
+```
+
+> You will be prompted for the PostgreSQL account password after entering the above command
+
+Once logged in to the appropriate database, enable PostGIS by executing the following statement:
 
 `CREATE EXTENSION postgis;`
 
-This is the only extension that Geoserver requires for connectivity, though many other PostGIS extensions exist.
+This is the only extension that Geoserver requires for connectivity, though many other PostGIS extensions exist if additional functionality is required.
