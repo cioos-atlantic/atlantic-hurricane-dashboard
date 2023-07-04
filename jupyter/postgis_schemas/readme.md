@@ -51,6 +51,8 @@ Schemas are a way of partitioning tables inside of a database.  By deafult all d
 
 PostGIS is an extension to an existing PostgreSQL database.  Geoserver requires PostGIS enabled in order to read from a PostgreSQL database.
 
+### Option 1: Command Line, psql
+
 Log in to the PostgreSQL docker container with psql and enable the postgis extension on the target database. (default: **postgres**)
 
 ```
@@ -58,6 +60,42 @@ docker exec -it <container_name> psql -h localhost -p 5432 -d <database_name> -U
 ```
 
 > You will be prompted for the PostgreSQL account password after entering the above command
+
+### Option 2: GUI, PgAdmin4
+
+Connecting to the PosgreSQL database via [PgAdmin4](https://www.pgadmin.org/) is also possible and can be achieved by two routes.
+
+#### Route 1: Using a locally installed PgAdmin4 client
+
+Using a locally installed client (one that is installed directly to your opererating system) requires you to use the external port specified in the .env file for you Geoserver/PostgreSQL containers (default: **32767**)
+
+If you are running docker locally then the host will be **localhost**, otherwise specify the hostname or IP address of the machine running the docker containers.
+
+#### Route 2: Using the PgAdmin Docker container
+
+If you are using a [docker container](https://hub.docker.com/r/dpage/pgadmin4/) to run PgAdmin then you'll need to connect the container to the virutal network GeoServer and PostgreSQL.
+
+List docker networks using the following command
+
+`docker network ls`
+
+The name of the network for Geoserver and PostgreSQL is determined by the COMPOSE_PROJECT_NAME value in the .env file for Geoserver (default: **cioos-geoserver_default**)
+
+When creating your PgAdmin4 docker container be sure to add the --network argument to your command.
+
+> **NOTE:** PgAdmin4 is capable of managing multiple PostgreSQL database server instances and as a result the PGADMIN_DEFAULT_EMAIL and PGADMIN_DEFAULT_PASSWORD values are for defining your login credentials to the PgAdmin4 client, *NOT* PostgreSQL itself.
+>
+> Once inside PgAdmin you will need to create a connection to the PosgreSQL database server in order to interact with it.
+
+**Create PgAdmin Docker Container Example:**
+
+```
+docker run -p 3650:80 -e 'PGADMIN_DEFAULT_EMAIL=pg_admin_user@example.com' -e 'PGADMIN_DEFAULT_PASSWORD=pg_admin_password' --network=cioos-geoserver_default --name=pgAdmin -d dpage/pgadmin4
+```
+
+Because you are attaching the PgAdmin container to the same network as Geoserver and PosgreSQL you can use the name of the PostgreSQL container and default port (5432) to connect to PostgreSQL.
+
+### Create Extension
 
 Once logged in to the appropriate database, enable PostGIS by executing the following statement:
 
