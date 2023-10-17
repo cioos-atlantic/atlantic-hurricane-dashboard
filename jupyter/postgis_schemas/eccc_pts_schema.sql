@@ -1,32 +1,44 @@
-CREATE TABLE IF NOT EXISTS "public"."eccc_storm_points" (gid serial,
-"STORMNAME" VARCHAR(80) NOT NULL,
-"STORMTYPE" INT4 NOT NULL,
-"BASIN" VARCHAR(80) NOT NULL,
-"ADVDATE" VARCHAR(80) NOT NULL,
-"STORMFORCE" INT4 NOT NULL,
-"LAT" NUMERIC NOT NULL,
-"LON" NUMERIC NOT NULL,
-"TIMESTAMP" TIMESTAMP NOT NULL,
-"VALIDTIME" VARCHAR(80),
-"TAU" INT4 NOT NULL,
-"MAXWIND" INT4 NOT NULL,
-"MSLP" NUMERIC NOT NULL,
-"TCDVLP" VARCHAR(80) NOT NULL,
-"DATELBL" VARCHAR(80) NOT NULL,
-"TIMEZONE" VARCHAR(80) NOT NULL,
-"ERRCT" NUMERIC NOT NULL,
-"R34NE" INT4 NOT NULL,
-"R34SE" INT4 NOT NULL,
-"R34SW" INT4 NOT NULL,
-"R34NW" INT4 NOT NULL,
-"R48NE" INT4 NOT NULL,
-"R48SE" INT4 NOT NULL,
-"R48SW" INT4 NOT NULL,
-"R48NW" INT4 NOT NULL,
-"R64NE" INT4 NOT NULL,
-"R64SE" INT4 NOT NULL,
-"R64SW" INT4 NOT NULL,
-"R64NW" INT4 NOT NULL,
-PRIMARY KEY(gid));
+-- Table: public.eccc_storm_points
 
-SELECT AddGeometryColumn('public','eccc_storm_points','geom','4326','POINT',2);
+-- DROP TABLE IF EXISTS public.eccc_storm_points;
+
+CREATE TABLE IF NOT EXISTS public.eccc_storm_points
+(
+    gid integer NOT NULL DEFAULT nextval('eccc_storm_points_gid_seq'::regclass),
+    "STORMNAME" character varying(80) COLLATE pg_catalog."default" NOT NULL,
+    "STORMTYPE" integer NOT NULL,
+    "BASIN" character varying(80) COLLATE pg_catalog."default" NOT NULL,
+    "ADVDATE" character varying(80) COLLATE pg_catalog."default" NOT NULL,
+    "STORMFORCE" integer NOT NULL,
+    "LAT" numeric NOT NULL,
+    "LON" numeric NOT NULL,
+    "TIMESTAMP" timestamp without time zone NOT NULL,
+    "VALIDTIME" character varying(80) COLLATE pg_catalog."default",
+    "TAU" integer NOT NULL,
+    "MAXWIND" integer NOT NULL,
+    "MSLP" numeric NOT NULL,
+    "TCDVLP" character varying(80) COLLATE pg_catalog."default" NOT NULL,
+    "DATELBL" character varying(80) COLLATE pg_catalog."default" NOT NULL,
+    "TIMEZONE" character varying(80) COLLATE pg_catalog."default" NOT NULL,
+    "ERRCT" numeric NOT NULL,
+    "R34NE" integer NOT NULL,
+    "R34SE" integer NOT NULL,
+    "R34SW" integer NOT NULL,
+    "R34NW" integer NOT NULL,
+    "R48NE" integer NOT NULL,
+    "R48SE" integer NOT NULL,
+    "R48SW" integer NOT NULL,
+    "R48NW" integer NOT NULL,
+    "R64NE" integer NOT NULL,
+    "R64SE" integer NOT NULL,
+    "R64SW" integer NOT NULL,
+    "R64NW" integer NOT NULL,
+    geom geometry(Point,4326),
+    CONSTRAINT eccc_storm_points_pkey PRIMARY KEY (gid),
+    CONSTRAINT eccc_storm_points_unique UNIQUE ("STORMNAME", "TIMESTAMP")
+)
+
+TABLESPACE pg_default;
+
+COMMENT ON CONSTRAINT eccc_storm_points_unique ON public.eccc_storm_points
+    IS 'Prevents duplicate records with the same storm name and timestamps';
