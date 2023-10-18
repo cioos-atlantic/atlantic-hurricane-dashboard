@@ -11,6 +11,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import generate_bounds as gb
 import time
+import load_into_postgis as lpg
 
 logging.basicConfig(
         handlers=[RotatingFileHandler('./file_watcher_log.log', maxBytes=100000, backupCount=10)],
@@ -19,6 +20,7 @@ logging.basicConfig(
         datefmt='%Y-%m-%dT%H:%M:%S')
 
 logger= logging.getLogger(__name__)
+
 
 def on_created(event):
     # This occurs when a new file has been added or created
@@ -31,16 +33,23 @@ def on_created(event):
     # It is then used to get the boundary points by passing the path to the ts module
     # Added a time sleep to give some time for all files to load
     sub_string = ".err.shp"
+    
     if sub_string in event.src_path:
         logger.info("Shape File Detected!")
         time.sleep(10)
-        path= r'{}'.format(event.src_path)  
-        (min_long, min_lat, max_long, max_lat)= gb.get_boundary(ecc_shp_path=path)
-        logger.info(min_long, min_lat, max_long, max_lat)
+        file_path= r'{}'.format(event.src_path)  
+        (min_long, min_lat, max_long, max_lat)= gb.get_boundary(ecc_shp_path=file_path)
+        logger.info((min_long, min_lat, max_long, max_lat))
         return (min_long, min_lat, max_long, max_lat)
         #TODO This bounds can be connected to Jared scripts (need to figure out how)
-    else:
-        logger.info("Carry On!")
+
+    time.sleep(60)
+    logger.info("Uploading Data to PostGIS Database!")
+    engine= lpg.pg_engine()
+
+    lpg.process_eccc_shp_files(path, engine)
+
+    
 
 def on_deleted(event):
     logger.info(
@@ -77,7 +86,8 @@ if __name__ == "__main__":
     event_handler.on_moved= on_moved
 
     #set to watch the shapefiles directory
-    path = os.path.abspath(os.path.join('..', 'shapefiles')) # to be configured
+    #path = os.path.abspath(os.path.join('..', 'shapefiles')) # to be configured
+    path= r"C:\Users\ceboigbe\Downloads\met\MetPX\sr3\hurricane" # test path
     
     observer = Observer()
     observer.schedule(event_handler, path, recursive=True) # recursive means it is monitoring everything in the sub folders so it should be left at True

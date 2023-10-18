@@ -1,4 +1,4 @@
-# This script is used to generate the bounds for a storm to feed into an ERDDAP query
+# This script is used to generate the boundary coordinates for a storm to feed into an ERDDAP query
 import shapefile as shp
 import shapely
 import numpy as np
@@ -14,17 +14,18 @@ os.environ['USE_PYGEOS'] = '0'
 #shapely.geos_capi_version_string  
 import geopandas as gpd
 import fiona
-#gdal.SetConfigOption('SHAPE_RESTORE_SHX', 'YES')
+import logging
 
 
 
+logger= logging.getLogger(__name__)
 sns.set(style="whitegrid", palette="pastel", color_codes=True) 
 sns.mpl.rc("figure", figsize=(10,6))
 
 
 def get_boundary (ecc_shp_path):
 
-    
+    logger.info("Getting Bounding Box Cordinates!")
     # Generating path directory for shapefiles
     shapefiles_dir = os.path.abspath(os.path.join('..', 'shapefiles'))
 
@@ -45,6 +46,8 @@ def get_boundary (ecc_shp_path):
     intersect_overlay.bounds
     boundary= intersect_overlay.bounds
     (min_long, min_lat, max_long, max_lat)= boundary.values.tolist()[0]
+    logger.debug ((min_long, min_lat, max_long, max_lat))
+    logger.debug("Bounding Box Cordinates Successfully Calculated!")
 
     return  (min_long, min_lat, max_long, max_lat)
 
