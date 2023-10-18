@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS public.eccc_storm_points
 (
-    gid integer NOT NULL DEFAULT nextval('eccc_storm_points_gid_seq'::regclass),
+    gid serial,
     "STORMNAME" character varying(80) COLLATE pg_catalog."default" NOT NULL,
     "STORMTYPE" integer NOT NULL,
     "BASIN" character varying(80) COLLATE pg_catalog."default" NOT NULL,
