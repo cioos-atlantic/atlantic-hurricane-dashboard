@@ -14,3 +14,5 @@ venv/
 jupyter/postgis_schemas/.env
 
 IBTrACS/last-modified.txt
+
+*.log
