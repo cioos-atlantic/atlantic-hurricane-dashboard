@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS public.eccc_storm_error_cones
 (
-    gid integer NOT NULL DEFAULT nextval('eccc_storm_error_cones_gid_seq'::regclass),
+    gid serial,
     "STORMNAME" character varying(80) COLLATE pg_catalog."default" NOT NULL,
     "TIMESTAMP" timestamp without time zone NOT NULL,
     geom geometry(MultiPolygon,4326),
