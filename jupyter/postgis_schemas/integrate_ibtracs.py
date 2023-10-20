@@ -248,7 +248,7 @@ def process_ibtracs(source_csv_file, destination_table, pg_engine):
 
 for file in ibtracs_files.keys():
     print(f"Checking {ibtracs_files[file]['path']} with checksum result: {ibtracs_files[file]['checksum']}...")
-    if file["checksum"] == "FAILED":
+    if ibtracs_files[file]["checksum"] == "FAILED":
         print("Checksum Failed! processing new file...")
         process_ibtracs(source_csv_file=ibtracs_files[file]["path"], destination_table=ibtracs_files[file]["table"], pg_engine=engine)
         print("Finished Processing.")
