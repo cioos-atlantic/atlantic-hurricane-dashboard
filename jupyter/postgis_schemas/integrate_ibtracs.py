@@ -5,8 +5,9 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 import psycopg2
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, Engine, exc
 from pathlib import Path
+from hashlib import md5
 
 load_dotenv()
 
@@ -16,6 +17,7 @@ pg_user = os.getenv('PG_USER')
 pg_pass = os.getenv('PG_PASS')
 pg_db = os.getenv('PG_DB')
 
+md5_results_file = os.getenv('MD5_RESULTS_FILE')
 md5_test_file = os.getenv('MD5_TEST_FILE')
 
 active_file = os.getenv('ACTIVE_FILE')
@@ -24,26 +26,31 @@ historical_file = os.getenv('HISTORICAL_FILE')
 active_table = os.getenv('ACTIVE_TABLE')
 historical_table = os.getenv('HISTORICAL_TABLE')
 
-ibtracs_files = {}
+print(f"MD5 Results File: {md5_results_file}")
+print(f"MD5 Test File: {md5_test_file}")
+print(f"Files: {active_file}, {historical_file}")
+print(f"Tables: {active_table}, {historical_table}")
 
+ibtracs_files = {}
 # Parse md5 checksum test result file for paths and states of checksum results 
 # for the associated files
 with open(file=md5_test_file, mode='r') as md5_file:
-    (file_path, checksum_result) = md5_file.readline().split(": ")
+    for line in md5_file:
+        (file_path, checksum_result) = line.split(":")
 
-    if active_file in file_path:
-        ibtracs_files["active"] = {
-            "path":file_path,
-            "table":active_table,
-            "checksum":checksum_result
-        }
+        if active_file in file_path:
+            ibtracs_files["active"] = {
+                "table":active_table,
+                "path":file_path.strip(),
+                "checksum":checksum_result.strip()
+            }
 
-    if historical_file in file_path:
-        ibtracs_files["historical"] = {
-            "path":file_path,
-            "table":historical_table,
-            "checksum":checksum_result
-        }
+        if historical_file in file_path:
+            ibtracs_files["historical"] = {
+                "table":historical_table,
+                "path":file_path.strip(),
+                "checksum":checksum_result.strip()
+            }
 
 # Tells pandas to skip the 2nd line in the CSV file that specifies unit types 
 # for the columns - this row doesn't need to be inserted into the postgis table
@@ -222,36 +229,86 @@ table_dtypes = {
     "STORM_DIR": 'Float32'
 }
 
-engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
-def process_ibtracs(source_csv_file, destination_table, pg_engine):
+pg_engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
+
+def process_ibtracs(source_csv_file:str, destination_table:str, pg_engine:Engine):
     df = pd.read_csv(filepath_or_buffer=source_csv_file, header=0, skiprows=skip_rows, parse_dates=True, dtype=table_dtypes, na_values=na_values, keep_default_na=False)
     
+    del_result = None
+    ins_result = None
+
     # truncate tables
-    print("Clearing Existing Data...")
-    sql = f"DELETE FROM {destination_table};"
-    pg_conn.execute(text(sql))
-
-    # populate table
-    print("Populating Table...")
-    df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
-    
     with pg_engine.begin() as pg_conn:
-        print("Updating Geometry...")
-        sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("LON", "LAT"), 4326);'
-        pg_conn.execute(text(sql))
+        print(" - Clearing Existing Data...")
+        sql = f"DELETE FROM {destination_table};"
+        
+        try:
+            del_result = pg_conn.execute(text(sql))
+            print(f" - Deleted {del_result.rowcount} rows")
+            print(" - Committing Transaction.")
+            pg_conn.commit()
 
-        print("Committing Transaction.")
-        pg_conn.execute(text("COMMIT;"))
-        print("Fin.")
+        except exc.SQLAlchemyError as ex:
+            print(f" - SQLAlchemyError: {ex}")
+            print(" - Rolling back Transaction.")
+            pg_conn.rollback()
 
+    # If delete table contents is successful, proceed to ingest the 
+    # replacement data.
+    if del_result:
+        print(" - Populating Table...")
+        ins_result = df.to_sql(destination_table, pg_engine, chunksize=10000, method='multi', if_exists='append', index=False, schema='public')
+        print(f" - Inserted {ins_result} rows")
+        
+        with pg_engine.begin() as pg_conn:
+            print(" - Updating Geometry...")
+            sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("LON", "LAT"), 4326);'
 
+            try:
+                upd_result = pg_conn.execute(text(sql))
+                
+                print(f" - Calculated geometry for {upd_result.rowcount} rows")
+                print(" - Committing Transaction.")
+
+                pg_conn.commit()
+
+            except exc.SQLAlchemyError as ex:
+                print(f" - SQLAlchemyError: {ex}")
+                print(" - Rolling back Transaction.")
+                pg_conn.rollback()
+
+    return ins_result
+
+# Process each IBTrACS file
 for file in ibtracs_files.keys():
     print(f"Checking {ibtracs_files[file]['path']} with checksum result: {ibtracs_files[file]['checksum']}...")
-    
+
     if "FAILED" in ibtracs_files[file]["checksum"]:
         print("Checksum Failed! processing new file...")
-        process_ibtracs(source_csv_file=ibtracs_files[file]["path"], destination_table=ibtracs_files[file]["table"], pg_engine=engine)
+        ins_result = process_ibtracs(source_csv_file=ibtracs_files[file]["path"], destination_table=ibtracs_files[file]["table"], pg_engine=pg_engine)
         print("Finished Processing.")
+        
+        # If insert 
+        if ins_result:
+            ibtracs_files[file]["ins_result"] = ins_result
+            ibtracs_files[file]['new_checksum'] = md5(open(ibtracs_files[file]['path'], mode='rt').read().encode()).hexdigest()
+
+
+# Regenerating the md5 log file with the new 
+with open(md5_results_file, mode='w') as results_file:
+    for file in ibtracs_files.keys():
+        output_checksum = ibtracs_files[file]["checksum"]
+
+        # If the file has been processed and a new checksum has been generated 
+        # replace the output checksum with this value instead of the original.
+        # 
+        # It is possible/more likely for the ACTIVE storm data to be updated 
+        # more frequently than the historical
+        if 'new_checksum' in ibtracs_files[file].keys():
+            output_checksum = ibtracs_files[file]['new_checksum']
+
+        print(f"New Checksum: {output_checksum}, File: {ibtracs_files[file]['path']}")
+        results_file.write(f"{output_checksum}  {ibtracs_files[file]['path']}\n")
 
 print("End.")
