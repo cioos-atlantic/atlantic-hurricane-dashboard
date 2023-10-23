@@ -9,6 +9,7 @@ from sqlalchemy import create_engine, text, Engine, exc
 from pathlib import Path
 from hashlib import md5
 
+# Load environment variables
 load_dotenv()
 
 pg_host = os.getenv('PG_HOST')
@@ -25,32 +26,6 @@ historical_file = os.getenv('HISTORICAL_FILE')
 
 active_table = os.getenv('ACTIVE_TABLE')
 historical_table = os.getenv('HISTORICAL_TABLE')
-
-print(f"MD5 Results File: {md5_results_file}")
-print(f"MD5 Test File: {md5_test_file}")
-print(f"Files: {active_file}, {historical_file}")
-print(f"Tables: {active_table}, {historical_table}")
-
-ibtracs_files = {}
-# Parse md5 checksum test result file for paths and states of checksum results 
-# for the associated files
-with open(file=md5_test_file, mode='r') as md5_file:
-    for line in md5_file:
-        (file_path, checksum_result) = line.split(":")
-
-        if active_file in file_path:
-            ibtracs_files["active"] = {
-                "table":active_table,
-                "path":file_path.strip(),
-                "checksum":checksum_result.strip()
-            }
-
-        if historical_file in file_path:
-            ibtracs_files["historical"] = {
-                "table":historical_table,
-                "path":file_path.strip(),
-                "checksum":checksum_result.strip()
-            }
 
 # Tells pandas to skip the 2nd line in the CSV file that specifies unit types 
 # for the columns - this row doesn't need to be inserted into the postgis table
@@ -229,8 +204,64 @@ table_dtypes = {
     "STORM_DIR": 'Float32'
 }
 
+def check_ibtracs_data_checksums():
+    ibtracs_files = {}
 
-pg_engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
+    # Parse md5 checksum test result file for paths and states of checksum results 
+    # for the associated files
+    with open(file=md5_test_file, mode='r') as md5_file:
+        for line in md5_file:
+            (file_path, checksum_result) = line.split(":")
+            
+            # Checksum result is stored in the results file but not the actual 
+            # checksum which is stored in the log file.
+            #
+            # Calculating the file checksum is relatively easy so this can be done
+            # at this stage rather than trying to coordinate another file calculate 
+            # checksum of file.
+            checksum = md5_file_checksum(file_path)
+
+            file_properties = {
+                "table":active_table,
+                "path":file_path.strip(),
+                "checksum":checksum,
+                "checksum_result":checksum_result.strip()
+            }
+            
+            if active_file in file_path:
+                ibtracs_files["active"] = file_properties
+
+            if historical_file in file_path:
+                ibtracs_files["historical"] = file_properties
+
+    return ibtracs_files
+
+
+def md5_file_checksum(path):
+    return md5(open(path, mode='rt').read().encode()).hexdigest()
+
+
+def process_files(ibtracs_files:dict, pg_engine:Engine):
+    # Keep a count of how many files have been processed, increment 1 per valid
+    # ins_result
+    files_processed = 0
+
+    # Process each IBTrACS file
+    for file in ibtracs_files.keys():
+        print(f"Checking {ibtracs_files[file]['path']} with checksum result: {ibtracs_files[file]['checksum']}...")
+
+        if "FAILED" in ibtracs_files[file]["checksum_result"]:
+            print("Checksum Failed! processing new file...")
+            ins_result = process_ibtracs(source_csv_file=ibtracs_files[file]["path"], destination_table=ibtracs_files[file]["table"], pg_engine=pg_engine)
+            print("Finished Processing.")
+            
+            # If insert 
+            if ins_result:
+                ibtracs_files[file]["ins_result"] = ins_result
+                ibtracs_files[file]['new_checksum'] = md5(open(ibtracs_files[file]['path'], mode='rt').read().encode()).hexdigest()
+                files_processed += 1
+
+    return (ibtracs_files, files_processed)
 
 def process_ibtracs(source_csv_file:str, destination_table:str, pg_engine:Engine):
     df = pd.read_csv(filepath_or_buffer=source_csv_file, header=0, skiprows=skip_rows, parse_dates=True, dtype=table_dtypes, na_values=na_values, keep_default_na=False)
@@ -279,46 +310,41 @@ def process_ibtracs(source_csv_file:str, destination_table:str, pg_engine:Engine
                 pg_conn.rollback()
 
     return ins_result
-
-# Keep a count of how many files have been processed, increment 1 per valid
-# ins_result
-files_processed = 0
-
-# Process each IBTrACS file
-for file in ibtracs_files.keys():
-    print(f"Checking {ibtracs_files[file]['path']} with checksum result: {ibtracs_files[file]['checksum']}...")
-
-    if "FAILED" in ibtracs_files[file]["checksum"]:
-        print("Checksum Failed! processing new file...")
-        ins_result = process_ibtracs(source_csv_file=ibtracs_files[file]["path"], destination_table=ibtracs_files[file]["table"], pg_engine=pg_engine)
-        print("Finished Processing.")
         
-        # If insert 
-        if ins_result:
-            ibtracs_files[file]["ins_result"] = ins_result
-            ibtracs_files[file]['new_checksum'] = md5(open(ibtracs_files[file]['path'], mode='rt').read().encode()).hexdigest()
-            files_processed += 1
 
-# Dispose of database connection pool after all files have been processed
-pg_engine.dispose()
+if __name__ == '__main__':
+    print(f"MD5 Results File: {md5_results_file}")
+    print(f"MD5 Test File: {md5_test_file}")
 
-# If no files are processed leave results file alone, only recreate when one 
-# or more files have been processed
-if files_processed > 0:
-    # Regenerating the md5 log file with the new 
-    with open(md5_results_file, mode='w') as results_file:
-        for file in ibtracs_files.keys():
-            output_checksum = ibtracs_files[file]["checksum"]
+    # Populate IBTrACS file metadata
+    ibtracs_files = check_ibtracs_data_checksums()
 
-            # If the file has been processed and a new checksum has been generated 
-            # replace the output checksum with this value instead of the original.
-            # 
-            # It is possible/more likely for the ACTIVE storm data to be updated 
-            # more frequently than the historical
-            if 'new_checksum' in ibtracs_files[file].keys():
-                output_checksum = ibtracs_files[file]['new_checksum']
+    # Open database connection
+    pg_engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
-            print(f"New Checksum: {output_checksum}, File: {ibtracs_files[file]['path']}")
-            results_file.write(f"{output_checksum}  {ibtracs_files[file]['path']}\n")
+    # Process files is invalid checksum results
+    (ibtracs_files, files_processed) = process_files(ibtracs_files=ibtracs_files, pg_engine=pg_engine)
 
-print("End.")
+    # Dispose of database connection pool after all files have been processed
+    pg_engine.dispose()
+
+    # If no files are processed leave results file alone, only recreate when one 
+    # or more files have been processed
+    if files_processed > 0:
+        # Regenerating the md5 log file with the new 
+        with open(md5_results_file, mode='w') as results_file:
+            for file in ibtracs_files.keys():
+                output_checksum = ibtracs_files[file]["checksum"]
+
+                # If the file has been processed and a new checksum has been generated 
+                # replace the output checksum with this value instead of the original.
+                # 
+                # It is possible/more likely for the ACTIVE storm data to be updated 
+                # more frequently than the historical
+                if 'new_checksum' in ibtracs_files[file].keys():
+                    output_checksum = ibtracs_files[file]['new_checksum']
+
+                print(f"New Checksum: {output_checksum}, File: {ibtracs_files[file]['path']}")
+                results_file.write(f"{output_checksum}  {ibtracs_files[file]['path']}\n")
+
+    print("End.")
