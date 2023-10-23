@@ -280,6 +280,10 @@ def process_ibtracs(source_csv_file:str, destination_table:str, pg_engine:Engine
 
     return ins_result
 
+# Keep a count of how many files have been processed, increment 1 per valid
+# ins_result
+files_processed = 0
+
 # Process each IBTrACS file
 for file in ibtracs_files.keys():
     print(f"Checking {ibtracs_files[file]['path']} with checksum result: {ibtracs_files[file]['checksum']}...")
@@ -293,22 +297,28 @@ for file in ibtracs_files.keys():
         if ins_result:
             ibtracs_files[file]["ins_result"] = ins_result
             ibtracs_files[file]['new_checksum'] = md5(open(ibtracs_files[file]['path'], mode='rt').read().encode()).hexdigest()
+            files_processed += 1
 
+# Dispose of database connection pool after all files have been processed
+pg_engine.dispose()
 
-# Regenerating the md5 log file with the new 
-with open(md5_results_file, mode='w') as results_file:
-    for file in ibtracs_files.keys():
-        output_checksum = ibtracs_files[file]["checksum"]
+# If no files are processed leave results file alone, only recreate when one 
+# or more files have been processed
+if files_processed > 0:
+    # Regenerating the md5 log file with the new 
+    with open(md5_results_file, mode='w') as results_file:
+        for file in ibtracs_files.keys():
+            output_checksum = ibtracs_files[file]["checksum"]
 
-        # If the file has been processed and a new checksum has been generated 
-        # replace the output checksum with this value instead of the original.
-        # 
-        # It is possible/more likely for the ACTIVE storm data to be updated 
-        # more frequently than the historical
-        if 'new_checksum' in ibtracs_files[file].keys():
-            output_checksum = ibtracs_files[file]['new_checksum']
+            # If the file has been processed and a new checksum has been generated 
+            # replace the output checksum with this value instead of the original.
+            # 
+            # It is possible/more likely for the ACTIVE storm data to be updated 
+            # more frequently than the historical
+            if 'new_checksum' in ibtracs_files[file].keys():
+                output_checksum = ibtracs_files[file]['new_checksum']
 
-        print(f"New Checksum: {output_checksum}, File: {ibtracs_files[file]['path']}")
-        results_file.write(f"{output_checksum}  {ibtracs_files[file]['path']}\n")
+            print(f"New Checksum: {output_checksum}, File: {ibtracs_files[file]['path']}")
+            results_file.write(f"{output_checksum}  {ibtracs_files[file]['path']}\n")
 
 print("End.")
