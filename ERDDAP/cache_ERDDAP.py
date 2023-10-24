@@ -8,6 +8,10 @@ import pandas as pd
 from erddapy import ERDDAP
 import logging
 from logging.handlers import RotatingFileHandler
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+from sqlalchemy import create_engine, text
 
 log = logging.getLogger('caching.log')
 handler = RotatingFileHandler('caching.log', maxBytes=2000, backupCount=10)
@@ -19,6 +23,81 @@ config.read("../config.ini")
 server = config.get("ERDDAP", "server")
 standard_names = config.get("ERDDAP", "standard_names").splitlines()
 e = ERDDAP(server=server)
+
+pg_erddap_cache_table = os.getenv('PG_ERDDAP_CACHE_TABLE')
+erddap_cache_schema = Path(os.getenv('ERDDAP_CACHE_SCHEMA'))
+
+load_dotenv()
+
+pg_host = os.getenv('PG_HOST')
+pg_port = os.getenv('PG_PORT')
+pg_user = os.getenv('PG_USER')
+pg_pass = os.getenv('PG_PASS')
+pg_db = os.getenv('PG_DB')
+
+engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
+
+table_dtypes = {
+    "storm": 'string',
+    "station": 'string',
+    "min_time": 'datetime',
+    "max_time": 'datetime',
+    "min_lon": 'float',
+    "max_lon": 'float',
+    "station_data": 'string'
+} 
+
+#process_ibtracs(df = , destination_table=pg_ibtracs_active_table, pg_engine=engine, table_schema=erddap_cache_schema)
+def cache_erddap_data(df, destination_table, pg_engine, table_schema):
+    with pg_engine.begin() as pg_conn:
+        # Create Tables (if not exist using schemas)
+        # Generate shapes for IBTRACS?
+        print("Creating Table (if not exists)...")
+        sql = Path(table_schema).read_text()
+        pg_conn.execute(text(sql))
+
+        # add lat/long geometry points
+        print("Adding Geometry Column...")
+        sql = f'ALTER TABLE public.{destination_table} ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);'
+        pg_conn.execute(text(sql))
+        
+        # truncate tables
+        print("Clearing Existing Data...")
+        sql = f"DELETE FROM {destination_table};"
+        pg_conn.execute(text(sql))
+
+        print("Committing Transaction.")
+        pg_conn.execute(text("COMMIT;"))
+    
+    # populate table
+    print("Populating Table...")
+    df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
+    
+    with pg_engine.begin() as pg_conn:
+        print("Updating Geometry...")
+        sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("LON", "LAT"), 4326);'
+        pg_conn.execute(text(sql))
+
+        print("Committing Transaction.")
+        pg_conn.execute(text("COMMIT;"))
+        print("Fin.")
+    return
+
+def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='public'):
+    # Create ECCC Tables if not exist
+    with pg_engine.begin() as pg_conn:
+        print(f"Creating Table {table_name} (if not exists)...")
+
+        sql = f"SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = '{pg_schema}' AND tablename = '{table_name}');"
+        result = pg_conn.execute(text(sql))
+        table_exists = result.first()[0]
+
+        if not table_exists:
+            sql = Path(schema_file).read_text()
+            pg_conn.execute(text(sql))
+
+        print("Committing Transaction.")
+        pg_conn.execute(text("COMMIT;"))
 
 # Extracts data from the erddap metadata Pandas dataframe, NC_GLOBAL and
 # row type attribute are assumed as defaults for variable specific values
@@ -140,6 +219,7 @@ def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
                     "max_lat":max_lat, 
                     "station_data":station_data
                 }
+                # time in ISO format or set column to timestamp (UTC for timezone)
             prev_interval = interval
         log.info(dataset_id + " cached")
         return 
