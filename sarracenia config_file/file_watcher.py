@@ -24,10 +24,10 @@ logger= logging.getLogger(__name__)
 
 def on_created(event):
     # This occurs when a new file has been added or created
-    logger.info(
+    logger.info((
             "[{}] noticed: [{}] on: [{}] ".format(
                 time.asctime(), event.event_type, event.src_path
-            )
+            ))
         )
     # It searches for the error cone shape file and converts it to a raw string
     # It is then used to get the boundary points by passing the path to the ts module
@@ -41,7 +41,7 @@ def on_created(event):
         (min_long, min_lat, max_long, max_lat)= gb.get_boundary(ecc_shp_path=file_path)
         logger.info((min_long, min_lat, max_long, max_lat))
         return (min_long, min_lat, max_long, max_lat)
-        #TODO This bounds can be connected to Jared scripts (need to figure out how)
+        
 
     time.sleep(60)
     logger.info("Uploading Data to PostGIS Database!")

@@ -20,3 +20,5 @@ sarracenia config_file/TODO
 sarracenia config_file/file_watcher_log.log.1
 sarracenia config_file/file_watcher_log.log.2
 sarracenia config_file/file_watcher copy.py
+*.10
+*.3
