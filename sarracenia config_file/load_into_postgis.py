@@ -71,7 +71,7 @@ def shp_to_json(shp_file:Path):
 
 def populate_eccc_table(source_df, destination_table, pg_engine, table_schema):
     # populate table
-    print("Populating Table...")
+    logger.info("Populating Table...")
     source_df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
 
 def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='public'):
@@ -213,28 +213,28 @@ def process_eccc_shp_files(source_dir, pg_engine):
     try: 
         populate_eccc_table(source_df=points_df, destination_table="eccc_storm_points", pg_engine=pg_engine, table_schema=eccc_pts_schema)
     except exc.IntegrityError:
-        print("already there")
+        logger.info("[Duplicate Detected]: Ignoring...")
         pass
 
     
     try:
         populate_eccc_table(source_df=lines_df, destination_table="eccc_storm_lines", pg_engine=pg_engine, table_schema=eccc_lin_schema)
     except exc.IntegrityError:
-        print("already there")
+        logger.info("[Duplicate Detected]: Ignoring...")
         pass
     
     
     try:
         populate_eccc_table(source_df=wind_radii_df, destination_table="eccc_storm_wind_radii", pg_engine=pg_engine, table_schema=eccc_rad_schema)
     except exc.IntegrityError:
-        print("already there")
+        logger.info("[Duplicate Detected]: Ignoring...")
         pass
     
     
     try:
         populate_eccc_table(source_df=error_cone_df, destination_table="eccc_storm_error_cones", pg_engine=pg_engine, table_schema=eccc_err_schema)
     except exc.IntegrityError:
-        print("already there")
+        logger.info("[Duplicate Detected]: Ignoring...")
         pass
 
 
