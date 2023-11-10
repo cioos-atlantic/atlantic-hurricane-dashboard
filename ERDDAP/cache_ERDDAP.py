@@ -24,9 +24,6 @@ server = config.get("ERDDAP", "server")
 standard_names = config.get("ERDDAP", "standard_names").splitlines()
 e = ERDDAP(server=server)
 
-pg_erddap_cache_table = os.getenv('PG_ERDDAP_CACHE_TABLE')
-erddap_cache_schema = Path(os.getenv('ERDDAP_CACHE_SCHEMA'))
-
 load_dotenv()
 
 pg_host = os.getenv('PG_HOST')
@@ -34,6 +31,8 @@ pg_port = os.getenv('PG_PORT')
 pg_user = os.getenv('PG_USER')
 pg_pass = os.getenv('PG_PASS')
 pg_db = os.getenv('PG_DB')
+pg_erddap_cache_table = os.getenv('PG_ERDDAP_CACHE_TABLE')
+erddap_cache_schema = Path("../jupyter/postgis_schemas/erddap_cache_schema.sql")#os.getenv('ERDDAP_CACHE_SCHEMA'))
 
 engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
@@ -49,6 +48,7 @@ table_dtypes = {
 
 #process_ibtracs(df = , destination_table=pg_ibtracs_active_table, pg_engine=engine, table_schema=erddap_cache_schema)
 def cache_erddap_data(df, destination_table, pg_engine, table_schema):
+    """
     with pg_engine.begin() as pg_conn:
         # Create Tables (if not exist using schemas)
         # Generate shapes for IBTRACS?
@@ -69,18 +69,23 @@ def cache_erddap_data(df, destination_table, pg_engine, table_schema):
         print("Committing Transaction.")
         pg_conn.execute(text("COMMIT;"))
     
+    """
+    print(df.head(2))
+
     # populate table
     print("Populating Table...")
-    df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
-    
+    result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
+    print(result)
+
     with pg_engine.begin() as pg_conn:
         print("Updating Geometry...")
-        sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("LON", "LAT"), 4326);'
+        sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("min_lon", "min_lat"), 4326);'
         pg_conn.execute(text(sql))
 
         print("Committing Transaction.")
         pg_conn.execute(text("COMMIT;"))
         print("Fin.")
+
     return
 
 def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='public'):
@@ -114,7 +119,7 @@ def erddap_meta(metadata, attribute_name, row_type="attribute", var_name="NC_GLO
         message = (
             f"IndexError (Not found?) extracting ERDDAP Metadata: attribute: {attribute_name}, row_type: {row_type}, var_name: {var_name}"
         )
-        log.warning(message)
+        print(message)
 
     return return_value
     
@@ -139,7 +144,7 @@ def match_standard_names(dataset_id):
             "meta" : metadata
         }
     else:
-        log.warning(dataset_id, "Doesn't have any matching variables.")
+        print(dataset_id, "Doesn't have any matching variables.")
     return dataset
 
 # Iterate through datasets and create a mapping between variable names and standard names
@@ -173,6 +178,7 @@ def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
         "time>=": min_time,
         "time<=": max_time
     }
+    cached_entries = []
 
     try:
         df = e.to_pandas()
@@ -194,21 +200,22 @@ def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
         min_lon= find_df_column_by_standard_name(df, "longitude").min().min()
 
         # Finds the time column based on standard name and converts the type to be usable as datetime
-        time_col = find_df_column_by_standard_name(df, "time")
+        time_col = find_df_column_by_standard_name(df, "time").columns.values[0]
         df[time_col] = pd.to_datetime(df[time_col])
         date_range = pd.date_range(min_time, max_time, freq="12H")
         
+
+        # Catch if part of the interval isn't in the range
         prev_interval = ""
         for interval in date_range:
             if(prev_interval):
                 df_interval = df[(df[time_col] >= prev_interval.to_pydatetime()) & (df[time_col] < interval.to_pydatetime())]
                 # Might be able to only do the conversion during the 
-                df_interval[time_col] = df_interval[time_col].dt.strftime('%Y-%m-%dT%H:%M:%SZ') 
-
+                # df_interval = df_interval[time_col].dt.strftime('%Y-%m-%dT%H:%M:%SZ')
                 # Change the dataframe to JSON, can change the format or orientation 
                 station_data = df_interval.to_json(orient="records")
 
-                cached_entry = {
+                entry = {
                     "storm":storm_id,
                     "station":dataset_id,
                     "min_time":prev_interval,
@@ -219,21 +226,22 @@ def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
                     "max_lat":max_lat, 
                     "station_data":station_data
                 }
+                cached_entries.append(entry)
                 # time in ISO format or set column to timestamp (UTC for timezone)
             prev_interval = interval
-        log.info(dataset_id + " cached")
-        return 
+        print(dataset_id + " cached")
+        return cached_entries
     except Exception as ex:
     #except httpx.HTTPStatusError as ex:
          print("HTTPStatusError", ex)
          log.info(f" - No data found for time range: {min_time} - {max_time}")
-    return
+    return cached_entries
 
 #Finds the column name in the dataframe given the standard name
 # Header format is column name (standard name|units|long name)
 def find_df_column_by_standard_name(df, standard_name):
-    column_name = df.filter(regex='\(' + standard_name + '\|').columns.values[0]
-    return column_name
+    column = df.filter(regex='\(' + standard_name + '\|')#.columns.values[0]
+    return column
 
 def main():
     # Storm_id and time range to be used as input - hard coded for now to test functionality
@@ -245,6 +253,7 @@ def main():
     search_url = e.get_search_url(response="csv", min_time=min_time, max_time=max_time)
     search = pd.read_csv(search_url)
     dataset_list = search["Dataset ID"].values
+    #cached_data = []
 
     for dataset_id in dataset_list:
         # Interrogate each dataset for the list of variable names using the list 
@@ -252,7 +261,13 @@ def main():
         # will be skipped
         dataset = match_standard_names(dataset_id)
         if (dataset):
-            cache_station_data(dataset, dataset_id, storm_id, min_time, max_time)
-
+            #cached_data.extend(cache_station_data(dataset, dataset_id, storm_id, min_time, max_time))
+            cached_data = cache_station_data(dataset, dataset_id, storm_id, min_time, max_time)
+            if(cached_data):
+                print("data found")
+                print(pg_erddap_cache_table)
+                cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_table,pg_engine=engine,table_schema=erddap_cache_schema)
+        
+    
 if __name__ == '__main__':
     main()

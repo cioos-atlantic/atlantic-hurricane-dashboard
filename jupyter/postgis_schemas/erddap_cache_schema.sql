@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS public."ibtracs_active_storms" (
+CREATE TABLE IF NOT EXISTS public."erddap_cache" (
 	"storm" VARCHAR(50) NOT NULL, 
     "station" VARCHAR(100) NOT NULL,
     "min_time" TIMESTAMP NOT NULL,
@@ -9,4 +9,3 @@ CREATE TABLE IF NOT EXISTS public."ibtracs_active_storms" (
     "max_lat" DECIMAL(7,4) NOT NULL,
     "station_data" TEXT NOT NULL,
     PRIMARY KEY(storm, station, min_time, max_time));
-SELECT AddGeometryColumn('public','eccc_storm_wind_radii','geom','4326','MULTIPOLYGON',2);
