@@ -48,30 +48,6 @@ table_dtypes = {
 
 #process_ibtracs(df = , destination_table=pg_ibtracs_active_table, pg_engine=engine, table_schema=erddap_cache_schema)
 def cache_erddap_data(df, destination_table, pg_engine, table_schema):
-    """
-    with pg_engine.begin() as pg_conn:
-        # Create Tables (if not exist using schemas)
-        # Generate shapes for IBTRACS?
-        print("Creating Table (if not exists)...")
-        sql = Path(table_schema).read_text()
-        pg_conn.execute(text(sql))
-
-        # add lat/long geometry points
-        print("Adding Geometry Column...")
-        sql = f'ALTER TABLE public.{destination_table} ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);'
-        pg_conn.execute(text(sql))
-        
-        # truncate tables
-        print("Clearing Existing Data...")
-        sql = f"DELETE FROM {destination_table};"
-        pg_conn.execute(text(sql))
-
-        print("Committing Transaction.")
-        pg_conn.execute(text("COMMIT;"))
-    
-    """
-    print(df.head(2))
-
     # populate table
     print("Populating Table...")
     result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
@@ -120,7 +96,6 @@ def erddap_meta(metadata, attribute_name, row_type="attribute", var_name="NC_GLO
             f"IndexError (Not found?) extracting ERDDAP Metadata: attribute: {attribute_name}, row_type: {row_type}, var_name: {var_name}"
         )
         print(message)
-
     return return_value
     
 # For a given dataset find out if it has any variables of interest (via standard name)
@@ -203,8 +178,6 @@ def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
         time_col = find_df_column_by_standard_name(df, "time").columns.values[0]
         df[time_col] = pd.to_datetime(df[time_col])
         date_range = pd.date_range(min_time, max_time, freq="12H")
-        
-
         # Catch if part of the interval isn't in the range
         prev_interval = ""
         for interval in date_range:
@@ -232,7 +205,6 @@ def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
         print(dataset_id + " cached")
         return cached_entries
     except Exception as ex:
-    #except httpx.HTTPStatusError as ex:
          print("HTTPStatusError", ex)
          log.info(f" - No data found for time range: {min_time} - {max_time}")
     return cached_entries
@@ -253,7 +225,6 @@ def main():
     search_url = e.get_search_url(response="csv", min_time=min_time, max_time=max_time)
     search = pd.read_csv(search_url)
     dataset_list = search["Dataset ID"].values
-    #cached_data = []
 
     for dataset_id in dataset_list:
         # Interrogate each dataset for the list of variable names using the list 
@@ -261,11 +232,8 @@ def main():
         # will be skipped
         dataset = match_standard_names(dataset_id)
         if (dataset):
-            #cached_data.extend(cache_station_data(dataset, dataset_id, storm_id, min_time, max_time))
             cached_data = cache_station_data(dataset, dataset_id, storm_id, min_time, max_time)
             if(cached_data):
-                print("data found")
-                print(pg_erddap_cache_table)
                 cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_table,pg_engine=engine,table_schema=erddap_cache_schema)
         
     
