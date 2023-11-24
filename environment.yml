@@ -5,12 +5,12 @@ channels:
 dependencies:
   - numpy<1.20
   - tropycal
-  - erddapy
+  - erddapy==1.2.1
   - jupyter
   - cartopy
   - matplotlib
   - shapely
-  - pandas
+  - pandas==1.5.3
   - pip
   - python
 

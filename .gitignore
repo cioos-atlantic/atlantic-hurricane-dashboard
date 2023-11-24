@@ -14,17 +14,5 @@ venv/
 jupyter/postgis_schemas/.env
 
 IBTrACS/last-modified.txt
-sarracenia config_file/file_watcher_log.log
-sarracenia config_file/.env
-sarracenia config_file/TODO
-sarracenia config_file/file_watcher_log.log.1
-sarracenia config_file/file_watcher_log.log.2
-sarracenia config_file/file_watcher copy.py
-*.10
-*.3
-sarracenia config_file/file_watcher_log.log.9
-sarracenia config_file/file_watcher_log.log.8
-sarracenia config_file/file_watcher_log.log.7
-sarracenia config_file/file_watcher_log.log.6
-sarracenia config_file/file_watcher_log.log.4
-sarracenia config_file/file_watcher_log.log.5
+sarracenia config_file/*.log
+sarracenia config_file/*.log.*
