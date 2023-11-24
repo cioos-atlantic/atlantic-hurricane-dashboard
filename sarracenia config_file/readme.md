@@ -1,8 +1,8 @@
 ## Procedure
 
-- Build a conda environment with environment.yaml file 
+- Build a conda environment with environment.yaml file in the sarracenia config_file folder
 (Disclaimer: the environment.yaml file contains both conda and pip packages. If you 
-want to run only pip packages, then search the conda site for the pip package 
+want to run only conda packages, then search the conda site for the pip package 
 equivalent. Also be careful while installing conda packages after installing pip
  packages, things tend to break when that happens. Anyways, Goodluck!
 
