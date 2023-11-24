@@ -14,5 +14,5 @@ venv/
 jupyter/postgis_schemas/.env
 
 IBTrACS/last-modified.txt
-
-*.log
+sarracenia config_file/*.log
+sarracenia config_file/*.log.*
