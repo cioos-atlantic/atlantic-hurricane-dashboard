@@ -16,3 +16,6 @@ jupyter/postgis_schemas/.env
 IBTrACS/last-modified.txt
 sarracenia config_file/*.log
 sarracenia config_file/*.log.*
+
+*.log
+*.log.[0-9]*
