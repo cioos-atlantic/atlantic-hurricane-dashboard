@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
+import sys
 
 log = logging.getLogger('caching.log')
 handler = RotatingFileHandler('caching.log', maxBytes=2000, backupCount=10)
@@ -32,7 +33,7 @@ pg_user = os.getenv('PG_USER')
 pg_pass = os.getenv('PG_PASS')
 pg_db = os.getenv('PG_DB')
 pg_erddap_cache_table = os.getenv('PG_ERDDAP_CACHE_TABLE')
-erddap_cache_schema = Path("../jupyter/postgis_schemas/erddap_cache_schema.sql")#os.getenv('ERDDAP_CACHE_SCHEMA'))
+erddap_cache_schema = os.getenv('ERDDAP_CACHE_SCHEMA'))
 
 engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
@@ -216,11 +217,18 @@ def find_df_column_by_standard_name(df, standard_name):
     return column
 
 def main():
-    # Storm_id and time range to be used as input - hard coded for now to test functionality
-    storm_id = "2022_fiona"
-    # Date range for Hurricane FIONA (2022)
-    min_time = "2022-09-20T0:00:00Z"
-    max_time = "2022-09-30T0:00:00Z"
+    args = sys.argv[1:]
+
+    # Add variables for input from previous steps so it can run autonomously
+ 
+    storm_id = args[0]
+    min_time = args[1]
+    max_time = args[2]
+
+    # Storm takes format of "YYYY_stormname"
+    # Time takes format of "2023-02-15T12:56:07Z"
+
+    # Depending on how other tables are set up might also be worth running retrieval script within the code
 
     search_url = e.get_search_url(response="csv", min_time=min_time, max_time=max_time)
     search = pd.read_csv(search_url)
@@ -235,7 +243,6 @@ def main():
             cached_data = cache_station_data(dataset, dataset_id, storm_id, min_time, max_time)
             if(cached_data):
                 cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_table,pg_engine=engine,table_schema=erddap_cache_schema)
-        
     
 if __name__ == '__main__':
     main()
