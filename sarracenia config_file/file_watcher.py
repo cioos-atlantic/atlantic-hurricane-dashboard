@@ -12,6 +12,7 @@ from watchdog.events import FileSystemEventHandler
 import generate_bounds as gb
 import time
 import load_into_postgis as lpg
+from dotenv import load_dotenv
 
 logging.basicConfig(
         handlers=[RotatingFileHandler('./file_watcher_log.log', maxBytes=100000, backupCount=10)],
@@ -21,6 +22,9 @@ logging.basicConfig(
 
 logger= logging.getLogger(__name__)
 
+load_dotenv() 
+
+folder_path = os.getenv('ECCC_SHP_SOURCE')
 
 def on_created(event):
     # This occurs when a new file has been added or created
@@ -87,7 +91,8 @@ if __name__ == "__main__":
 
     #set to watch the shapefiles directory
     #path = os.path.abspath(os.path.join('..', 'shapefiles')) # to be configured
-    path= r"C:\Users\ceboigbe\Downloads\met\MetPX\sr3\hurricane" # test path
+    #path= r"/path/to/shapefiles/" # test path
+    path= folder_path
     
     observer = Observer()
     observer.schedule(event_handler, path, recursive=True) # recursive means it is monitoring everything in the sub folders so it should be left at True
