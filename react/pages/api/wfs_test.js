@@ -11,10 +11,10 @@ export default async function handler(req, res) {
     const source = req.query["source"]
     const source_type = req.query["source_type"]
 
-    console.log(storm_name, season, source)
+    console.log("handler", storm_name, season, source, source_type);
 
     try {
-        const result = await wfs_query(storm_name, season, source)
+        const result = await wfs_query(storm_name, season, source, source_type)
         res.status(200).json({ "storm_name": storm_name, "season": season, "source": source, "source_type": source_type, ...result })
     } catch (err) {
         res.status(500).json({ error: 'failed to load data' })
@@ -23,6 +23,8 @@ export default async function handler(req, res) {
 
 async function wfs_query(storm_name, season, source, source_type) {
     // https://dev.cioosatlantic.ca/geoserver/cioos-atlantic/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=cioos-atlantic%3Aibtracs_active_storms&maxFeatures=50&outputFormat=application%2Fjson
+    
+    console.log("wfs_query", storm_name, season, source, source_type);
 
     // Define base URL
     const base_url = "https://dev.cioosatlantic.ca/geoserver/ows?service=wfs&version=2.0.0";
@@ -38,25 +40,26 @@ async function wfs_query(storm_name, season, source, source_type) {
     if (storm_name && storm_name.trim().toUpperCase() != "") {
         cql_filter.push("NAME='" + storm_name.trim().toUpperCase() + "'");
     }
-
+    
     // Test if season is populated, if so add to array
     if (season) {
         cql_filter.push("SEASON=" + season);
     }
-
-    wfs_source = "ibtracs_historical_storms";
-    if (source_type.trim().toUpperCase == "ACTIVE") {
+    
+    let wfs_source = "ibtracs_historical_storms";
+    if (source_type !== undefined && source_type.trim().toUpperCase == "ACTIVE") {
         wfs_source = "ibtracs_active_storms";
     }
+    console.log(cql_filter, wfs_source);
 
     // Build final filter if 1 or more conditions have been added to the array, join with an AND
     // Otherwise, return an empty string representing no filter
     const final_filter = (cql_filter.length > 0) ? "&cql_filter=" + cql_filter.join(" AND ") : "";
-    console.log("Final Filter: ", final_filter)
+    console.log("Final Filter: ", final_filter);
 
     // Build final URL
     const get_features_url = base_url + "&request=GetFeature&typeName=cioos-atlantic%3A" + wfs_source + output_format + final_filter + property_list;
-    console.log("URL: ", get_features_url)
+    console.log("URL: ", get_features_url);
 
     // Fetch response
     const response = await fetch(get_features_url);
