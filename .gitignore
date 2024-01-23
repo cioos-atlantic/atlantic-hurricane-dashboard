@@ -17,10 +17,5 @@ IBTrACS/last-modified.txt
 sarracenia config_file/*.log
 sarracenia config_file/*.log.*
 
-<<<<<<< HEAD
 **caching.log**
 .env
-=======
-*.log
-*.log.[0-9]*
->>>>>>> main

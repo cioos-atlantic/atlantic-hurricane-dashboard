@@ -13,6 +13,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 import sys
+import argparse
 
 log = logging.getLogger('caching.log')
 handler = RotatingFileHandler('caching.log', maxBytes=2000, backupCount=10)
@@ -33,7 +34,7 @@ pg_user = os.getenv('PG_USER')
 pg_pass = os.getenv('PG_PASS')
 pg_db = os.getenv('PG_DB')
 pg_erddap_cache_table = os.getenv('PG_ERDDAP_CACHE_TABLE')
-erddap_cache_schema = os.getenv('ERDDAP_CACHE_SCHEMA'))
+erddap_cache_schema = os.getenv('ERDDAP_CACHE_SCHEMA')
 
 engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
@@ -217,16 +218,48 @@ def find_df_column_by_standard_name(df, standard_name):
     return column
 
 def main():
+    """
     args = sys.argv[1:]
 
     # Add variables for input from previous steps so it can run autonomously
  
-    storm_id = args[0]
-    min_time = args[1]
-    max_time = args[2]
+
+    """
+
+    from datetime import datetime
+
+    import re
+    def storm_format (arg_value, pattern=re.compile("[0-9]{4}_[a-z].*")):
+        if not pattern.match(arg_value):
+            raise argparse.ArgumentTypeError("invalid storm format")
+        return arg_value
+
+    def datetime_format (arg_value):
+        try:
+            datetime.strptime(arg_value, '%Y-%m-%dT%H:%M:%SZ')
+        except (ValueError):
+            raise argparse.ArgumentTypeError("invalid date format")
+        return arg_value
+
 
     # Storm takes format of "YYYY_stormname"
     # Time takes format of "2023-02-15T12:56:07Z"
+    parser = argparse.ArgumentParser("Parses args")
+    parser.add_argument("storm", help="The storm identifier, in the format of YYYY_stormname (lowercase). Example: 2022_fiona", type=storm_format)
+    parser.add_argument("min_time", help="The start time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
+    parser.add_argument("max_time", help="The end time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
+    
+    
+    args = parser.parse_args()
+    storm_id = args.storm
+    min_time = args.min_time
+    max_time = args.max_time
+
+    if(datetime.strptime(min_time, '%Y-%m-%dT%H:%M:%SZ') > datetime.strptime(max_time, '%Y-%m-%dT%H:%M:%SZ')):
+        raise argparse.ArgumentTypeError("End time is before start time")
+
+    # Min and max time in ISO format otherwise throw error (or can convert?)
+
 
     # Depending on how other tables are set up might also be worth running retrieval script within the code
 
@@ -243,6 +276,6 @@ def main():
             cached_data = cache_station_data(dataset, dataset_id, storm_id, min_time, max_time)
             if(cached_data):
                 cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_table,pg_engine=engine,table_schema=erddap_cache_schema)
-    
+
 if __name__ == '__main__':
     main()
