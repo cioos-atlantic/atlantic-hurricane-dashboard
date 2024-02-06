@@ -218,14 +218,6 @@ def find_df_column_by_standard_name(df, standard_name):
     return column
 
 def main():
-    """
-    args = sys.argv[1:]
-
-    # Add variables for input from previous steps so it can run autonomously
- 
-
-    """
-
     from datetime import datetime
 
     import re
