@@ -19,3 +19,4 @@ sarracenia config_file/*.log.*
 
 **caching.log**
 .env
+oryx-build-commands.txt
