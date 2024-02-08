@@ -8,7 +8,7 @@ import { el } from "date-fns/locale";
 export default async function handler(req, res) {
     const storm_name = req.query["storm_name"]
     const season = req.query["season"]
-    const source = req.query["source"]
+    const source = req.query["source"].split(",")
     const source_type = req.query["source_type"]
 
     console.log("handler", storm_name, season, source, source_type);
@@ -46,8 +46,26 @@ async function wfs_query(storm_name, season, source, source_type) {
         cql_filter.push("SEASON=" + season);
     }
     
+    let get_ibtracs = false;
+    let get_eccc = false;
+    let get_erddap = false;
+    
+    if (source.indexOf("IBTRACS") > -1){
+        get_ibtracs = true;
+    }
+
+    if (source.indexOf("ECCC") > -1){
+        get_eccc = true;
+    }
+
+    if (source.indexOf("ERDDAP") > -1){
+        get_erddap = true;
+    }
+    
+
+
     let wfs_source = "ibtracs_historical_storms";
-    if (source_type !== undefined && source_type.trim().toUpperCase == "ACTIVE") {
+    if (source_type !== undefined && source_type.trim().toUpperCase() == "ACTIVE") {
         wfs_source = "ibtracs_active_storms";
     }
     console.log(cql_filter, wfs_source);
