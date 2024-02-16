@@ -221,7 +221,7 @@ def main():
     from datetime import datetime
 
     import re
-    def storm_format (arg_value, pattern=re.compile("[0-9]{4}_[a-z].*")):
+    def storm_format (arg_value, pattern=re.compile("[0-9]{4}_[A-Z].*")):
         if not pattern.match(arg_value):
             raise argparse.ArgumentTypeError("invalid storm format")
         return arg_value
@@ -237,7 +237,7 @@ def main():
     # Storm takes format of "YYYY_stormname"
     # Time takes format of "2023-02-15T12:56:07Z"
     parser = argparse.ArgumentParser("Parses args")
-    parser.add_argument("storm", help="The storm identifier, in the format of YYYY_stormname (lowercase). Example: 2022_fiona", type=storm_format)
+    parser.add_argument("storm", help="The storm identifier, in the format of YYYY_stormname (uppercase). Example: 2022_fiona", type=storm_format)
     parser.add_argument("min_time", help="The start time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
     parser.add_argument("max_time", help="The end time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
     
