@@ -16,7 +16,7 @@ jupyter/postgis_schemas/.env
 IBTrACS/last-modified.txt
 sarracenia config_file/*.log
 sarracenia config_file/*.log.*
+oryx-build-commands.txt
 
 **caching.log**
 .env
-oryx-build-commands.txt
