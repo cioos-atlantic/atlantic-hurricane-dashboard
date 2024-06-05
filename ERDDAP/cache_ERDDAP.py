@@ -33,8 +33,10 @@ pg_port = os.getenv('PG_PORT')
 pg_user = os.getenv('PG_USER')
 pg_pass = os.getenv('PG_PASS')
 pg_db = os.getenv('PG_DB')
-pg_erddap_cache_table = os.getenv('PG_ERDDAP_CACHE_TABLE')
-erddap_cache_schema = os.getenv('ERDDAP_CACHE_SCHEMA')
+pg_erddap_historical_cache_table = os.getenv('ERDDAP_HISTORICAL_CACHE_TABLE')
+erddap_historical_cache_schema = os.getenv('ERDDAP_HISTORICAL_CACHE_SCHEMA')
+pg_erddap_active_cache_table = os.getenv('ERDDAP_ACTIVE_CACHE_TABLE')
+erddap_active_cache_schema = os.getenv('ERDDAP_ACTIVE_CACHE_SCHEMA')
 
 engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
@@ -217,8 +219,17 @@ def find_df_column_by_standard_name(df, standard_name):
     column = df.filter(regex='\(' + standard_name + '\|')#.columns.values[0]
     return column
 
+def get_recent_station_cache(dataset_id, timestamp, destination_table, pg_engine, table_schema):
+    print("Retrieving table data")
+    with pg_engine.begin() as pg_conn:
+        print("Getting table data")
+        sql = f'SELECT station_data FROM public.{destination_table} WHERE station=={dataset_id} AND min_time <= {timestamp} AND max_time>{timestamp}'
+        station_data = pg_conn.execute(text(sql))
+        print(station_data)
+    return station_data
+
 def main():
-    from datetime import datetime
+    from datetime import datetime, timedelta
 
     import re
     def storm_format (arg_value, pattern=re.compile("[0-9]{4}_[a-z].*")):
@@ -233,26 +244,48 @@ def main():
             raise argparse.ArgumentTypeError("invalid date format")
         return arg_value
 
+    # Seperate command for active and historical caching?
+
 
     # Storm takes format of "YYYY_stormname"
     # Time takes format of "2023-02-15T12:56:07Z"
+
+    ###Subparser, one active, one historical
     parser = argparse.ArgumentParser("Parses args")
-    parser.add_argument("storm", help="The storm identifier, in the format of YYYY_stormname (lowercase). Example: 2022_fiona", type=storm_format)
-    parser.add_argument("min_time", help="The start time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
-    parser.add_argument("max_time", help="The end time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
+
+    # Separate active and historical commands
+    subparsers = parser.add_subparsers(dest='subcommand')
+    subparsers.required = True  
+
+    parser_historical = subparsers.add_parser("historical")
+    parser_historical.add_argument("storm", help="The storm identifier, in the format of YYYY_stormname (lowercase). Example: 2022_fiona", type=storm_format)
+    parser_historical.add_argument("min_time", help="The start time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
+    parser_historical.add_argument("max_time", help="The end time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
     
+    parser_active = subparsers.add_parser("active")
+    parser_active.add_argument("command", help="Whether to repull recent station data or update the existing data in the db. Options: init, update")
     
     args = parser.parse_args()
-    storm_id = args.storm
-    min_time = args.min_time
-    max_time = args.max_time
+    active_storm = False
+    if(args.subcommand == 'historical'):
+        storm_id = args.storm
+        min_time = args.min_time
+        max_time = args.max_time
+        destination_table=pg_erddap_historical_cache_table
+        erddap_cache_schema=erddap_historical_cache_schema
 
-    if(datetime.strptime(min_time, '%Y-%m-%dT%H:%M:%SZ') > datetime.strptime(max_time, '%Y-%m-%dT%H:%M:%SZ')):
-        raise argparse.ArgumentTypeError("End time is before start time")
+        if(datetime.strptime(min_time, '%Y-%m-%dT%H:%M:%SZ') > datetime.strptime(max_time, '%Y-%m-%dT%H:%M:%SZ')):
+            raise argparse.ArgumentTypeError("End time is before start time")
+    else:
+        active_storm = True
+        storm_id = "active"
+        max_time = datetime.now()
+        min_time = datetime.strftime(max_time - timedelta(days=7),'%Y-%m-%dT%H:%M:%SZ')
+        max_time = datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ')
+        destination_table=pg_erddap_active_cache_table
+        erddap_cache_schema=erddap_active_cache_schema
 
     # Min and max time in ISO format otherwise throw error (or can convert?)
-
-
     # Depending on how other tables are set up might also be worth running retrieval script within the code
 
     search_url = e.get_search_url(response="csv", min_time=min_time, max_time=max_time)
@@ -265,9 +298,22 @@ def main():
         # will be skipped
         dataset = match_standard_names(dataset_id)
         if (dataset):
-            cached_data = cache_station_data(dataset, dataset_id, storm_id, min_time, max_time)
-            if(cached_data):
-                cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_table,pg_engine=engine,table_schema=erddap_cache_schema)
+            # Change this for historical vs active
+            # Just leave out storm_id for active?
+            # Active init vs update
+                # init - works as the same
+                # active - use UPDATE command
+            if(active_storm and args.command=="update"):
+                print("WIP")
+                # Gets min time from the newest data in the cache
+                # cached_data = update_cached_station(dataset, dataset_id, timestamp)
+            else:
+                cached_data = cache_station_data(dataset, dataset_id, storm_id, min_time, max_time)
+                print(cached_data)
+                #if(cached_data):
+                    #cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=destination_table,pg_engine=engine,table_schema=erddap_cache_schema)
+            #If update
+
 
 if __name__ == '__main__':
     main()
