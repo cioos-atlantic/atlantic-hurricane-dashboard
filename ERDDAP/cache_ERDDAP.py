@@ -51,40 +51,15 @@ table_dtypes = {
 } 
 
 #process_ibtracs(df = , destination_table=pg_ibtracs_active_table, pg_engine=engine, table_schema=erddap_cache_schema)
-def cache_erddap_data(df, destination_table, pg_engine, table_schema):
-    # Remove conflicting datasets
-
+def cache_erddap_data(df, destination_table, pg_engine, table_schema, replace=False):
     # populate table
     print("Populating Table...")
-    result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
-    print(result)
+    if_exists_action = 'append'
+    # Active storm table cleared on new data
+    if(replace):
+        if_exists_action = 'replace'
 
-    with pg_engine.begin() as pg_conn:
-        print("Updating Geometry...")
-        sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("min_lon", "min_lat"), 4326);'
-        pg_conn.execute(text(sql))
-
-        print("Committing Transaction.")
-        pg_conn.execute(text("COMMIT;"))
-        print("Fin.")
-
-    return
-
-#process_ibtracs(df = , destination_table=pg_ibtracs_active_table, pg_engine=engine, table_schema=erddap_cache_schema)
-def update_erddap_data(df, destination_table, pg_engine, table_schema, time):
-    with pg_engine.begin() as pg_conn:
-        # truncate tables
-        print("Clear existing time periods")
-        sql = f'DELETE FROM public.{destination_table} WHERE min_time == {time};'
-        pg_conn.execute(text(sql))
-
-        print("Committing Transaction.")
-        pg_conn.execute(text("COMMIT;"))
-
-    # populate table
-    print("Populating Table...")
-    result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
-    print(result)
+    result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists=if_exists_action, index=False, schema='public')
 
     with pg_engine.begin() as pg_conn:
         print("Updating Geometry...")
@@ -112,9 +87,6 @@ def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='publ
 
         print("Committing Transaction.")
         pg_conn.execute(text("COMMIT;"))
-
-def replace_on_conflict():
-    return
 
 # Extracts data from the erddap metadata Pandas dataframe, NC_GLOBAL and
 # row type attribute are assumed as defaults for variable specific values
@@ -252,18 +224,8 @@ def find_df_column_by_standard_name(df, standard_name):
     column = df.filter(regex='\(' + standard_name + '\|')#.columns.values[0]
     return column
 
-def get_recent_station_cache(dataset_id, timestamp, destination_table, pg_engine, table_schema):
-    print("Retrieving table data")
-    with pg_engine.begin() as pg_conn:
-        print("Getting table data")
-        sql = f'SELECT station_data FROM public.{destination_table} WHERE station=={dataset_id} AND min_time <= {timestamp} AND max_time>{timestamp}'
-        station_data = pg_conn.execute(text(sql))
-        print(station_data)
-    return station_data
-
 def main():
     from datetime import datetime, timedelta, timezone
-
     import re
     def storm_format (arg_value, pattern=re.compile("[0-9]{4}_[a-z].*")):
         if not pattern.match(arg_value):
@@ -276,9 +238,6 @@ def main():
         except (ValueError):
             raise argparse.ArgumentTypeError("invalid date format")
         return arg_value
-
-    # Seperate command for active and historical caching?
-
 
     # Storm takes format of "YYYY_stormname"
     # Time takes format of "2023-02-15T12:56:07Z"
@@ -296,21 +255,15 @@ def main():
     parser_historical.add_argument("max_time", help="The end time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
     
     parser_active = subparsers.add_parser("active")
-    parser_active.add_argument("command", help="Whether to repull recent station data or update the existing data in the db. Options: init, update")
+    parser_active.add_argument("command", help="Pulls station data from the past 7 days and replaces existing")
     
     args = parser.parse_args()
     # TODO Determine if storing storm data in separate tables or not
 
-    # Might just want to replace the table each time since figuring out if any new data has been added will be tricky to say the least
-        # Also don't have to worry about clearing older data
-
     if(args.subcommand == 'historical'):
         storm_id = args.storm
-        # TODO: Catch formatting errors with date
         min_time = datetime.strptime(args.min_time, '%Y-%m-%dT%H:%M:%SZ')
         max_time = datetime.strptime(args.max_time, '%Y-%m-%dT%H:%M:%SZ')
-        destination_table=pg_erddap_historical_cache_table
-        erddap_cache_schema=erddap_historical_cache_schema
         if(min_time > max_time ):
             raise argparse.ArgumentTypeError("End time is before start time")
     else:
@@ -322,8 +275,6 @@ def main():
         else:
             max_time = datetime.combine(max_time.date(), datetime.min.time()) + timedelta(hours=12)
         min_time = max_time - timedelta(days=7)
-        destination_table=pg_erddap_active_cache_table
-        erddap_cache_schema=erddap_active_cache_schema
 
     # Min and max time in ISO format otherwise throw error (or can convert?)
     # Depending on how other tables are set up might also be worth running retrieval script within the code
@@ -334,7 +285,6 @@ def main():
                                   max_time=datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ'))
     search = pd.read_csv(search_url)
     dataset_list = search["Dataset ID"].values  
-    print(dataset_list)
 
     for dataset_id in dataset_list:
         # Interrogate each dataset for the list of variable names using the list 
@@ -342,26 +292,17 @@ def main():
         # will be skipped
         dataset = match_standard_names(dataset_id)
         if (dataset):
-            # Change this for historical vs active
-            # Just leave out storm_id for active?
-            # Active init vs update
-                # init - works as the same
-                # active - use UPDATE command
             cached_data = cache_station_data(dataset, dataset_id, storm_id, 
                                                 min_time=datetime.strftime(min_time,'%Y-%m-%dT%H:%M:%SZ'), 
                                                 max_time=datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ'))
-            if(storm_id =="ACTIVE"):
-                print("active")
-                #update_erddap_data(df=pd.DataFrame(cached_data),destination_table=destination_table,pg_engine=engine,table_schema=erddap_cache_schema, time=min_time)
-
-                # Grab cached data from most recent interval only
-                # Don't append, update table
-            else:
-                print('historical')
-                #if(cached_data):
-                    #cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=destination_table,pg_engine=engine,table_schema=erddap_cache_schema)
-            #If update
-
+            if(cached_data and storm_id =="ACTIVE"):
+                    print("active")
+                    cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_active_cache_table,pg_engine=engine,
+                                      table_schema=erddap_active_cache_schema,replace=True)
+            elif(cached_data):
+                    print('historical')
+                    cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_historical_cache_table,pg_engine=engine,
+                                      table_schema=erddap_historical_cache_schema)
 
 if __name__ == '__main__':
     main()
