@@ -1,8 +1,8 @@
--- Table: public.erddap_cache
+-- Table: public.erddap_cache_active
 
--- DROP TABLE IF EXISTS public.erddap_cache;
+-- DROP TABLE IF EXISTS public.erddap_cache_active;
 
-CREATE TABLE IF NOT EXISTS public.erddap_cache
+CREATE TABLE IF NOT EXISTS public.erddap_cache_active
 (
     storm character varying(50) COLLATE pg_catalog."default" NOT NULL,
     station character varying(100) COLLATE pg_catalog."default" NOT NULL,
@@ -14,13 +14,13 @@ CREATE TABLE IF NOT EXISTS public.erddap_cache
     max_lat numeric NOT NULL,
     station_data text COLLATE pg_catalog."default" NOT NULL,
     geom geometry NOT NULL,
-    CONSTRAINT "PK_erddap_cache" PRIMARY KEY (storm, station, min_time, max_time)
+    CONSTRAINT "PK_erddap_cache_active" PRIMARY KEY (station, min_time)
 )
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.erddap_cache
+ALTER TABLE IF EXISTS public.erddap_cache_active
     OWNER to hurricane_dash;
 
-COMMENT ON TABLE public.erddap_cache
-    IS 'A table for caching storm data stored on CIOOS Atlantic ERDDAP servers';
+COMMENT ON TABLE public.erddap_cache_active
+    IS 'A table for caching recent station data stored on CIOOS Atlantic ERDDAP servers';
