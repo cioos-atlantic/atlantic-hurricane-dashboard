@@ -1,4 +1,4 @@
-Install NodeJS first.
+# Install NodeJS
 
 Use `npm install` to install necessary modules.
 
