@@ -268,7 +268,6 @@ def main():
     parser_active = subparsers.add_parser("active")
     
     args = parser.parse_args()
-    # TODO Determine if storing storm data in separate tables or not
 
     if(args.subcommand == 'historical'):
         storm_id = args.storm

@@ -270,4 +270,3 @@ dependencies:
     - typing-extensions==4.6.3
     - tzdata==2023.3
     - urllib3==2.0.4
-prefix: /home/jmclellan/miniconda3/envs/hurricane
