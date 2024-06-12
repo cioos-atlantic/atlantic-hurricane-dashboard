@@ -10,7 +10,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from sqlalchemy import create_engine, text
 import sys
 import argparse
@@ -26,17 +26,18 @@ server = config.get("ERDDAP", "server")
 standard_names = config.get("ERDDAP", "standard_names").splitlines()
 e = ERDDAP(server=server)
 
-load_dotenv()
+# Find env file
+load_dotenv(find_dotenv())
 
 pg_host = os.getenv('PG_HOST')
 pg_port = os.getenv('PG_PORT')
 pg_user = os.getenv('PG_USER')
 pg_pass = os.getenv('PG_PASS')
 pg_db = os.getenv('PG_DB')
-pg_erddap_historical_cache_table = os.getenv('ERDDAP_HISTORICAL_CACHE_TABLE')
-erddap_historical_cache_schema = os.getenv('ERDDAP_HISTORICAL_CACHE_SCHEMA')
-pg_erddap_active_cache_table = os.getenv('ERDDAP_ACTIVE_CACHE_TABLE')
-erddap_active_cache_schema = os.getenv('ERDDAP_ACTIVE_CACHE_SCHEMA')
+pg_erddap_cache_historical_table = os.getenv('ERDDAP_CACHE_HISTORICAL_TABLE')
+erddap_cache_historical_schema = os.getenv('ERDDAP_CACHE_HISTORICAL_SCHEMA')
+pg_erddap_cache_active_table = os.getenv('ERDDAP_CACHE_ACTIVE_TABLE')
+erddap_cache_active_schema = os.getenv('ERDDAP_CACHE_ACTIVE_SCHEMA')
 
 engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
@@ -59,12 +60,16 @@ def cache_erddap_data(df, destination_table, pg_engine, table_schema, replace=Fa
     if(replace):
         if_exists_action = 'replace'
 
-    result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists=if_exists_action, index=False, schema='public')
+    result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', 
+                       if_exists=if_exists_action, index=False, schema='public')
 
     with pg_engine.begin() as pg_conn:
+        # Unsure if needed, but causing issues as ALTER isn't adding the column in
+        """
         print("Updating Geometry...")
         sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("min_lon", "min_lat"), 4326);'
         pg_conn.execute(text(sql))
+        """
 
         print("Committing Transaction.")
         pg_conn.execute(text("COMMIT;"))
@@ -84,6 +89,10 @@ def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='publ
         if not table_exists:
             sql = Path(schema_file).read_text()
             pg_conn.execute(text(sql))
+
+        print(f"Adding geom column")
+        sql = f"ALTER TABLE {pg_schema}.{table_name} ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);"
+        pg_conn.execute(text(sql))
 
         print("Committing Transaction.")
         pg_conn.execute(text("COMMIT;"))
@@ -208,7 +217,9 @@ def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
                     "max_lat":max_lat, 
                     "station_data":station_data
                 }
-                cached_entries.append(entry)
+                # Avoids caching empty json strings (2 for the brackets)
+                if(len(station_data) > 2):
+                    cached_entries.append(entry)
                 # time in ISO format or set column to timestamp (UTC for timezone)
             prev_interval = interval
         print(dataset_id + " cached")
@@ -255,7 +266,6 @@ def main():
     parser_historical.add_argument("max_time", help="The end time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
     
     parser_active = subparsers.add_parser("active")
-    parser_active.add_argument("command", help="Pulls station data from the past 7 days and replaces existing")
     
     args = parser.parse_args()
     # TODO Determine if storing storm data in separate tables or not
@@ -276,33 +286,32 @@ def main():
             max_time = datetime.combine(max_time.date(), datetime.min.time()) + timedelta(hours=12)
         min_time = max_time - timedelta(days=7)
 
-    # Min and max time in ISO format otherwise throw error (or can convert?)
-    # Depending on how other tables are set up might also be worth running retrieval script within the code
-
     # Get datasets that have data within the times
-    # Not many realtime datasets
     search_url = e.get_search_url(response="csv", min_time=datetime.strftime(min_time,'%Y-%m-%dT%H:%M:%SZ'), 
                                   max_time=datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ'))
     search = pd.read_csv(search_url)
     dataset_list = search["Dataset ID"].values  
 
+    create_table_from_schema(pg_engine=engine, table_name=pg_erddap_cache_active_table, schema_file=erddap_cache_active_schema)
+    # Store in shared list to reduce calls and avoid overwriting for active cache
+    cached_data = []
     for dataset_id in dataset_list:
         # Interrogate each dataset for the list of variable names using the list 
         # of standard names above. If a dataset does not have any of those variables it
         # will be skipped
         dataset = match_standard_names(dataset_id)
         if (dataset):
-            cached_data = cache_station_data(dataset, dataset_id, storm_id, 
+            cached_data.extend(cache_station_data(dataset, dataset_id, storm_id, 
                                                 min_time=datetime.strftime(min_time,'%Y-%m-%dT%H:%M:%SZ'), 
-                                                max_time=datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ'))
-            if(cached_data and storm_id =="ACTIVE"):
-                    print("active")
-                    cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_active_cache_table,pg_engine=engine,
-                                      table_schema=erddap_active_cache_schema,replace=True)
-            elif(cached_data):
-                    print('historical')
-                    cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_historical_cache_table,pg_engine=engine,
-                                      table_schema=erddap_historical_cache_schema)
+                                                max_time=datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ')))
+    if(cached_data and storm_id =="ACTIVE"):
+            print("Caching active storm...")
+            cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_active_table,
+                                pg_engine=engine,table_schema=erddap_cache_active_schema,replace=True)
+    elif(cached_data):
+            print('Caching historical storm...')
+            cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_historical_table,
+                                pg_engine=engine,table_schema=erddap_cache_historical_schema)
 
 if __name__ == '__main__':
     main()
