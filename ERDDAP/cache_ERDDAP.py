@@ -39,6 +39,8 @@ erddap_cache_historical_schema = os.getenv('ERDDAP_CACHE_HISTORICAL_SCHEMA')
 pg_erddap_cache_active_table = os.getenv('ERDDAP_CACHE_ACTIVE_TABLE')
 erddap_cache_active_schema = os.getenv('ERDDAP_CACHE_ACTIVE_SCHEMA')
 
+active_data_period = config.getint('erddap_cache', 'active_data_period')
+
 engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
 table_dtypes = {
@@ -283,7 +285,7 @@ def main():
             max_time = datetime.combine(max_time.date(), datetime.min.time()) + timedelta(days=1)
         else:
             max_time = datetime.combine(max_time.date(), datetime.min.time()) + timedelta(hours=12)
-        min_time = max_time - timedelta(days=7)
+        min_time = max_time - timedelta(days=active_data_period)
 
     # Get datasets that have data within the times
     search_url = e.get_search_url(response="csv", min_time=datetime.strftime(min_time,'%Y-%m-%dT%H:%M:%SZ'), 
