@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS public."erddap_cache" (
     "min_lat" DECIMAL(7,4) NOT NULL,
     "max_lat" DECIMAL(7,4) NOT NULL,
     "station_data" TEXT NOT NULL,
-    PRIMARY KEY(storm, station, min_time, max_time));
+    PRIMARY KEY(storm, station, min_time));
