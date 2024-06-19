@@ -65,18 +65,18 @@ def cache_erddap_data(df, destination_table, pg_engine, table_schema, replace=Fa
     result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', 
                        if_exists=if_exists_action, index=False, schema='public')
 
-    with pg_engine.begin() as pg_conn:
-        # Unsure if needed, but causing issues as ALTER isn't adding the column in
-        """
+    with pg_engine.begin() as pg_conn:        
+        print(f"Adding geom column")
+        sql = f"ALTER TABLE public.{destination_table} ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);"
+        pg_conn.execute(text(sql))
+        
         print("Updating Geometry...")
         sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("min_lon", "min_lat"), 4326);'
         pg_conn.execute(text(sql))
-        """
 
         print("Committing Transaction.")
         pg_conn.execute(text("COMMIT;"))
         print("Fin.")
-
     return
 
 def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='public'):
