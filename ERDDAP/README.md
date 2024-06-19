@@ -42,15 +42,6 @@ ERDDAP_CACHE_TABLE = erddap_cache
 
 ## Running
 
-In progress
-
-- Use rundeck to trigger every hour / every day
-- Look through active_storms database and get data that's not already in the cache
-- Separate function to search through historic storms
-- Re-caching/clearing data beforehand
-- Add buffer to start/end times to get surrounding data
-- Start at 00:00 of the start date to standardize time ranges and avoid duplicate stations with slightly
-  different time ranges
 
 ## Logging
 
