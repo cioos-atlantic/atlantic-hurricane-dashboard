@@ -1,0 +1,4 @@
+.selected_storm a {
+    font-weight: bold;
+    text-decoration-line: overline underline;
+}

@@ -26,7 +26,7 @@ export const empty_storm_obj = {
 export default function Layout({ children, home, topNav, logo, active_storm_data, querystring }) {
 
   const [storms, setStorms] = useState([]);
-  const [selected_storm, setSelectedStorm] = useState({});
+  const [selected_storm, setSelectedStorm] = useState("");
   const [selected_forecast, setSelectedForecast] = useState({});
   const [storm_timeline, setStormTimeline] = useState([]);
   const [storm_points, setStormPoints] = useState(empty_storm_obj);
@@ -42,8 +42,8 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     [],
   );
 
-  console.log(querystring.storms)
-  console.log(active_storm_data.season)
+  // console.log(querystring.storms)
+  // console.log(active_storm_data.season)
 
   // const data = get_forecast_sources();
 
@@ -57,15 +57,36 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     setStorms(filtered_storms);
   }
 
-  function populateStormDetails(event, storm_obj) {
-    // console.log(event, storm_obj);
-    setSelectedStorm(storm_obj);
+  function populateStormDetails(event, storm_data) {
+    console.log("Set Selected storm to: " + storm_data.data[0].properties.NAME);
+    setSelectedStorm(storm_data.data[0].properties.NAME);
 
-    const filtered = forecasts.map(source => {
-       return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") 
-    })[0];
-    console.log(filtered[0]);
-    setStormTimeline(filtered);
+    // const filtered = forecasts.map(source => {
+    //    return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") 
+    // })[0];
+    setStormPoints(empty_storm_obj);
+    
+    // console.log(storm_obj);
+    let storm_features = {
+      pts:{features:[]},
+      err:{features:[]},
+      lin:{features:[]},
+      rad:{features:[]},
+    };
+    
+    for(var i in storm_data.data){
+      switch(storm_data.data[i].geometry.type){
+        case "Point":
+          storm_features.pts.features.push(storm_data.data[i])
+          break;
+        // case "LineString":
+        //   break;
+        // case "Polygon":
+        //   break;
+      }
+    }
+    
+    setStormPoints(storm_features);
   }
 
   function populateTimeline(event, storm_obj) {
@@ -115,6 +136,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
           {active_storms ? (
             <ActiveStormList 
               active_storm_data={active_storm_data}
+              onPopulateStormDetails={populateStormDetails}
             />
           ) : (
             <StormSearch
