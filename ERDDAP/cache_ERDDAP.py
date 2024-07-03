@@ -10,8 +10,10 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from sqlalchemy import create_engine, text
+import sys
+import argparse
 
 log = logging.getLogger('caching.log')
 handler = RotatingFileHandler('caching.log', maxBytes=2000, backupCount=10)
@@ -24,15 +26,20 @@ server = config.get("ERDDAP", "server")
 standard_names = config.get("ERDDAP", "standard_names").splitlines()
 e = ERDDAP(server=server)
 
-load_dotenv()
+# Find env file
+load_dotenv(find_dotenv())
 
 pg_host = os.getenv('PG_HOST')
 pg_port = os.getenv('PG_PORT')
 pg_user = os.getenv('PG_USER')
 pg_pass = os.getenv('PG_PASS')
 pg_db = os.getenv('PG_DB')
-pg_erddap_cache_table = os.getenv('PG_ERDDAP_CACHE_TABLE')
-erddap_cache_schema = Path("../jupyter/postgis_schemas/erddap_cache_schema.sql")#os.getenv('ERDDAP_CACHE_SCHEMA'))
+pg_erddap_cache_historical_table = os.getenv('ERDDAP_CACHE_HISTORICAL_TABLE')
+erddap_cache_historical_schema = os.getenv('ERDDAP_CACHE_HISTORICAL_SCHEMA')
+pg_erddap_cache_active_table = os.getenv('ERDDAP_CACHE_ACTIVE_TABLE')
+erddap_cache_active_schema = os.getenv('ERDDAP_CACHE_ACTIVE_SCHEMA')
+
+active_data_period = config.getint('erddap_cache', 'active_data_period')
 
 engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
@@ -47,13 +54,22 @@ table_dtypes = {
 } 
 
 #process_ibtracs(df = , destination_table=pg_ibtracs_active_table, pg_engine=engine, table_schema=erddap_cache_schema)
-def cache_erddap_data(df, destination_table, pg_engine, table_schema):
+def cache_erddap_data(df, destination_table, pg_engine, table_schema, replace=False):
     # populate table
     print("Populating Table...")
-    result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
-    print(result)
+    if_exists_action = 'append'
+    # Active storm table cleared on new data
+    if(replace):
+        if_exists_action = 'replace'
 
-    with pg_engine.begin() as pg_conn:
+    result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', 
+                       if_exists=if_exists_action, index=False, schema='public')
+
+    with pg_engine.begin() as pg_conn:        
+        print(f"Adding geom column")
+        sql = f"ALTER TABLE public.{destination_table} ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);"
+        pg_conn.execute(text(sql))
+        
         print("Updating Geometry...")
         sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("min_lon", "min_lat"), 4326);'
         pg_conn.execute(text(sql))
@@ -61,7 +77,6 @@ def cache_erddap_data(df, destination_table, pg_engine, table_schema):
         print("Committing Transaction.")
         pg_conn.execute(text("COMMIT;"))
         print("Fin.")
-
     return
 
 def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='public'):
@@ -76,6 +91,10 @@ def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='publ
         if not table_exists:
             sql = Path(schema_file).read_text()
             pg_conn.execute(text(sql))
+
+        print(f"Adding geom column")
+        sql = f"ALTER TABLE {pg_schema}.{table_name} ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);"
+        pg_conn.execute(text(sql))
 
         print("Committing Transaction.")
         pg_conn.execute(text("COMMIT;"))
@@ -144,6 +163,7 @@ def standardize_column_names(dataset, dataset_id):
         log.info(var, " => ", standard_name)
     return replace_cols
 
+# For active storms set id to ACTIVE
 def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
     # Once variable names have been 
     e.protocol = "tabledap"
@@ -151,7 +171,7 @@ def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
     e.variables = dataset["vars"]
     e.constraints = {
         "time>=": min_time,
-        "time<=": max_time
+        "time<": max_time
     }
     cached_entries = []
 
@@ -199,7 +219,9 @@ def cache_station_data(dataset, dataset_id, storm_id, min_time, max_time):
                     "max_lat":max_lat, 
                     "station_data":station_data
                 }
-                cached_entries.append(entry)
+                # Avoids caching empty json strings (2 for the brackets)
+                if(len(station_data) > 2):
+                    cached_entries.append(entry)
                 # time in ISO format or set column to timestamp (UTC for timezone)
             prev_interval = interval
         print(dataset_id + " cached")
@@ -216,26 +238,81 @@ def find_df_column_by_standard_name(df, standard_name):
     return column
 
 def main():
-    # Storm_id and time range to be used as input - hard coded for now to test functionality
-    storm_id = "2022_fiona"
-    # Date range for Hurricane FIONA (2022)
-    min_time = "2022-09-20T0:00:00Z"
-    max_time = "2022-09-30T0:00:00Z"
+    from datetime import datetime, timedelta, timezone
+    import re
+    def storm_format (arg_value, pattern=re.compile("[0-9]{4}_[a-z].*")):
+        if not pattern.match(arg_value):
+            raise argparse.ArgumentTypeError("invalid storm format")
+        return arg_value
 
-    search_url = e.get_search_url(response="csv", min_time=min_time, max_time=max_time)
+    def datetime_format (arg_value):
+        try:
+            datetime.strptime(arg_value, '%Y-%m-%dT%H:%M:%SZ')
+        except (ValueError):
+            raise argparse.ArgumentTypeError("invalid date format")
+        return arg_value
+
+    # Storm takes format of "YYYY_stormname"
+    # Time takes format of "2023-02-15T12:56:07Z"
+
+    ###Subparser, one active, one historical
+    parser = argparse.ArgumentParser("Parses args")
+
+    # Separate active and historical commands
+    subparsers = parser.add_subparsers(dest='subcommand')
+    subparsers.required = True  
+
+    parser_historical = subparsers.add_parser("historical")
+    parser_historical.add_argument("storm", help="The storm identifier, in the format of YYYY_stormname (lowercase). Example: 2022_fiona", type=storm_format)
+    parser_historical.add_argument("min_time", help="The start time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
+    parser_historical.add_argument("max_time", help="The end time of data in the storm interval. Format: YYYY-mm-ddTHH:MM:SSZ", type=datetime_format)
+    
+    parser_active = subparsers.add_parser("active")
+    
+    args = parser.parse_args()
+
+    if(args.subcommand == 'historical'):
+        storm_id = args.storm
+        min_time = datetime.strptime(args.min_time, '%Y-%m-%dT%H:%M:%SZ')
+        max_time = datetime.strptime(args.max_time, '%Y-%m-%dT%H:%M:%SZ')
+        if(min_time > max_time ):
+            raise argparse.ArgumentTypeError("End time is before start time")
+    else:
+        storm_id = "ACTIVE"
+        max_time = datetime.now(timezone.utc)
+        # Round maxtime up to nearest 12 hour interval
+        if(max_time.hour/12 >= 1):
+            max_time = datetime.combine(max_time.date(), datetime.min.time()) + timedelta(days=1)
+        else:
+            max_time = datetime.combine(max_time.date(), datetime.min.time()) + timedelta(hours=12)
+        min_time = max_time - timedelta(days=active_data_period)
+
+    # Get datasets that have data within the times
+    search_url = e.get_search_url(response="csv", min_time=datetime.strftime(min_time,'%Y-%m-%dT%H:%M:%SZ'), 
+                                  max_time=datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ'))
     search = pd.read_csv(search_url)
-    dataset_list = search["Dataset ID"].values
+    dataset_list = search["Dataset ID"].values  
 
+    create_table_from_schema(pg_engine=engine, table_name=pg_erddap_cache_active_table, schema_file=erddap_cache_active_schema)
+    # Store in shared list to reduce calls and avoid overwriting for active cache
+    cached_data = []
     for dataset_id in dataset_list:
         # Interrogate each dataset for the list of variable names using the list 
         # of standard names above. If a dataset does not have any of those variables it
         # will be skipped
         dataset = match_standard_names(dataset_id)
         if (dataset):
-            cached_data = cache_station_data(dataset, dataset_id, storm_id, min_time, max_time)
-            if(cached_data):
-                cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_table,pg_engine=engine,table_schema=erddap_cache_schema)
-        
-    
+            cached_data.extend(cache_station_data(dataset, dataset_id, storm_id, 
+                                                min_time=datetime.strftime(min_time,'%Y-%m-%dT%H:%M:%SZ'), 
+                                                max_time=datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ')))
+    if(cached_data and storm_id =="ACTIVE"):
+            print("Caching active storm...")
+            cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_active_table,
+                                pg_engine=engine,table_schema=erddap_cache_active_schema,replace=True)
+    elif(cached_data):
+            print('Caching historical storm...')
+            cache_erddap_data(df=pd.DataFrame(cached_data),destination_table=pg_erddap_cache_historical_table,
+                                pg_engine=engine,table_schema=erddap_cache_historical_schema)
+
 if __name__ == '__main__':
     main()
