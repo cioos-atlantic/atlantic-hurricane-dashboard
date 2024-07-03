@@ -14,13 +14,13 @@ CREATE TABLE IF NOT EXISTS public.erddap_cache_active
     max_lat numeric NOT NULL,
     station_data text COLLATE pg_catalog."default" NOT NULL,
     geom geometry(Point,4326),
-    CONSTRAINT "PK_erddap_cache_active" PRIMARY KEY (storm, station, min_time, max_time)
+    CONSTRAINT "PK_erddap_cache_active" PRIMARY KEY (station, min_time)
 )
 
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.erddap_cache_active
-    OWNER to hurricane_dash_service;
+    OWNER to hurricane_dash;
 
 COMMENT ON TABLE public.erddap_cache_active
-    IS 'A table for caching active storm data stored on CIOOS Atlantic ERDDAP servers';
+    IS 'A table for caching recent station data stored on CIOOS Atlantic ERDDAP servers';
