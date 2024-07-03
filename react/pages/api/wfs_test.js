@@ -108,10 +108,10 @@ export async function wfs_query(storm_name, season, source, source_type) {
         let eccc_filters = [];
         let eccc_sources = [];
 
-        eccc_sources.push("eccc_storm_error_cones")
-        eccc_sources.push("eccc_storm_lines")
+        // eccc_sources.push("eccc_storm_error_cones")
+        // eccc_sources.push("eccc_storm_lines")
         eccc_sources.push("eccc_storm_points")
-        eccc_sources.push("eccc_storm_wind_radii")
+        // eccc_sources.push("eccc_storm_wind_radii")
         
         console.debug("cioos-atlantic:" + eccc_sources.join(",cioos-atlantic:"));
 

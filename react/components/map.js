@@ -124,17 +124,20 @@ export default function Map({ children, storm_data }) {
             attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
           />
 
-          <WMSTileLayer
-            url="https://geo.weather.gc.ca/geomet"
-            layers='HURRICANE_RESPONSE_ZONE'
-            format='image/png'
-            transparent='true'
-            styles='HURRICANE_LINE_BLACK_DASHED'
-            attribution='<a href=&quot;https://www.canada.ca/en/environment-climate-change.html&quot;>ECCC</a>'
-            version='1.3.0'
-          />
-
           <LayersControl position="topright">
+            <LayersControl.Overlay checked name="ECCC Hurricane Response Zone">
+              <LayerGroup>
+                <WMSTileLayer
+                  url="https://geo.weather.gc.ca/geomet"
+                  layers='HURRICANE_RESPONSE_ZONE'
+                  format='image/png'
+                  transparent='true'
+                  styles='HURRICANE_LINE_BLACK_DASHED'
+                  attribution='<a href=&quot;https://www.canada.ca/en/environment-climate-change.html&quot;>ECCC</a>'
+                  version='1.3.0'
+                />
+              </LayerGroup>
+            </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Error Cone">
               <LayerGroup>
                 {
