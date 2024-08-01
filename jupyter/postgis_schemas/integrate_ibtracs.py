@@ -314,7 +314,7 @@ def process_ibtracs(source_csv_file:str, destination_table:str, pg_engine:Engine
             pg_conn.commit()
 
         except exc.SQLAlchemyError as ex:
-            print(f" - SQLAlchemyError: {ex.code}")
+            print(f" - SQLAlchemyError: {ex}")
             print(" - Rolling back Transaction.")
             pg_conn.rollback()
 
