@@ -9,6 +9,15 @@ from sqlalchemy import create_engine, text, Engine, exc
 from pathlib import Path
 from hashlib import md5
 
+# import logging
+# logging.basicConfig(
+#     filename="integrate_ibtracs.log", 
+#     filemode='w', 
+#     level=logging.DEBUG,
+#     format="%(asctime)s %(levelno)s %(funcName)s:%(lineno)d - %(message)s"
+# )
+# logging.info("Starting Process...")
+
 # Load environment variables
 load_dotenv()
 
@@ -207,32 +216,55 @@ table_dtypes = {
 def check_ibtracs_data_checksums():
     ibtracs_files = {}
 
-    # Parse md5 checksum test result file for paths and states of checksum results 
-    # for the associated files
-    with open(file=md5_test_file, mode='r') as md5_file:
-        for line in md5_file:
-            (file_path, checksum_result) = line.split(":")
-            
-            # Checksum result is stored in the results file but not the actual 
-            # checksum which is stored in the log file.
-            #
-            # Calculating the file checksum is relatively easy so this can be done
-            # at this stage rather than trying to coordinate another file calculate 
-            # checksum of file.
-            checksum = md5_file_checksum(file_path)
+    try:
+        # Parse md5 checksum test result file for paths and states of checksum results 
+        # for the associated files
+        with open(file=md5_test_file, mode='r') as md5_file:
+            for line in md5_file:
+                (file_path, checksum_result) = line.split(":")
+                
+                # Checksum result is stored in the results file but not the actual 
+                # checksum which is stored in the log file.
+                #
+                # Calculating the file checksum is relatively easy so this can be done
+                # at this stage rather than trying to coordinate another file calculate 
+                # checksum of file.
+                checksum = md5_file_checksum(file_path)
 
-            file_properties = {
-                "table":active_table,
-                "path":file_path.strip(),
-                "checksum":checksum,
-                "checksum_result":checksum_result.strip()
-            }
-            
-            if active_file in file_path:
-                ibtracs_files["active"] = file_properties
+                file_properties = {
+                    "table":active_table,
+                    "path":file_path.strip(),
+                    "checksum":checksum,
+                    "checksum_result":checksum_result.strip()
+                }
+                
+                if active_file in file_path:
+                    ibtracs_files["active"] = file_properties
 
-            if historical_file in file_path:
-                ibtracs_files["historical"] = file_properties
+                if historical_file in file_path:
+                    ibtracs_files["historical"] = file_properties
+
+    # except TypeError:
+    except FileNotFoundError:
+        print("MD5 signature not found, processing all files...")
+
+        active_file_properties = {
+            "table":active_table,
+            "path":active_file,
+            "checksum": None,
+            "checksum_result":"FAILED"
+        }
+
+        ibtracs_files["active"] = active_file_properties
+
+        historical_file_properties = {
+            "table":historical_table,
+            "path":historical_file,
+            "checksum": None,
+            "checksum_result":"FAILED"
+        }
+
+        ibtracs_files["historical"] = historical_file_properties
 
     return ibtracs_files
 
@@ -266,22 +298,23 @@ def process_files(ibtracs_files:dict, pg_engine:Engine):
 def process_ibtracs(source_csv_file:str, destination_table:str, pg_engine:Engine):
     df = pd.read_csv(filepath_or_buffer=source_csv_file, header=0, skiprows=skip_rows, parse_dates=True, dtype=table_dtypes, na_values=na_values, keep_default_na=False)
     
+    table_columns = pd.read_sql_table(destination_table, pg_engine).columns.drop('geom')
+    
     del_result = None
     ins_result = None
 
     # truncate tables
     with pg_engine.begin() as pg_conn:
         print(" - Clearing Existing Data...")
-        sql = f"DELETE FROM {destination_table};"
+        sql = f"TRUNCATE {destination_table};"
         
         try:
             del_result = pg_conn.execute(text(sql))
-            print(f" - Deleted {del_result.rowcount} rows")
             print(" - Committing Transaction.")
             pg_conn.commit()
 
         except exc.SQLAlchemyError as ex:
-            print(f" - SQLAlchemyError: {ex}")
+            print(f" - SQLAlchemyError: {ex.code}")
             print(" - Rolling back Transaction.")
             pg_conn.rollback()
 
@@ -289,7 +322,7 @@ def process_ibtracs(source_csv_file:str, destination_table:str, pg_engine:Engine
     # replacement data.
     if del_result:
         print(" - Populating Table...")
-        ins_result = df.to_sql(destination_table, pg_engine, chunksize=10000, method='multi', if_exists='append', index=False, schema='public')
+        ins_result = df[table_columns].to_sql(destination_table, pg_engine, chunksize=2500, method='multi', if_exists='append', index=False, schema='public')
         print(f" - Inserted {ins_result} rows")
         
         with pg_engine.begin() as pg_conn:

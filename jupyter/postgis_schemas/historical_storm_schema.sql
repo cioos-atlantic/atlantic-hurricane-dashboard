@@ -162,5 +162,6 @@ CREATE TABLE IF NOT EXISTS public."ibtracs_historical_storms" (
 	"USA_SEARAD_NW" DECIMAL(5), 
 	"STORM_SPEED" DECIMAL(5), 
 	"STORM_DIR" DECIMAL(5),
+	geom geometry(Point,4326),
 	PRIMARY KEY("SID", "ISO_TIME")
 );
