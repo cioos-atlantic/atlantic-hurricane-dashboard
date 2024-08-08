@@ -3,7 +3,7 @@ import React, { useState, useMemo } from "react";
 import { parseISO, format } from 'date-fns';
 import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, Polyline } from 'react-leaflet'
 import { useMap, useMapEvent, useMapEvents } from 'react-leaflet/hooks'
-import { Icon, DivIcon } from 'leaflet'
+import { Icon, DivIcon, Point } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
@@ -68,9 +68,13 @@ function PointDetails(point) {
   )
 }
 
-export default function Map({ children, storm_data }) {
+export default function Map({ children, storm_data, station_data }) {
+  // Add parameter for points
+  // Points always there, even not in storm seasons
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
-
+  console.log("Data");
+  console.log(storm_data);
+  console.log(station_data);
   const hurricon = new Icon({
     iconUrl: HurricaneIcon.src,
     iconRetinaUrl: HurricaneIcon.src,
@@ -84,6 +88,8 @@ export default function Map({ children, storm_data }) {
     iconSize: [28, 28],
     iconAnchor: [14, 14],
   });
+
+  const examplestationdata = new Point(44.59, -63.52);
 
   // Define error cone object and populate it if the appropriate object is 
   // defined in storm_data, Leaflet requires the coordinates be flipped from 
@@ -151,7 +157,8 @@ export default function Map({ children, storm_data }) {
                 {
                   storm_data.pts.features.map(point => {
                     // console.log(point);
-                    const position = flip_coords(point.geometry.coordinates);
+                    //const position = flip_coords(point.geometry.coordinates);
+                    const position = [46.9736, -54.69528]
                     return (
                       <Marker
                         key={point.properties.TIMESTAMP}
@@ -164,6 +171,13 @@ export default function Map({ children, storm_data }) {
                       </Marker>
                     );
                   })
+                }
+              </LayerGroup>
+            </LayersControl.Overlay>
+            <LayersControl.Overlay checked name="Stations">
+              <LayerGroup>
+                { 
+                  <Marker key={"Test"} position={[46.9736, -54.69528]}></Marker>
                 }
               </LayerGroup>
             </LayersControl.Overlay>
