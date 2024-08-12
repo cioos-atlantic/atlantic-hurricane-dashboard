@@ -59,13 +59,13 @@ table_dtypes = {
 def cache_erddap_data(df, destination_table, pg_engine, table_schema, replace=False):
     # populate table
     print("Populating Table...")
-    if_exists_action = 'append'
-    # Active storm table cleared on new data
-    if(replace):
-        if_exists_action = 'replace'
+
+    with pg_engine.begin() as pg_conn: 
+        sql = f"TRUNCATE public.{destination_table};"
+        pg_conn.execute(text(sql))
 
     result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', 
-                       if_exists=if_exists_action, index=False, schema='public')
+                       if_exists='append', index=False, schema='public')
 
     with pg_engine.begin() as pg_conn:        
         print(f"Adding geom column")
