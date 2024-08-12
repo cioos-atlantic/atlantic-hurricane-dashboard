@@ -75,9 +75,6 @@ export async function wfs_query(storm_name, season, source, source_type) {
         get_erddap = true;
     }
 
-    console.log(source.indexOf("ERDDAP"))
-    console.log(get_erddap)
-
     // cioos-atlantic:ibtracs_active_storms
     // cioos-atlantic:ibtracs_historical_storms
     if(get_ibtracs){
@@ -136,9 +133,9 @@ export async function wfs_query(storm_name, season, source, source_type) {
     if(get_erddap){
         console.debug("Getting ERDDAP data")
         // cioos-atlantic:erddap_cache
-        wfs_sources.push("erddap_cache")
+        wfs_sources.push("erddap_cache_active")
 
-        let erddap_source = "erddap_cache"
+        let erddap_source = "erddap_cache_active"
         const erddap_features_url = build_wfs_query("cioos-atlantic:" + erddap_source, [])
 
         console.debug("ERDDAP URL: ", erddap_features_url)
@@ -185,6 +182,5 @@ function build_wfs_query(source, filters, output_format="application/json", base
 async function fetch_wfs_data(url){
     const response = await fetch(url);
     const data = await response.json();
-
     return data; 
 }
