@@ -232,16 +232,18 @@ def check_ibtracs_data_checksums():
                 checksum = md5_file_checksum(file_path)
 
                 file_properties = {
-                    "table":active_table,
+                    "table":"",
                     "path":file_path.strip(),
                     "checksum":checksum,
                     "checksum_result":checksum_result.strip()
                 }
                 
                 if active_file in file_path:
+                    file_properties["table"] = active_table
                     ibtracs_files["active"] = file_properties
 
                 if historical_file in file_path:
+                    file_properties["table"] = historical_table
                     ibtracs_files["historical"] = file_properties
 
     # except TypeError:
