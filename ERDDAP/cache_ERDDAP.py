@@ -39,6 +39,8 @@ erddap_cache_historical_schema = os.getenv('ERDDAP_CACHE_HISTORICAL_SCHEMA')
 pg_erddap_cache_active_table = os.getenv('ERDDAP_CACHE_ACTIVE_TABLE')
 erddap_cache_active_schema = os.getenv('ERDDAP_CACHE_ACTIVE_SCHEMA')
 
+docker_user = {'docker'}
+
 active_data_period = config.getint('erddap_cache', 'active_data_period')
 
 engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
@@ -72,6 +74,12 @@ def cache_erddap_data(df, destination_table, pg_engine, table_schema, replace=Fa
         
         print("Updating Geometry...")
         sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("min_lon", "min_lat"), 4326);'
+        pg_conn.execute(text(sql))
+
+        # TODO: Add users to env file. Caused errors when attempting through variable
+        print("Providing docker with permissions...")
+        sql = f"GRANT ALL ON public.{destination_table} TO docker;"
+        sql = f"GRANT SELECT ON public.{destination_table} TO hurricane_dash_geoserver;"
         pg_conn.execute(text(sql))
 
         print("Committing Transaction.")
