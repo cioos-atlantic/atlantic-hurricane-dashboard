@@ -25,12 +25,10 @@ export const empty_storm_obj = {
 };
 
 export const empty_station_obj = {
-  station_name:"",
-  lat:44.64,
-  lon:-63.56
+  pts:{features:[]}
 };
 
-export default function Layout({ children, home, topNav, logo, active_storm_data, querystring }) {
+export default function Layout({ children, home, topNav, logo, active_storm_data, station_data, querystring }) {
 
   const [storms, setStorms] = useState([]);
   const [selected_storm, setSelectedStorm] = useState("");
@@ -51,7 +49,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     [],
   );
 
-  <main><MapWithNoSSR station_data={station_points}></MapWithNoSSR></main>
+  <main><MapWithNoSSR station_data={station_data}></MapWithNoSSR></main>
   
 
   // console.log(querystring.storms)
@@ -100,18 +98,6 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     }
     
     setStormPoints(storm_features);
-  }
-
-  function populateStationData(event, station_data){
-    // Just focus on drawing the points for now
-    // Attach the other data at a later point
-    console.log("Populating station data" + station_data);
-    let station_features={
-      station_name:"test",
-      lon:44.65,
-      lat:-63.57
-    };
-    setStationPoints(station_features);
   }
 
   function populateTimeline(event, storm_obj) {
@@ -176,7 +162,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
             />
           )}
         </Drawer>
-        <MapWithNoSSR storm_data={storm_points} station_data={station_points}></MapWithNoSSR>
+        <MapWithNoSSR storm_data={storm_points} station_data={station_data}></MapWithNoSSR>
       </main>
       <footer>
         <FooterNav></FooterNav>

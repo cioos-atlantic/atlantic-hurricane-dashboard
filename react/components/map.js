@@ -58,7 +58,6 @@ function PointDetails(point) {
         <p><strong>Storm Type:</strong> {storm_types[point.properties.STORMTYPE]}</p>
         <p><strong>Storm Status:</strong> {point.properties.TCDVLP}</p>
         <p><strong>Storm Force:</strong> {point.properties.STORMFORCE}</p>
-        <p><strong>Timestamp:</strong> {format(parseISO(point.properties.TIMESTAMP), 'PP pp X')}</p>
         <p><strong>Lat/Long:</strong> {point.properties.LAT}&deg; N, {point.properties.LON}&deg; W</p>
         <p><strong>Max Windspeed:</strong> {point.properties.MAXWIND} knots ({(point.properties.MAXWIND * 1.84).toFixed(2)} km/h)</p>
         <p><strong>Pressure:</strong> {point.properties.MSLP}mb</p>
@@ -73,7 +72,7 @@ export default function Map({ children, storm_data, station_data }) {
   // Points always there, even not in storm seasons
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
   console.log("Data");
-  console.log(storm_data);
+  console.log(Object.entries(station_data));
   console.log(station_data);
   const hurricon = new Icon({
     iconUrl: HurricaneIcon.src,
@@ -89,7 +88,8 @@ export default function Map({ children, storm_data, station_data }) {
     iconAnchor: [14, 14],
   });
 
-  const examplestationdata = new Point(44.59, -63.52);
+  //let station_markers = [];
+  //station_data.forEach((element, i) => station_markers[i] = Marker([element.geometry.coordinates[0], element.geometry.coordinates[1]]));
 
   // Define error cone object and populate it if the appropriate object is 
   // defined in storm_data, Leaflet requires the coordinates be flipped from 
@@ -119,7 +119,6 @@ export default function Map({ children, storm_data, station_data }) {
     <div className="map_container">
       <div className='inner_container'>
         {PointDetails(hover_marker)}
-
         <MapContainer
           center={defaultPosition}
           zoom={defaultZoom}
@@ -177,7 +176,14 @@ export default function Map({ children, storm_data, station_data }) {
             <LayersControl.Overlay checked name="Stations">
               <LayerGroup>
                 { 
-                  <Marker key={"Test"} position={[46.9736, -54.69528]}></Marker>
+                  Object.entries(station_data).map((element, i) => {
+                    return (
+                      <Marker 
+                        key={element.station} 
+                        position={flip_coords(element[1].geometry.coordinates)}
+                        ></Marker>
+                    )
+                  })
                 }
               </LayerGroup>
             </LayersControl.Overlay>

@@ -36,26 +36,30 @@ export async function getStaticProps() {
   // const forecast_sources = getAllStormData();
   const resource = await fetch(process.env.BASE_URL + '/api/active_storms')
   const active_storm_data = await resource.json()
+
+  const station_resource = await fetch(process.env.BASE_URL + '/api/query_stations')
+  const station_data = await station_resource.json()
   
   // The value of the `props` key will be
   //  passed to the `Home` component
   return {
     props: {
-      active_storm_data: active_storm_data
+      active_storm_data: active_storm_data,
+      station_data : station_data
     }
   }
 }
 
 
 
-export default function StormDashboard({ active_storm_data }) {
+export default function StormDashboard({ active_storm_data, station_data }) {
   const router = useRouter()
   const qs = queryString.parseUrl(process.env.BASE_URL + router.asPath)
   
   // console.log("STORM TYPE: " + qs.query.storms)
 
   return (
-    <Layout topNav={top_nav} logo={logo} active_storm_data={active_storm_data} querystring={qs} >
+    <Layout topNav={top_nav} logo={logo} active_storm_data={active_storm_data} station_data={station_data} querystring={qs} >
 
     </Layout>
   )
