@@ -39,6 +39,50 @@ function flip_coords(coordinates) {
 
 const empty_point_obj = { properties: {}, geometry: {} }
 
+function WindDirection(dir_val){
+  // 0 = North, 90 = East, 180 = South, 270 = West
+  // Draw an arrow on a circle? (Up / 0 = North, Right / 90 = East, etc.)
+  return
+}
+
+function RecentStationData(data){
+  const station_data = JSON.parse(data)
+  const len = Object.keys(station_data).length
+  var data_obj = {}
+  // Will always be most recently added
+  Object.keys(station_data[len-1]).forEach(element => {
+    const value = station_data[len-1][element]
+    if (element.includes('(time|')) {
+      const datetime = new Date(value * 1).toString()
+      data_obj['datetime'] = datetime
+    }
+    else{
+        //Matches standard name
+        //Name (standard_name | units | long_name)
+        const regex = "\\((.*?)\\|"
+        const match = element.match(regex)
+        data_obj[match[1]] = value
+    }
+  })
+  // Update to conditional rendering
+  // Create function to match either standard or long name
+  // How to match when multiple matches exist?
+  // Something to calculate wind direction
+  const output = (
+    <div className="station_pane">
+      <p><b>Data taken: </b>{data_obj['datetime']}</p>
+      <p><strong>Wind speed:</strong> {(parseFloat(data_obj['wind_speed']).toFixed(2))} m/s</p>
+      <p><strong>Wind direction:</strong> {data_obj['wind_from_direction']}</p>
+      <p><strong>Wave height avg:</strong> {data_obj['sea_surface_wave_significant_height']}m</p>
+      <p><strong>Wave height max:</strong> {data_obj['sea_surface_wave_maximum_height']}m</p>
+      <p><strong>Pressure:</strong> {data_obj['air_pressure']} hPa</p>
+      <p><strong>Air temperature:</strong> {(parseFloat(data_obj['air_temperature']).toFixed(1))} °C</p>
+      <p><strong>Sea temperature:</strong> {(parseFloat(data_obj['sea_surface_temperature']).toFixed(1))} °C</p>
+    </div>
+  )
+  return output
+}
+
 function PointDetails(point) {
   const storm_types = [
     "Tropical Depression",
@@ -176,12 +220,25 @@ export default function Map({ children, storm_data, station_data }) {
             <LayersControl.Overlay checked name="Stations">
               <LayerGroup>
                 { 
-                  Object.entries(station_data).map((element, i) => {
+                  Object.entries(station_data).map((element) => {
+                    const data_link = "/station_data/" + element[0]
+                    const data = RecentStationData(element[1].properties.station_data)
                     return (
                       <Marker 
                         key={element.station} 
                         position={flip_coords(element[1].geometry.coordinates)}
-                        ></Marker>
+                        //eventHandlers={{click : )}}
+                        >
+                          <Popup> 
+                            <p>
+                              <h3>Station Details</h3>
+                              <b>{element[1].properties.station}</b><br />
+                              {element[1].geometry.coordinates[0]}, {element[1].geometry.coordinates[1]}<br />
+                              {data}
+                            </p>
+                            <a href={data_link} target="_blank">Full data</a>
+                          </Popup>
+                        </Marker>
                     )
                   })
                 }
