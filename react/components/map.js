@@ -14,6 +14,44 @@ import TropicalStormIcon from '../public/tropical-storm.svg'
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
 
+const hurricane_categories = {
+  "5":{
+    "min":157,
+    "max":null,
+    "name": {"en": "Category 5", "fr": "catégorie 5"}
+  },
+  "4":{
+    "min":113,
+    "max":136,
+    "name": {"en": "Category 4", "fr": "catégorie 4"}
+  },
+  "3":{
+    "min":96,
+    "max":112,
+    "name": {"en": "Category 3", "fr": "catégorie 3"}
+  },
+  "2":{
+    "min":83,
+    "max":95,
+    "name": {"en": "Category 2", "fr": "catégorie 2"}
+  },
+  "1":{
+    "min":64,
+    "max":82,
+    "name": {"en": "Category 1", "fr": "catégorie 1"}
+  },
+  "TS":{
+    "min":34,
+    "max":63,
+    "name": {"en": "Tropical Storm", "fr": "Tempête tropicale"}
+  },
+  "TD":{
+    "min": 33,
+    "max": null,
+    "name": {"en": "Tropical Depression", "fr": "Dépression tropicale"}
+  },
+}
+
 /**
  * Flips an array of coordinate arrays, simply flips the order of each 
  * element of the larger list of coordinates
@@ -36,33 +74,73 @@ function flip_coords(coordinates) {
   return ([coordinates[1], coordinates[0]]);
 }
 
+/**
+ * Because multiple sources are in play with different names for different 
+ * values a list of candidates need to be supplied to be iterated through to 
+ * return the one with an actual, usable value in it.
+ * 
+ * @param {object} point the storm point object
+ * @param {array} property_list list of properties that may have the appropriate value
+ */
+function fetch_value(point, property_list){
+  let return_value = null;
+
+  property_list.forEach((value) => {
+    if (point.properties[value] !== undefined && point.properties[value] !== null){
+      return_value = point.properties[value];
+    }
+  });
+
+  return return_value;
+}
+
 
 const empty_point_obj = { properties: {}, geometry: {} }
 
 function PointDetails(point) {
-  const storm_types = [
-    "Tropical Depression",
-    "Tropical Storm",
-    "Hurricane",
-    "Post-Tropical",
-  ];
+  // ECCC and IBTRACS have multiple ways to define a storm type, some overlap and others are unique
+  const storm_types = {
+    "MX": "Mixture",
+    "NR": "Not Reported",
+    "SS": "Subtropical Storm",
+    "ET": "Extratropical Storm",
+    "DS": "Disturbance",
+    "TD": "Tropical Depression",
+    "TS": "Tropical Storm",
+    "HU": "Hurricane",
+    "HR": "Hurricane",
+    "PT": "Post-Tropical Storm",
+  };
 
   if (point == empty_point_obj) {
     return (<></>);
   }
 
+  // ECCC and IBTRACS use different names for the same kinds of information.  Sometimes, within IBTRACS, several different fields may possibly contain the appropriate value
+  // ECCC uses TIMESTAMP and IBTRACS uses ISO_TIME
+  const TIMESTAMP = fetch_value(point, ["TIMESTAMP", "ISO_TIME"]);
+  const STORMNAME = fetch_value(point, ["STORMNAME", "NAME"]);
+  const STORMTYPE = fetch_value(point, ["STORMTYPE", "NATURE"]);
+  const STORMFORCE = fetch_value(point, ["STORMFORCE", "USA_SSHS"]);
+  const MAXWIND = fetch_value(point, ["MAXWIND", "WMO_WIND", "USA_WIND"]);
+  const MINPRESS = fetch_value(point, ["MSLP", "WMO_PRES", "USA_PRES"]);
+
+
   return (
     <div className="info_pane">
       <div>
-        <h3>{point.properties.STORMNAME}</h3>
-        <p><strong>Storm Type:</strong> {storm_types[point.properties.STORMTYPE]}</p>
+        <h3>{STORMNAME}</h3>
+        <p><strong>Storm Type:</strong> {storm_types[STORMTYPE]}</p>
         <p><strong>Storm Status:</strong> {point.properties.TCDVLP}</p>
-        <p><strong>Storm Force:</strong> {point.properties.STORMFORCE}</p>
-        <p><strong>Timestamp:</strong> {format(parseISO(point.properties.TIMESTAMP), 'PP pp X')}</p>
+        <p><strong>Storm Category:</strong> {STORMFORCE}</p>
+        <p><strong>Timestamp:</strong> {format(parseISO(TIMESTAMP), 'PP pp X')}</p>
         <p><strong>Lat/Long:</strong> {point.properties.LAT}&deg; N, {point.properties.LON}&deg; W</p>
-        <p><strong>Max Windspeed:</strong> {point.properties.MAXWIND} knots ({(point.properties.MAXWIND * 1.84).toFixed(2)} km/h)</p>
-        <p><strong>Pressure:</strong> {point.properties.MSLP}mb</p>
-        <p><strong>Error radius :</strong> {point.properties.ERRCT} nmi ({(point.properties.ERRCT * 1.852).toFixed(2)} km)</p>
+        <p><strong>Max Windspeed:</strong> {MAXWIND} knots ({(MAXWIND * 1.84).toFixed(2)} km/h)</p>
+        <p><strong>Pressure:</strong> {MINPRESS}mb</p>
+        {
+          point.properties.ERRCT &&
+          <p><strong>Error radius :</strong> {point.properties.ERRCT} nmi ({(point.properties.ERRCT * 1.852).toFixed(2)} km)</p>
+        }
       </div>
     </div>
   )

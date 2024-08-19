@@ -164,7 +164,7 @@ function build_wfs_query(source, filters, output_format="application/json", base
     console.debug();
 
     output_format = "&outputFormat=" + encodeURI(output_format);
-    const final_filter = "&cql_filter=" + filters.join(";");
+    const final_filter = "&cql_filter=" + filters.join(" AND ");
     const url = base_url + "&request=GetFeature&typeName=" + source + output_format + final_filter;
 
     return url;

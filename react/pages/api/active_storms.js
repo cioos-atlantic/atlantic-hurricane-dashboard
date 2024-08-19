@@ -1,8 +1,8 @@
 import { wfs_query } from "./wfs_test"
 
 export default async function handler(req, res) {
-    const storm_name = ""
     // (cql_filter.length > 0) ? "&cql_filter=" + cql_filter.join(";") : "";
+    const storm_name = (req.query["name"]) ? req.query["name"] : "";
     const season = (req.query["season"]) ? req.query["season"] : new Date().getFullYear();
     const source = ["IBTRACS", "ECCC"];
     const source_type = "ACTIVE";
