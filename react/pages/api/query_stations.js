@@ -1,15 +1,24 @@
+import { wfs_query } from "./wfs_test";
 
 export default async function handler(req, res) {
-    const storm_name = req.query["storm_name"]
-    const season = req.query["season"]
-    const source = req.query["source"]
-    const source_type = req.query["source_type"]
+    const source = ["ERDDAP"]
+    const source_type = "ACTIVE"
 
-    console.log("handler", storm_name, season, source, source_type);
 
     try {
+        console.log("handler", source, source_type);
+        /*
         const result = await wfs_query(storm_name, season, source, source_type)
         res.status(200).json({ "storm_name": storm_name, "season": season, "source": source, "source_type": source_type, ...result })
+        */
+        const result = await wfs_query("","",source,source_type)
+        console.log('getting features...')
+        let station_recent = {}
+        const features = result['erddap_data']['features']
+        for (let feature in features){
+            station_recent[features[feature]['properties']['station']] = features[feature]
+        }
+        res.status(200).json(station_recent)
     } catch (err) {
         res.status(500).json({ error: 'failed to load data' })
     }

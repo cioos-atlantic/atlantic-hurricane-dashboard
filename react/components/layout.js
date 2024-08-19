@@ -11,8 +11,9 @@ import StormSearch from "@/components/storm_search";
 import ActiveStormList from "@/components/active_storm_list";
 
 import dynamic from "next/dynamic";
-// import storm_list from '../data/forecasts/list.json'
+import storm_list from '../data/forecasts/list.json'
 
+import ErddapHandler from "../pages/api/query_stations";
 
 export const siteTitle = 'Atlantic Hurricane Dashboard'
 
@@ -23,6 +24,12 @@ export const empty_storm_obj = {
   rad:{features:[]},
 };
 
+export const empty_station_obj = {
+  station_name:"",
+  lat:44.64,
+  lon:-63.56
+};
+
 export default function Layout({ children, home, topNav, logo, active_storm_data, querystring }) {
 
   const [storms, setStorms] = useState([]);
@@ -30,6 +37,8 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
   const [selected_forecast, setSelectedForecast] = useState({});
   const [storm_timeline, setStormTimeline] = useState([]);
   const [storm_points, setStormPoints] = useState(empty_storm_obj);
+  const [station_points, setStationPoints] = useState([empty_station_obj]);
+
   
   // useMemo() tells React to "memorize" the map component.
   // Wthout this, the map will get redrawn by many interactions 
@@ -42,12 +51,15 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     [],
   );
 
+  <main><MapWithNoSSR station_data={station_points}></MapWithNoSSR></main>
+  
+
   // console.log(querystring.storms)
   // console.log(active_storm_data.season)
 
   // const data = get_forecast_sources();
 
-  function updateStormList(event) {
+  function updateStormList(event) { 
     const filtered_storms = event.target.value != "" ? storm_list.filter(storm => {
       const storm_index = storm.name + storm.year;
       return (
@@ -55,6 +67,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     }) : [];
 
     setStorms(filtered_storms);
+    
   }
 
   function populateStormDetails(event, storm_data) {
@@ -87,6 +100,18 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     }
     
     setStormPoints(storm_features);
+  }
+
+  function populateStationData(event, station_data){
+    // Just focus on drawing the points for now
+    // Attach the other data at a later point
+    console.log("Populating station data" + station_data);
+    let station_features={
+      station_name:"test",
+      lon:44.65,
+      lat:-63.57
+    };
+    setStationPoints(station_features);
   }
 
   function populateTimeline(event, storm_obj) {
@@ -151,7 +176,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
             />
           )}
         </Drawer>
-        <MapWithNoSSR storm_data={storm_points}></MapWithNoSSR>
+        <MapWithNoSSR storm_data={storm_points} station_data={station_points}></MapWithNoSSR>
       </main>
       <footer>
         <FooterNav></FooterNav>
