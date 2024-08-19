@@ -11,6 +11,12 @@ import StormSearch from "@/components/storm_search";
 import ActiveStormList from "@/components/active_storm_list";
 
 import dynamic from "next/dynamic";
+
+// NOTE:  This data and form was used early on for 
+//        testing purposes and will be removed.
+//        
+//        The data represented here should be swapped 
+//        out in favour of data from the WFS service
 import storm_list from '../data/forecasts/list.json'
 
 import ErddapHandler from "../pages/api/query_stations";

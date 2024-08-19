@@ -150,9 +150,11 @@ export default function Map({ children, storm_data, station_data }) {
   // Add parameter for points
   // Points always there, even not in storm seasons
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
-  console.log("Data");
-  console.log(storm_data);
-  console.log(station_data);
+  
+  // console.log("Data");
+  // console.log(storm_data);
+  // console.log(station_data);
+
   const hurricon = new Icon({
     iconUrl: HurricaneIcon.src,
     iconRetinaUrl: HurricaneIcon.src,
@@ -234,9 +236,7 @@ export default function Map({ children, storm_data, station_data }) {
               <LayerGroup>
                 {
                   storm_data.pts.features.map(point => {
-                    // console.log(point);
-                    //const position = flip_coords(point.geometry.coordinates);
-                    const position = [46.9736, -54.69528]
+                    const position = flip_coords(point.geometry.coordinates);
                     return (
                       <Marker
                         key={point.properties.TIMESTAMP}

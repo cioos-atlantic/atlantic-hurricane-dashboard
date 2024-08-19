@@ -20,3 +20,6 @@ oryx-build-commands.txt
 
 **caching.log**
 .env
+.venv
+jupyter/postgis_schemas/integrate_ibtracs.log
+jupyter/postgis_schemas/sandbox.ipynb
