@@ -84,11 +84,14 @@ function flip_coords(coordinates) {
  */
 function fetch_value(point, property_list){
   let return_value = null;
-
-  property_list.forEach((value) => {
+  
+  property_list.every(value => {
     if (point.properties[value] !== undefined && point.properties[value] !== null){
       return_value = point.properties[value];
+      return false;
     }
+
+    return true;
   });
 
   return return_value;
@@ -150,10 +153,6 @@ export default function Map({ children, storm_data, station_data }) {
   // Add parameter for points
   // Points always there, even not in storm seasons
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
-  
-  // console.log("Data");
-  // console.log(storm_data);
-  // console.log(station_data);
 
   const hurricon = new Icon({
     iconUrl: HurricaneIcon.src,
