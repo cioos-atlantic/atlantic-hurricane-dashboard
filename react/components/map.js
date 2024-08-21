@@ -42,13 +42,24 @@ const empty_point_obj = { properties: {}, geometry: {} }
 function WindDirection(dir_val){
   // 0 = North, 90 = East, 180 = South, 270 = West
   // Draw an arrow on a circle? (Up / 0 = North, Right / 90 = East, etc.)
+  // Something to calculate wind direction - arrow icon and then rotate based on direction
   return
+}
+
+
+// Have it as a dictionary with time as keys and values as values?
+function Station_Variable(name, std_name,  value, units){
+  this.name = name;
+  this.standard_name = std_name;
+  this.value = value;
+  this.units = units;
 }
 
 function RecentStationData(data){
   const station_data = JSON.parse(data)
   const len = Object.keys(station_data).length
-  var data_obj = {}
+  let data_obj = {}
+  let children = []
   // Will always be most recently added
   Object.keys(station_data[len-1]).forEach(element => {
     const value = station_data[len-1][element]
@@ -57,30 +68,41 @@ function RecentStationData(data){
       data_obj['datetime'] = datetime
     }
     else{
-        //Matches standard name
+        //WARNING: Ugly regex ahead
         //Name (standard_name | units | long_name)
-        const regex = "\\((.*?)\\|"
-        const match = element.match(regex)
-        data_obj[match[1]] = value
+        const standard_name = element.match("\\((.*?)\\|")[1];
+        const units = element.match("\\|(.*?)\\|")[1];
+        const long_name = element.match("[^\\|]*\\|[^\\|]*\\|(.*?)\\)")[1];
+        data_obj[standard_name] = new Station_Variable(long_name, standard_name, value, units);
     }
   })
-  // Update to conditional rendering
-  // Create function to match either standard or long name
-  // How to match when multiple matches exist?
-  // Something to calculate wind direction
-  const output = (
+
+  //TODO: Clean up
+  const attributes_of_interest = {
+    'wind_speed':'Wind speed', 
+    'sea_surface_wave_significant_height':'Wave Height (Avg)',
+    'sea_surface_wave_maximum_height':'Wave Height (Max)',
+    'air_temperature':'Temperature (Air)',
+    'sea_surface_temperature': 'Temperature (Sea Surface)',
+    'air_pressure':'Air Pressure'
+  }
+  Object.entries(attributes_of_interest).forEach(entry =>{
+    const key = entry[0]
+    const val = entry[1]
+    if(data_obj[key] && data_obj[key].value){
+      children.push(<p><strong>{val}</strong> {(parseFloat(data_obj[key].value).toFixed(1))} {data_obj[key].units}</p>)
+    }
+  }
+  )
+
+  let station_info = (
     <div className="station_pane">
-      <p><b>Data taken: </b>{data_obj['datetime']}</p>
-      <p><strong>Wind speed:</strong> {(parseFloat(data_obj['wind_speed']).toFixed(2))} m/s</p>
-      <p><strong>Wind direction:</strong> {data_obj['wind_from_direction']}</p>
-      <p><strong>Wave height avg:</strong> {data_obj['sea_surface_wave_significant_height']}m</p>
-      <p><strong>Wave height max:</strong> {data_obj['sea_surface_wave_maximum_height']}m</p>
-      <p><strong>Pressure:</strong> {data_obj['air_pressure']} hPa</p>
-      <p><strong>Air temperature:</strong> {(parseFloat(data_obj['air_temperature']).toFixed(1))} °C</p>
-      <p><strong>Sea temperature:</strong> {(parseFloat(data_obj['sea_surface_temperature']).toFixed(1))} °C</p>
+      <p>{data_obj['datetime']}</p>
+      {children}
     </div>
   )
-  return output
+
+  return station_info;
 }
 
 function PointDetails(point) {
@@ -230,12 +252,8 @@ export default function Map({ children, storm_data, station_data }) {
                         //eventHandlers={{click : )}}
                         >
                           <Popup> 
-                            <p>
-                              <h3>Station Details</h3>
-                              <b>{element[1].properties.station}</b><br />
-                              {element[1].geometry.coordinates[0]}, {element[1].geometry.coordinates[1]}<br />
-                              {data}
-                            </p>
+                            <h3>{element[1].properties.station}</h3>
+                            {data}
                             <a href={data_link} target="_blank">Full data</a>
                           </Popup>
                         </Marker>
