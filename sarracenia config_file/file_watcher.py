@@ -9,13 +9,12 @@ import logging
 from logging.handlers import RotatingFileHandler
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import generate_bounds as gb
 import time
 import load_into_postgis as lpg
 from dotenv import load_dotenv
 
 logging.basicConfig(
-        handlers=[RotatingFileHandler('./file_watcher_log.log', maxBytes=100000, backupCount=10)],
+        handlers=[RotatingFileHandler('./file_watcher.log', maxBytes=1_000_000, backupCount=10)],
         level=logging.DEBUG,
         format="[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
         datefmt='%Y-%m-%dT%H:%M:%S')
@@ -33,27 +32,28 @@ def on_created(event):
                 time.asctime(), event.event_type, event.src_path
             ))
         )
+    
     # It searches for the error cone shape file and converts it to a raw string
     # It is then used to get the boundary points by passing the path to the ts module
     # Added a time sleep to give some time for all files to load
-    sub_string = ".err.shp"
+    sub_string = ".shp"
     
     if sub_string in event.src_path:
-        logger.info("Shape File Detected!")
-        time.sleep(10)
-        file_path= r'{}'.format(event.src_path)  
-        (min_long, min_lat, max_long, max_lat)= gb.get_boundary(ecc_shp_path=file_path)
-        logger.info((min_long, min_lat, max_long, max_lat))
-        return (min_long, min_lat, max_long, max_lat)
+        logger.info(f"Shape File Detected! {event.src_path} Waiting for writing to complete...")
+        source_path = os.path.dirname(event.src_path)
+
+        logger.debug(f"Source path is: {source_path}")
+        time.sleep(1)
+
+        logger.info("Uploading Data to PostGIS Database!")
+        engine = lpg.pg_engine()
+
+        lpg.process_eccc_shp_files(source_path, engine)
         
+        engine.dispose()
 
-    time.sleep(60)
-    logger.info("Uploading Data to PostGIS Database!")
-    engine= lpg.pg_engine()
+        logger.info("Finished processing file.")
 
-    lpg.process_eccc_shp_files(path, engine)
-
-    
 
 def on_deleted(event):
     logger.info(
@@ -84,10 +84,10 @@ if __name__ == "__main__":
     
     event_handler = FileSystemEventHandler()
     #calling functions
-    event_handler.on_created= on_created
-    event_handler.on_deleted= on_deleted
-    event_handler.on_modified= on_modified
-    event_handler.on_moved= on_moved
+    event_handler.on_created = on_created
+    event_handler.on_deleted = on_deleted
+    event_handler.on_modified = on_modified
+    event_handler.on_moved = on_moved
 
     #set to watch the shapefiles directory
     #path = os.path.abspath(os.path.join('..', 'shapefiles')) # to be configured
@@ -101,6 +101,10 @@ if __name__ == "__main__":
         logger.info ("Now Monitoring")
         while True:
             time.sleep(30)
+
+            if os.path.exists(os.getenv('STOP_FILE')):
+                logger.info("STOP FILE detected, ")
+                break
             
     except KeyboardInterrupt:
         observer.stop()

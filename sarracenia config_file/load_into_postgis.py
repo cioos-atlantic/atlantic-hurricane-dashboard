@@ -23,26 +23,16 @@ import logging
 logger= logging.getLogger(__name__)
 load_dotenv()
 
-pg_host = os.getenv('PG_HOST')
-pg_port = int(os.getenv('PG_PORT'))
-pg_user = os.getenv('PG_USER')
-pg_pass = os.getenv('PG_PASS')
-pg_db = os.getenv('PG_DB')
-
 #pg_ibtracs_historical_table = os.getenv('PG_IBTRACS_HISTORICAL_TABLE')
 #pg_ibtracs_active_table = os.getenv('PG_IBTRACS_ACTIVE_TABLE')
 pg_eccc_table = os.getenv('PG_ECCC_ACTIVE_TABLE')
 
-
 eccc_shp_path_src = Path(os.getenv('ECCC_SHP_SOURCE'))
-
 
 eccc_pts_schema = Path(os.getenv('ECCC_PTS_SCHEMA'))
 eccc_lin_schema = Path(os.getenv('ECCC_LIN_SCHEMA'))
 eccc_rad_schema = Path(os.getenv('ECCC_RAD_SCHEMA'))
 eccc_err_schema = Path(os.getenv('ECCC_ERR_SCHEMA'))
-
-
 
 # Tells pandas to skip the 2nd line in the CSV file that specifies unit types 
 # for the columns - this row doesn't need to be inserted into the postgis table
@@ -58,6 +48,12 @@ na_values = ' '
 
 # eccc_source_path = Path(os.getenv('ECCC_SHP_SOURCE'))
 def pg_engine():
+    pg_host = os.getenv('PG_HOST')
+    pg_port = int(os.getenv('PG_PORT'))
+    pg_user = os.getenv('PG_USER')
+    pg_pass = os.getenv('PG_PASS')
+    pg_db = os.getenv('PG_DB')
+
     engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
 
     return engine
@@ -214,27 +210,20 @@ def process_eccc_shp_files(source_dir, pg_engine):
         populate_eccc_table(source_df=points_df, destination_table="eccc_storm_points", pg_engine=pg_engine, table_schema=eccc_pts_schema)
     except exc.IntegrityError:
         logger.info("[Duplicate Detected]: Ignoring...")
-        pass
-
     
     try:
         populate_eccc_table(source_df=lines_df, destination_table="eccc_storm_lines", pg_engine=pg_engine, table_schema=eccc_lin_schema)
     except exc.IntegrityError:
         logger.info("[Duplicate Detected]: Ignoring...")
-        pass
-    
     
     try:
         populate_eccc_table(source_df=wind_radii_df, destination_table="eccc_storm_wind_radii", pg_engine=pg_engine, table_schema=eccc_rad_schema)
     except exc.IntegrityError:
         logger.info("[Duplicate Detected]: Ignoring...")
-        pass
-    
     
     try:
         populate_eccc_table(source_df=error_cone_df, destination_table="eccc_storm_error_cones", pg_engine=pg_engine, table_schema=eccc_err_schema)
     except exc.IntegrityError:
         logger.info("[Duplicate Detected]: Ignoring...")
-        pass
 
 
