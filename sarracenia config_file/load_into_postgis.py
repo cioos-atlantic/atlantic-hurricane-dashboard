@@ -14,7 +14,7 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 import psycopg2
-from sqlalchemy import create_engine, text, exc
+from sqlalchemy import create_engine, text, exc, Engine
 from pathlib import Path
 import shapefile
 import json
@@ -48,6 +48,9 @@ na_values = ' '
 
 # eccc_source_path = Path(os.getenv('ECCC_SHP_SOURCE'))
 def pg_engine():
+    """
+    Create a PostGIS database engine using .env variables and return the engine object
+    """
     pg_host = os.getenv('PG_HOST')
     pg_port = int(os.getenv('PG_PORT'))
     pg_user = os.getenv('PG_USER')
@@ -65,13 +68,17 @@ def shp_to_json(shp_file:Path):
 
     return(json_data)
 
-def populate_eccc_table(source_df, destination_table, pg_engine, table_schema):
+
+def populate_eccc_table(source_df:pd.DataFrame, destination_table:str, pg_engine:Engine):
     # populate table
     logger.info("Populating Table...")
     source_df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', if_exists='append', index=False, schema='public')
 
+
 def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='public'):
-    # Create ECCC Tables if not exist
+    """
+    Create ECCC destination table if it does not exist
+    """
     with pg_engine.begin() as pg_conn:
         logger.info(f"Creating Table {table_name} (if not exists)...")
 
@@ -83,8 +90,9 @@ def create_table_from_schema(pg_engine, table_name, schema_file, pg_schema='publ
             sql = Path(schema_file).read_text()
             pg_conn.execute(text(sql))
 
-        logger.debug("Committing Transaction.")
-        pg_conn.execute(text("COMMIT;"))
+            logger.debug("Committing Transaction.")
+            pg_conn.execute(text("COMMIT;"))
+
 
 def build_eccc_points(json_data, df, pg_engine):
     # return properties of features collection to form an array of 
@@ -148,6 +156,7 @@ def build_eccc_wind_radii(json_data, df, pg_engine):
 
     return pd.concat([df, temp_df])
 
+
 def build_eccc_error_cone(json_data, df, pg_engine, storm_date, storm_time):
     err_data = json_data["features"][0]["properties"]
     
@@ -171,59 +180,58 @@ def build_eccc_error_cone(json_data, df, pg_engine, storm_date, storm_time):
     
     return pd.concat([df, temp_df])
 
-def process_eccc_shp_files(source_dir, pg_engine):
-    source_search_pattern = "**/*.shp"
+
+def process_eccc_shp(shp_file_path:str, pg_engine:Engine):
+    """
+    Processes an ECCC hurricane .shp file into PostGIS
+    """
+    return_df = pd.DataFrame()
+    destination_table = ""
+    target_schema = ""
+
+    shp_file = Path(shp_file_path)
+
     filename_parser = re.compile(r'(?P<date>\d+)_(?P<time>\d+)Z_(?P<storm>\w+)\.(?P<type>\w+).*')
 
-    points_df = pd.DataFrame()
-    lines_df = pd.DataFrame()
-    wind_radii_df = pd.DataFrame()
-    error_cone_df = pd.DataFrame()
+    (storm_date, storm_time, storm_name, data_type) = filename_parser.match(shp_file.name).groupdict().values()
 
-    # Check and, if necessary, create ECCC tables
-    create_table_from_schema(pg_engine=pg_engine, table_name='eccc_storm_points', schema_file=eccc_pts_schema)
-    create_table_from_schema(pg_engine=pg_engine, table_name='eccc_storm_lines', schema_file=eccc_lin_schema)
-    create_table_from_schema(pg_engine=pg_engine, table_name='eccc_storm_wind_radii', schema_file=eccc_rad_schema)
-    create_table_from_schema(pg_engine=pg_engine, table_name='eccc_storm_error_cones', schema_file=eccc_err_schema)
+    json_data = shp_to_json(shp_file=shp_file)
 
-    for shp_file_path in Path(source_dir).glob(source_search_pattern):
-        shp_file = Path(shp_file_path)
+    if data_type == "pts":
+        return_df = build_eccc_points(json_data, return_df, pg_engine)
+        destination_table = 'eccc_storm_points'
+        target_schema = eccc_pts_schema
 
-        (storm_date, storm_time, storm_name, data_type) = filename_parser.match(shp_file.name).groupdict().values()
+    elif data_type == "lin":
+        return_df = build_eccc_lines(json_data, return_df, pg_engine, storm_date, storm_time)
+        destination_table = 'eccc_storm_lines'
+        target_schema = eccc_lin_schema
 
-        json_data = shp_to_json(shp_file=shp_file)
+    elif data_type == "rad":
+        return_df = build_eccc_wind_radii(json_data, return_df, pg_engine)
+        destination_table = 'eccc_storm_wind_radii'
+        target_schema = eccc_rad_schema
 
-        if data_type == "pts":
-            points_df = build_eccc_points(json_data, points_df, pg_engine)
+    elif data_type == "err":
+        return_df = build_eccc_error_cone(json_data, return_df, pg_engine, storm_date, storm_time)
+        destination_table = 'eccc_storm_error_cones'
+        target_schema = eccc_err_schema
 
-        elif data_type == "lin":
-            lines_df = build_eccc_lines(json_data, lines_df, pg_engine, storm_date, storm_time)
-
-        elif data_type == "rad":
-            wind_radii_df = build_eccc_wind_radii(json_data, wind_radii_df, pg_engine)
-
-        elif data_type == "err":
-            error_cone_df = build_eccc_error_cone(json_data, error_cone_df, pg_engine, storm_date, storm_time)
-    
+    create_table_from_schema(pg_engine=pg_engine, table_name=destination_table, schema_file=target_schema)
     
     try: 
-        populate_eccc_table(source_df=points_df, destination_table="eccc_storm_points", pg_engine=pg_engine, table_schema=eccc_pts_schema)
+        populate_eccc_table(source_df=return_df, destination_table=destination_table, pg_engine=pg_engine)
     except exc.IntegrityError:
-        logger.info("[Duplicate Detected]: Ignoring...")
-    
-    try:
-        populate_eccc_table(source_df=lines_df, destination_table="eccc_storm_lines", pg_engine=pg_engine, table_schema=eccc_lin_schema)
-    except exc.IntegrityError:
-        logger.info("[Duplicate Detected]: Ignoring...")
-    
-    try:
-        populate_eccc_table(source_df=wind_radii_df, destination_table="eccc_storm_wind_radii", pg_engine=pg_engine, table_schema=eccc_rad_schema)
-    except exc.IntegrityError:
-        logger.info("[Duplicate Detected]: Ignoring...")
-    
-    try:
-        populate_eccc_table(source_df=error_cone_df, destination_table="eccc_storm_error_cones", pg_engine=pg_engine, table_schema=eccc_err_schema)
-    except exc.IntegrityError:
-        logger.info("[Duplicate Detected]: Ignoring...")
+        logger.info(f"[Duplicate Detected]: {shp_file.name} already integrated. Ignoring.")
 
 
+def process_eccc_shp_files(source_dir, pg_engine):
+    """
+    Iterates through a directory and all subdirectories looking for .shp files to process and integrate into PostGIS database
+    """
+    source_search_pattern = "**/*.shp"
+
+    # Check and, if necessary, create ECCC tables
+
+    for shp_file_path in Path(source_dir).glob(source_search_pattern):
+        process_eccc_shp(shp_file_path, pg_engine)
