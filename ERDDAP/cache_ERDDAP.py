@@ -21,10 +21,11 @@ handler = RotatingFileHandler('caching.log', maxBytes=2000, backupCount=10)
 log.addHandler(handler)
 
 config = ConfigParser()
-config.read("../config.ini")
+config.read("./config/config.ini")
 
 server = config.get("ERDDAP", "server")
 standard_names = config.get("ERDDAP", "standard_names").splitlines()
+ignore_stations = config.get("ERDDAP", "ignore_stations").splitlines()
 e = ERDDAP(server=server)
 
 # Find env file
@@ -318,7 +319,7 @@ def main():
         # of standard names above. If a dataset does not have any of those variables it
         # will be skipped
         dataset = match_standard_names(dataset_id)
-        if (dataset):
+        if (dataset and dataset_id not in ignore_stations):
             cached_data.extend(cache_station_data(dataset, dataset_id, storm_id, 
                                                 min_time=datetime.strftime(min_time,'%Y-%m-%dT%H:%M:%SZ'), 
                                                 max_time=datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ')))
