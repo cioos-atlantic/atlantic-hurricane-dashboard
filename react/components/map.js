@@ -9,6 +9,8 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
 
+import station_names from "../data/station/names.json"
+
 import HurricaneIcon from '../public/hurricane.svg'
 import TropicalStormIcon from '../public/tropical-storm.svg'
 
@@ -39,14 +41,6 @@ function flip_coords(coordinates) {
 
 
 const empty_point_obj = { properties: {}, geometry: {} }
-
-function WindDirection(dir_val){
-  // 0 = North, 90 = East, 180 = South, 270 = West
-  // Draw an arrow on a circle? (Up / 0 = North, Right / 90 = East, etc.)
-  // Something to calculate wind direction - arrow icon and then rotate based on direction
-  return
-}
-
 
 // Have it as a dictionary with time as keys and values as values?
 function Station_Variable(name, std_name,  value, units){
@@ -90,8 +84,8 @@ function RecentStationData(data){
   // Separate section for wind since the arrows need to be drawn
   if(data_obj['wind_from_direction']){
     const wind_direction = (180 + parseInt(data_obj['wind_from_direction'].value)) % 360
-    children.push(<strong>Wind:   {wind_direction}</strong>)
-    children.push(<Image class="wind_arrow" alt={wind_direction} src="arrow.svg" height={25} width={25} 
+    children.push(<strong>Wind:  </strong>)
+    children.push(<Image class="wind_arrow" alt={wind_direction} src="arrow.svg" height={20} width={20} 
       style={{ transform: 'rotate(' + (wind_direction) + 'deg)' }}></Image>)
   }
   if(data_obj['wind_speed']){
@@ -252,6 +246,8 @@ export default function Map({ children, storm_data, station_data }) {
                   Object.entries(station_data).map((element) => {
                     const data_link = "https://cioosatlantic.ca/erddap/tabledap/" + element[0] + ".html"
                     const data = RecentStationData(element[1].properties.station_data)
+                    const station_name = element[1].properties.station
+                    const display_name = (station_name in station_names) ? station_names[station_name]['display']:station_name
                     return (
                       <Marker 
                         key={element.station} 
@@ -259,7 +255,7 @@ export default function Map({ children, storm_data, station_data }) {
                         //eventHandlers={{click : )}}
                         >
                           <Popup> 
-                            <h3>{element[1].properties.station}</h3>
+                            <h3>{display_name}</h3>
                             {data}
                             <a href={data_link} target="_blank">Full data</a>
                           </Popup>
