@@ -14,16 +14,18 @@ from dotenv import load_dotenv, find_dotenv
 from sqlalchemy import create_engine, text
 import sys
 import argparse
+import json
 
 log = logging.getLogger('caching.log')
 handler = RotatingFileHandler('caching.log', maxBytes=2000, backupCount=10)
 log.addHandler(handler)
 
 config = ConfigParser()
-config.read("../config.ini")
+config.read("./config/config.ini")
 
 server = config.get("ERDDAP", "server")
 standard_names = config.get("ERDDAP", "standard_names").splitlines()
+ignore_stations = config.get("ERDDAP", "ignore_stations").splitlines()
 e = ERDDAP(server=server)
 
 # Find env file
@@ -54,6 +56,9 @@ table_dtypes = {
     "max_lon": 'float',
     "station_data": 'string'
 } 
+
+unit_override_file = open("./config/unit_mapping.json")
+unit_overrides = json.load(unit_override_file)
 
 #process_ibtracs(df = , destination_table=pg_ibtracs_active_table, pg_engine=engine, table_schema=erddap_cache_schema)
 def cache_erddap_data(df, destination_table, pg_engine, table_schema, replace=False):
@@ -152,6 +157,11 @@ def match_standard_names(dataset_id):
 # Iterate through datasets and create a mapping between variable names and standard names
 #for dataset_id in final_dataset_list.keys():
 def standardize_column_names(dataset, dataset_id):
+    def unit_override(unit):
+        if(unit in unit_overrides):
+            return unit_overrides[unit]
+        else:
+            return unit
     # A dictionary to hold the variable name mappings
     replace_cols = {}
 
@@ -159,7 +169,7 @@ def standardize_column_names(dataset, dataset_id):
         metadata = dataset["meta"]
 
         standard_name = erddap_meta(metadata=metadata, attribute_name="standard_name", var_name=var)["value"]
-        units = erddap_meta(metadata=metadata, attribute_name="units", var_name=var)["value"]
+        units = unit_override(erddap_meta(metadata=metadata, attribute_name="units", var_name=var)["value"])
         long_name = erddap_meta(metadata=metadata, attribute_name="long_name", var_name=var)["value"]
 
         # Time columns usually have the unit of time in unix timestamp
@@ -309,7 +319,7 @@ def main():
         # of standard names above. If a dataset does not have any of those variables it
         # will be skipped
         dataset = match_standard_names(dataset_id)
-        if (dataset):
+        if (dataset and dataset_id not in ignore_stations):
             cached_data.extend(cache_station_data(dataset, dataset_id, storm_id, 
                                                 min_time=datetime.strftime(min_time,'%Y-%m-%dT%H:%M:%SZ'), 
                                                 max_time=datetime.strftime(max_time,'%Y-%m-%dT%H:%M:%SZ')))

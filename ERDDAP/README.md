@@ -37,10 +37,30 @@ PG_DB: Database name in postgres
 Define the location of the schema for the ERDDAP Cache table in the .env
 ERDDAP_CACHE_SCHEMA = ./erddap_cache_schema.sql
 
-Define the name of the ERDDAP Cache table in the .env
-ERDDAP_CACHE_TABLE = erddap_cache
+Define the name of the ERDDAP Cache tables in the .env and the location of the schemas
+Default names:
+ERDDAP_CACHE_HISTORICAL_TABLE = erddap_cache_historical
+ERDDAP_CACHE_ACTIVE_TABLE = erddap_cache_active
+
+Default locations:
+ERDDAP_CACHE_HISTORICAL_SCHEMA = ../jupyter/postgis_schemas/erddap_cache_schema.sql
+ERDDAP_CACHE_ACTIVE_SCHEMA = ../jupyter/postgis_schemas/erddap_cache_active_schema.sql
 
 ## Running
+
+To run the ERDDAP cache make sure the conda environment is set
+
+> conda activate hurricane
+
+Active storm data
+
+> python cache_ERDDAP.py active
+
+Running the ERDDAP cache for active data will clear existing data in the cache
+
+Historical storm data
+
+> python cache_ERDDAP.py historical 2022_fiona
 
 
 ## Logging
