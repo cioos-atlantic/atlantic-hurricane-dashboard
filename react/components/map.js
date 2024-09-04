@@ -4,6 +4,7 @@ import { parseISO, format } from 'date-fns';
 import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, Polyline } from 'react-leaflet'
 import { useMap, useMapEvent, useMapEvents } from 'react-leaflet/hooks'
 import { Icon, DivIcon, Point } from 'leaflet'
+import Image from "next/image";
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
@@ -79,22 +80,28 @@ function RecentStationData(data){
 
   //TODO: Clean up
   const attributes_of_interest = {
-    'wind_speed':'Wind speed', 
     'sea_surface_wave_significant_height':'Wave Height (Avg)',
     'sea_surface_wave_maximum_height':'Wave Height (Max)',
     'air_temperature':'Temperature (Air)',
     'sea_surface_temperature': 'Temperature (Sea Surface)',
-    'air_pressure':'Air Pressure'
+    'air_pressure':'Air Pressure',
+    'relative_humidity':'Humidity'
   }
+  // Separate section for wind since the arrows need to be drawn
+  if(data_obj['wind_from_direction']){
+    const wind_direction = (180 + parseInt(data_obj['wind_from_direction'].value)) % 360
+    children.push(<strong>Wind:   {wind_direction}</strong>)
+    children.push(<Image class="wind_arrow" alt={wind_direction} src="arrow.svg" height={25} width={25} 
+      style={{ transform: 'rotate(' + (wind_direction) + 'deg)' }}></Image>)
+  }
+  if(data_obj['wind_speed']){
+    children.push(<span>   {(parseFloat(data_obj['wind_speed'].value).toFixed(1))} {data_obj['wind_speed'].units}</span>)}
   Object.entries(attributes_of_interest).forEach(entry =>{
     const key = entry[0]
     const val = entry[1]
     if(data_obj[key] && data_obj[key].value){
-      children.push(<p><strong>{val}</strong> {(parseFloat(data_obj[key].value).toFixed(1))} {data_obj[key].units}</p>)
-    }
-  }
-  )
-
+        children.push(<p><strong>{val}:</strong> {(parseFloat(data_obj[key].value).toFixed(1))} {data_obj[key].units}</p>)}
+  })
   let station_info = (
     <div className="station_pane">
       <p>{data_obj['datetime']}</p>
@@ -243,7 +250,7 @@ export default function Map({ children, storm_data, station_data }) {
               <LayerGroup>
                 { 
                   Object.entries(station_data).map((element) => {
-                    const data_link = "/station_data/" + element[0]
+                    const data_link = "https://cioosatlantic.ca/erddap/tabledap/" + element[0] + ".html"
                     const data = RecentStationData(element[1].properties.station_data)
                     return (
                       <Marker 
