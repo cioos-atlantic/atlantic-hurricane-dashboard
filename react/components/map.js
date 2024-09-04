@@ -59,7 +59,7 @@ function RecentStationData(data){
   Object.keys(station_data[len-1]).forEach(element => {
     const value = station_data[len-1][element]
     if (element.includes('(time|')) {
-      const datetime = new Date(value * 1).toString()
+      const datetime = new Date(value * 1).toLocaleString()
       data_obj['datetime'] = datetime
     }
     else{
