@@ -18,3 +18,4 @@ oryx-build-commands.txt
 
 **caching.log**
 .env
+.venv
