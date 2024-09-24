@@ -1,0 +1,65 @@
+{
+    "sma_negl_cartwright_junction_nlqu0004":{
+        "display":"Cartwright Junction",
+        "organization":"Smart Atlantic"},
+    "sma_negl_red_bay_nlqu0005":{
+        "display":"Red Bay",
+        "organization":"Smart Atlantic"},
+    "sma_negl_north_west_river_nlqu0007":{
+        "display":"North West River",
+        "organization":"Smart Atlantic"},
+    "sma_negl_postville_nlqu0001":{
+        "display":"Postville",
+        "organization":"Smart Atlantic"},
+    "sma_negl_rigolet_nlqu0002":{
+        "display":"Rigolet",
+        "organization":"Smart Atlantic"},
+    "sma_negl_black_tickle_nlqu0003":{
+        "display":"Black Tide",
+        "organization":"Smart Atlantic"},
+    "DFO_Sutron_NHARB":{
+        "display":"Placentia Bay: North Harbour",
+        "organization":"Smart Atlantic"},
+    "DFO_Sutron_KLUMI":{
+        "display":"Placentia Bay: Ragged Islands",
+        "organization":"Smart Atlantic"},
+    "SMA_red_island_shoal":{
+        "display":"Red Island Shoal",
+        "organization":"Smart Atlantic"},
+    "SMA_Holyrood_Buoy2":{
+        "display":"Holyrood (Buoy 2)",
+        "organization":"Smart Atlantic"},
+    "SMA_st_johns":{
+        "display":"St. John's",
+        "organization":"Smart Atlantic"},
+    "SMA_halifax":{
+        "display":"Herring Cove",
+        "organization":"Smart Atlantic"},
+    "SMA_halifax_anemometer1":{
+        "display":"Halifax (Anemometer)",
+        "organization":"Smart Atlantic"},
+    "SMA_halifax_pier9c":{
+        "display":"Halifax (Pier 9c)",
+        "organization":"Smart Atlantic"},
+    "SMA_halifax_fairview":{
+        "display":"Halifax (Fairview)",
+        "organization":"Smart Atlantic"},
+    "force_meteorological_tower":{
+        "display":"FORCE Meteorological Tower",
+        "organization":"Smart Atlantic"},
+    "SMA_saint_john":{
+        "display":"Saint John",
+        "organization":"Smart Atlantic"},
+    "SMA_saint_john_cruise_terminal":{
+        "display":"Saint John (Cruise Terminal)",
+        "organization":"Smart Atlantic"},
+    "SPOT-1431_202204":{
+        "display":"Sable Island South (SPOT 1431)",
+        "organization":"Smart Atlantic"},
+    "SPOT-1461_202204":{
+        "display":"Sable Island South (SPOT 1461)",
+        "organization":"Smart Atlantic"},
+    "candhis_spm_97501_wave_spectra":{
+        "display":"St. Pierre et Miquelon",
+        "organization":"CANDHIS"}
+}
