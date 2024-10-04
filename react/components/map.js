@@ -13,6 +13,7 @@ import station_names from "../data/station/names.json"
 
 import HurricaneIcon from '../public/hurricane.svg'
 import TropicalStormIcon from '../public/tropical-storm.svg'
+import {windSpeedToKnots, windSpeedToKmh} from './utils/unit_conversion.js'
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
@@ -150,13 +151,18 @@ function RecentStationData(data){
       style={{ transform: 'rotate(' + (wind_direction) + 'deg)' }}></Image>)
   }
   if(data_obj['wind_speed']){
-    children.push(<span>   {(parseFloat(data_obj['wind_speed'].value).toFixed(1))} {data_obj['wind_speed'].units}</span>)}
+    console.log(data_obj['wind_speed']);
+    const resultKmh = windSpeedToKmh(data_obj['wind_speed'].value)
+    const resultKnots = windSpeedToKnots(data_obj['wind_speed'].value)
+    children.push(<span>    {resultKnots.converted_value} {resultKnots.unit} ({resultKmh.converted_value} {resultKmh.unit})</span>)}
   Object.entries(attributes_of_interest).forEach(entry =>{
     const key = entry[0]
     const val = entry[1]
     if(data_obj[key] && data_obj[key].value){
         children.push(<p><strong>{val}:</strong> {(parseFloat(data_obj[key].value).toFixed(1))} {data_obj[key].units}</p>)}
   })
+
+  //console.log(children);
   let station_info = (
     <div className="station_pane">
       <p>{data_obj['datetime']}</p>
@@ -164,7 +170,9 @@ function RecentStationData(data){
     </div>
   )
 
+  //console.log(station_info)
   return station_info;
+  
 }
 
 function PointDetails(point) {
