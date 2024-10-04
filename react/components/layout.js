@@ -11,8 +11,15 @@ import StormSearch from "@/components/storm_search";
 import ActiveStormList from "@/components/active_storm_list";
 
 import dynamic from "next/dynamic";
-// import storm_list from '../data/forecasts/list.json'
 
+// NOTE:  This data and form was used early on for 
+//        testing purposes and will be removed.
+//        
+//        The data represented here should be swapped 
+//        out in favour of data from the WFS service
+import storm_list from '../data/forecasts/list.json'
+
+import ErddapHandler from "../pages/api/query_stations";
 
 export const siteTitle = 'Atlantic Hurricane Dashboard'
 
@@ -23,13 +30,19 @@ export const empty_storm_obj = {
   rad:{features:[]},
 };
 
-export default function Layout({ children, home, topNav, logo, active_storm_data, querystring }) {
+export const empty_station_obj = {
+  pts:{features:[]}
+};
+
+export default function Layout({ children, home, topNav, logo, active_storm_data, station_data, querystring }) {
 
   const [storms, setStorms] = useState([]);
   const [selected_storm, setSelectedStorm] = useState("");
   const [selected_forecast, setSelectedForecast] = useState({});
   const [storm_timeline, setStormTimeline] = useState([]);
   const [storm_points, setStormPoints] = useState(empty_storm_obj);
+  const [station_points, setStationPoints] = useState([empty_station_obj]);
+
   
   // useMemo() tells React to "memorize" the map component.
   // Wthout this, the map will get redrawn by many interactions 
@@ -42,12 +55,15 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     [],
   );
 
+  <main><MapWithNoSSR station_data={station_data}></MapWithNoSSR></main>
+  
+
   // console.log(querystring.storms)
   // console.log(active_storm_data.season)
 
   // const data = get_forecast_sources();
 
-  function updateStormList(event) {
+  function updateStormList(event) { 
     const filtered_storms = event.target.value != "" ? storm_list.filter(storm => {
       const storm_index = storm.name + storm.year;
       return (
@@ -55,6 +71,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     }) : [];
 
     setStorms(filtered_storms);
+    
   }
 
   function populateStormDetails(event, storm_data) {
@@ -151,7 +168,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
             />
           )}
         </Drawer>
-        <MapWithNoSSR storm_data={storm_points}></MapWithNoSSR>
+        <MapWithNoSSR storm_data={storm_points} station_data={station_data}></MapWithNoSSR>
       </main>
       <footer>
         <FooterNav></FooterNav>

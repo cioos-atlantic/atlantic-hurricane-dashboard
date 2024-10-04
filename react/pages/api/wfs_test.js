@@ -129,15 +129,22 @@ export async function wfs_query(storm_name, season, source, source_type) {
         console.debug("ECCC URL: ", eccc_features_url);
 
         responses["eccc_data"] = await fetch_wfs_data(eccc_features_url);
+    }    
+    if(get_erddap){
+        console.debug("Getting ERDDAP data")
+        // cioos-atlantic:erddap_cache
+        wfs_sources.push("erddap_cache_active")
+
+        let erddap_source = "erddap_cache_active"
+        const erddap_features_url = build_wfs_query("cioos-atlantic:" + erddap_source, [])
+
+        console.debug("ERDDAP URL: ", erddap_features_url)
+        responses["erddap_data"] = await fetch_wfs_data(erddap_features_url)
     }
 
     return responses;
 
-    
-    if(get_erddap){
-        // cioos-atlantic:erddap_cache
-        wfs_sources.push("erddap_cache")
-    }
+
     
     console.log(cql_filter, wfs_sources.join(",cioos-atlantic:"));   
 
@@ -164,15 +171,16 @@ function build_wfs_query(source, filters, output_format="application/json", base
     console.debug();
 
     output_format = "&outputFormat=" + encodeURI(output_format);
-    const final_filter = "&cql_filter=" + filters.join(";");
+    //Filter causes issues for ERDDAP cache
+    const final_filter = (source.includes("erddap")) ? (""):("&cql_filter=" + filters.join(" AND "))
     const url = base_url + "&request=GetFeature&typeName=" + source + output_format + final_filter;
 
     return url;
 }
 
+
 async function fetch_wfs_data(url){
     const response = await fetch(url);
     const data = await response.json();
-
     return data; 
 }
