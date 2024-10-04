@@ -13,7 +13,8 @@ import station_names from "../data/station/names.json"
 
 import HurricaneIcon from '../public/hurricane.svg'
 import TropicalStormIcon from '../public/tropical-storm.svg'
-import {windSpeedToKnots, windSpeedToKmh} from './utils/unit_conversion.js'
+import {formatCioosStations, formatCioosDateTime} from './station_formats'
+
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
@@ -121,8 +122,10 @@ function RecentStationData(data){
   Object.keys(station_data[len-1]).forEach(element => {
     const value = station_data[len-1][element]
     if (element.includes('(time|')) {
-      const datetime = new Date(value * 1).toLocaleString()
-      data_obj['datetime'] = datetime
+      console.log(value)
+      //const datetime = new Date(value * 1).toLocaleString()
+      data_obj['datetime'] = formatCioosDateTime(value)
+      console.log(data_obj['datetime'])
     }
     else{
         //WARNING: Ugly regex ahead
@@ -135,32 +138,9 @@ function RecentStationData(data){
   })
 
   //TODO: Clean up
-  const attributes_of_interest = {
-    'sea_surface_wave_significant_height':'Wave Height (Avg)',
-    'sea_surface_wave_maximum_height':'Wave Height (Max)',
-    'air_temperature':'Temperature (Air)',
-    'sea_surface_temperature': 'Temperature (Sea Surface)',
-    'air_pressure':'Air Pressure',
-    'relative_humidity':'Humidity'
-  }
-  // Separate section for wind since the arrows need to be drawn
-  if(data_obj['wind_from_direction']){
-    const wind_direction = (180 + parseInt(data_obj['wind_from_direction'].value)) % 360
-    children.push(<strong>Wind:  </strong>)
-    children.push(<Image class="wind_arrow" alt={wind_direction} src="arrow.svg" height={20} width={20} 
-      style={{ transform: 'rotate(' + (wind_direction) + 'deg)' }}></Image>)
-  }
-  if(data_obj['wind_speed']){
-    console.log(data_obj['wind_speed']);
-    const resultKmh = windSpeedToKmh(data_obj['wind_speed'].value)
-    const resultKnots = windSpeedToKnots(data_obj['wind_speed'].value)
-    children.push(<span>    {resultKnots.converted_value} {resultKnots.unit} ({resultKmh.converted_value} {resultKmh.unit})</span>)}
-  Object.entries(attributes_of_interest).forEach(entry =>{
-    const key = entry[0]
-    const val = entry[1]
-    if(data_obj[key] && data_obj[key].value){
-        children.push(<p><strong>{val}:</strong> {(parseFloat(data_obj[key].value).toFixed(1))} {data_obj[key].units}</p>)}
-  })
+ formatCioosStations(data_obj, children)
+
+      
 
   //console.log(children);
   let station_info = (

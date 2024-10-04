@@ -41,4 +41,19 @@ export function pressureToInHg(value_str){
   return {converted_value, unit};
 };
 
+export function windHeightToFt(value_str){
+  const unit = 'ft';
+  const value= parseFloat(value_str); // Convert string to float
+  const converted_value = (value * 3.28084).toFixed(1); 
+  return {converted_value, unit};
+};
+
+export function windHeightToM(value_str){
+  const unit = 'm';
+  const value= parseFloat(value_str); // Convert string to float
+  const converted_value = parseFloat(value).toFixed(1); 
+  return {converted_value, unit};
+};
+
+
 
