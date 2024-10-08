@@ -14,6 +14,7 @@ import station_names from "../data/station/names.json"
 import HurricaneIcon from '../public/hurricane.svg'
 import TropicalStormIcon from '../public/tropical-storm.svg'
 import {formatCioosStations, formatCioosDateTime} from './station_formats'
+import {RenderChart} from './station_graph.js'
 
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
@@ -316,14 +317,29 @@ export default function Map({ children, storm_data, station_data }) {
                     const data = RecentStationData(element[1].properties.station_data)
                     const station_name = element[1].properties.station
                     const display_name = (station_name in station_names) ? station_names[station_name]['display']:station_name
+
+                    console.log("Station Name:", station_name);
+                    
                     return (
                       <Marker 
                         key={element.station} 
                         position={flip_coords(element[1].geometry.coordinates)}
                         //eventHandlers={{click : )}}
                         >
-                          <Popup> 
-                            <h3>{display_name}</h3>
+                          <Popup 
+                            contentStyle={{
+                              width: 'auto', // Adjust width based on content (chart)
+                              padding: '20px', // Optional padding around chart
+                              }}> 
+                            
+                            <div>
+                              <h4>{display_name}</h4>
+                              <h4>{station_name}</h4>
+                              <RenderChart  
+                              targetStationName={station_name}
+                              chartData={station_data}
+                              />
+                            </div>
                             {data}
                             <a href={data_link} target="_blank">Full data</a>
                           </Popup>
