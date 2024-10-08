@@ -21,6 +21,8 @@ import storm_list from '../data/forecasts/list.json'
 
 import ErddapHandler from "../pages/api/query_stations";
 
+import * as geolib from 'geolib';
+
 export const siteTitle = 'Atlantic Hurricane Dashboard'
 
 export const empty_storm_obj = {
@@ -77,6 +79,72 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
   function populateStormDetails(event, storm_data) {
     console.log("Set Selected storm to: " + storm_data.data[0].properties.NAME);
     setSelectedStorm(storm_data.data[0].properties.NAME);
+
+    console.debug("Printing out storm properties");
+    console.debug(storm_data);
+
+    storm_data.data.forEach((storm_pt, idx) => {
+      console.debug("Storm Point: ", idx, storm_pt);
+
+      for(let field in storm_pt.properties){
+        // Dropping null fields 
+        if(!storm_pt.properties[field]){
+          delete storm_data.data[idx].properties[field];
+        }
+        // Calculating wind radius points based on wind speed radii quadrant distances
+        else{
+          let wind_spd_rad_dir = field.match(/^\w+R(?<speed>\d+)\w+(?<direction>NE|SE|NW|SW)$/);
+
+          if(wind_spd_rad_dir){
+            console.debug(field, storm_pt.properties[field], wind_spd_rad_dir);
+
+            // let radius_m = geolib.convertDistance(storm_pt.properties[field], 'sm');
+            let radius_m = storm_pt.properties[field] * 1852.216;
+            console.debug(`Converted Radius: ${storm_pt.properties[field]}NM to ${radius_m}m `);
+
+            let rad_dir_1 = undefined, 
+                rad_dir_2 = undefined;
+
+            switch(wind_spd_rad_dir.groups["direction"]){
+              case "NE":
+                rad_dir_1 = 0;
+                rad_dir_2 = 90;
+                break;
+
+              case "SE":
+                rad_dir_1 = 90;
+                rad_dir_2 = 180;
+                break;
+              case "SW":
+                rad_dir_1 = 180;
+                rad_dir_2 = 270;
+                break;
+              case "NW":
+                rad_dir_1 = 270;
+                rad_dir_2 = 0;
+                break;
+            }
+
+            let dest_point_1 = geolib.computeDestinationPoint(
+              // { latitude: 52.518611, longitude: 13.408056 },
+              storm_pt.geometry.coordinates,
+              radius_m,
+              rad_dir_1
+            );
+
+            let dest_point_2 = geolib.computeDestinationPoint(
+              // { latitude: 52.518611, longitude: 13.408056 },
+              storm_pt.geometry.coordinates,
+              radius_m,
+              rad_dir_2
+            );
+            console.debug(`Original Coordinates: ${storm_pt.geometry.coordinates}`)
+            console.debug(`New Destination Points for Wind Radii in quadrant ${wind_spd_rad_dir.groups["direction"]} at ${wind_spd_rad_dir.groups["speed"]} knots`, dest_point_1, dest_point_2)
+          }
+        }
+      }
+    });
+
 
     // const filtered = forecasts.map(source => {
     //    return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") 
@@ -154,6 +222,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
             <ActiveStormList 
               active_storm_data={active_storm_data}
               onPopulateStormDetails={populateStormDetails}
+              selected_storm={selected_storm}
             />
           ) : (
             <StormSearch
