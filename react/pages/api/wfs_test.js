@@ -101,6 +101,14 @@ export async function wfs_query(storm_name, season, source, source_type) {
         console.debug("IBTRACS URL: ", ib_features_url);
 
         responses["ib_data"] = await fetch_wfs_data(ib_features_url);
+
+        responses["ib_data"].features = responses["ib_data"].features.map((storm_point) => {
+            storm_point.properties.TIMESTAMP = storm_point.id.match(/\d+-\d+-\d+[\sT]\d+:\d+:\d+/)[0].replace(" ", "T");
+            storm_point.properties.STORMNAME = storm_point.properties.NAME;
+
+            return storm_point;
+        });
+
     }
 
     if(get_eccc){

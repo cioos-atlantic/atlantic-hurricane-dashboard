@@ -83,17 +83,18 @@ footer {
   bottom: 50px;
 }
 
-.eccc-rad-34 {
+.wind-rad-34 {
   stroke: yellow;
   fill: yellow;
 }
 
-.eccc-rad-48 {
+.wind-rad-48,
+.wind-rad-50 {
   stroke: orange;
   fill: orange;
 }
 
-.eccc-rad-64 {
+.wind-rad-64 {
   stroke: red;
   fill: red;
 }

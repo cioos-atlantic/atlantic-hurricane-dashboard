@@ -9,7 +9,7 @@ import FooterNav from './footer_nav'
 import Drawer from '../components/drawer'
 import StormSearch from "@/components/storm_search";
 import ActiveStormList from "@/components/active_storm_list";
-
+import {build_wind_radii} from '../lib/storm_utils';
 import dynamic from "next/dynamic";
 
 // NOTE:  This data and form was used early on for 
@@ -20,8 +20,6 @@ import dynamic from "next/dynamic";
 import storm_list from '../data/forecasts/list.json'
 
 import ErddapHandler from "../pages/api/query_stations";
-
-import * as geolib from 'geolib';
 
 export const siteTitle = 'Atlantic Hurricane Dashboard'
 
@@ -82,10 +80,14 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
 
     console.debug("Printing out storm properties");
     console.debug(storm_data);
+    
+    let wind_rad_polys = [];
+    let wind_spd_rad_dir = null;
+    let wind_rad_parts = {};
 
     storm_data.data.forEach((storm_pt, idx) => {
-      console.debug("Storm Point: ", idx, storm_pt);
-
+      // console.debug("Storm Point: ", idx, storm_pt);
+      wind_rad_parts = {};
       for(let field in storm_pt.properties){
         // Dropping null fields 
         if(!storm_pt.properties[field]){
@@ -93,56 +95,36 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
         }
         // Calculating wind radius points based on wind speed radii quadrant distances
         else{
-          let wind_spd_rad_dir = field.match(/^\w+R(?<speed>\d+)\w+(?<direction>NE|SE|NW|SW)$/);
+          wind_spd_rad_dir = field.match(/^\w+R(?<speed>\d+)\w+(?<direction>NE|SE|NW|SW)$/);
 
           if(wind_spd_rad_dir){
-            console.debug(field, storm_pt.properties[field], wind_spd_rad_dir);
-
-            // let radius_m = geolib.convertDistance(storm_pt.properties[field], 'sm');
-            let radius_m = storm_pt.properties[field] * 1852.216;
-            console.debug(`Converted Radius: ${storm_pt.properties[field]}NM to ${radius_m}m `);
-
-            let rad_dir_1 = undefined, 
-                rad_dir_2 = undefined;
-
-            switch(wind_spd_rad_dir.groups["direction"]){
-              case "NE":
-                rad_dir_1 = 0;
-                rad_dir_2 = 90;
-                break;
-
-              case "SE":
-                rad_dir_1 = 90;
-                rad_dir_2 = 180;
-                break;
-              case "SW":
-                rad_dir_1 = 180;
-                rad_dir_2 = 270;
-                break;
-              case "NW":
-                rad_dir_1 = 270;
-                rad_dir_2 = 0;
-                break;
+            // console.debug(wind_spd_rad_dir);
+            if(!wind_rad_parts[wind_spd_rad_dir.groups["speed"]]){
+              wind_rad_parts[wind_spd_rad_dir.groups["speed"]] = {};
             }
 
-            let dest_point_1 = geolib.computeDestinationPoint(
-              // { latitude: 52.518611, longitude: 13.408056 },
-              storm_pt.geometry.coordinates,
-              radius_m,
-              rad_dir_1
-            );
-
-            let dest_point_2 = geolib.computeDestinationPoint(
-              // { latitude: 52.518611, longitude: 13.408056 },
-              storm_pt.geometry.coordinates,
-              radius_m,
-              rad_dir_2
-            );
-            console.debug(`Original Coordinates: ${storm_pt.geometry.coordinates}`)
-            console.debug(`New Destination Points for Wind Radii in quadrant ${wind_spd_rad_dir.groups["direction"]} at ${wind_spd_rad_dir.groups["speed"]} knots`, dest_point_1, dest_point_2)
+            wind_rad_parts[wind_spd_rad_dir.groups["speed"]][wind_spd_rad_dir.groups["direction"]] = storm_pt.properties[field];
           }
         }
       }
+
+      console.debug("Wind Radius Parts:", wind_rad_parts);
+
+      for(let wind_speed in wind_rad_parts) {
+        console.debug(`Building wind speed radii for: ${wind_speed}knots`);
+
+        wind_rad_polys.push(build_wind_radii(
+          storm_pt,
+          parseInt(wind_speed), 
+          storm_pt.geometry.coordinates, 
+          wind_rad_parts[wind_speed]['NE'], 
+          wind_rad_parts[wind_speed]['SE'], 
+          wind_rad_parts[wind_speed]['SW'], 
+          wind_rad_parts[wind_speed]['NW']
+        ));
+      }
+
+      console.debug("Final Polygons: ", wind_rad_polys);
     });
 
 
@@ -169,6 +151,11 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
         // case "Polygon":
         //   break;
       }
+    }
+
+    if(wind_rad_polys){
+      console.debug("Adding polygons to storm features");
+      storm_features.rad.features = wind_rad_polys;
     }
     
     setStormPoints(storm_features);

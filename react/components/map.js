@@ -1,7 +1,7 @@
 // https://iconoir.com/ icon library that can be installed via npm
 import React, { useState, useMemo } from "react";
 import { parseISO, format } from 'date-fns';
-import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, Polyline } from 'react-leaflet'
+import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, Polyline, GeoJSON } from 'react-leaflet'
 import { useMap, useMapEvent, useMapEvents } from 'react-leaflet/hooks'
 import { Icon, DivIcon, Point } from 'leaflet'
 import Image from "next/image";
@@ -328,7 +328,7 @@ export default function Map({ children, storm_data, station_data }) {
 
                     return (
                       <Marker
-                        key={point.properties.TIMESTAMP}
+                        key={point.id}
                         position={position}
                         eventHandlers={{
                           mouseover: (event) => setHoverMarker(point),
@@ -379,27 +379,36 @@ export default function Map({ children, storm_data, station_data }) {
                 {
                   storm_data.rad.features.length > 0 &&
                   storm_data.rad.features.map(radii => {
+                    // console.debug("Mapping radii...", radii);
 
-                    let fixed_coords = remap_coord_array(radii.geometry.coordinates[0]);
+                    let display_radii = radii;
                     if (hover_marker.properties.TIMESTAMP != radii.properties.TIMESTAMP) {
-                      fixed_coords = false;
+                      display_radii = false;
                     }
 
-                    const path_options = { className: 'eccc-rad-'.concat(radii.properties.WINDFORCE) };
+                    const path_options = { className: 'wind-rad-'.concat(radii.properties.WINDFORCE) };
+                    // const positions = radii.geometry.coordinates.map((coord_array) => {return coord_array[0]});
+                    
+                    // console.debug("Multipolygon Positions: ", positions);
 
                     return (
-                      <Polygon
-                        key={radii.properties.TIMESTAMP + radii.properties.WINDFORCE}
-                        positions={fixed_coords}
-                        pathOptions={path_options}
+                      // <Polygon
+                      //   key={radii.properties.TIMESTAMP + radii.properties.WINDFORCE}
+                      //   positions={positions}
+                      //   pathOptions={path_options}
 
-                      >
-                        <Popup>
-                          <h3>{radii.properties.STORMNAME}</h3>
-                          <p>Wind force: {radii.properties.WINDFORCE}</p>
-                          <p>Timestamp: {radii.properties.TIMESTAMP}</p>
-                        </Popup>
-                      </Polygon>
+                      // >
+                      //   <Popup>
+                      //     <h3>{radii.properties.STORMNAME}</h3>
+                      //     <p>Wind force: {radii.properties.WINDFORCE}</p>
+                      //     <p>Timestamp: {radii.properties.TIMESTAMP}</p>
+                      //   </Popup>
+                      // </Polygon>
+                      <GeoJSON 
+                        key={radii.properties.TIMESTAMP + radii.properties.WINDFORCE}
+                        data={display_radii} 
+                        style={path_options}
+                      />
                     );
                   })
                 }
