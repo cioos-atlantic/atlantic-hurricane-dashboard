@@ -87,7 +87,7 @@ export function formatCioosDateTime(date_str){
 
 export function parseData(fullStationData) {
   //console.log(JSON.parse(chartData));
-  const stationDataTable = {}; 
+  let stationDataTable = {}; 
 
 
   const attributes_of_interest = ['sea_surface_wave_significant_height',
@@ -146,6 +146,51 @@ export function parseData(fullStationData) {
       }});});
       });
     console.log(stationDataTable) 
+    stationDataTable= dataConversion(stationDataTable);
+    console.log(stationDataTable) 
+
+
     return stationDataTable 
+}
+
+function dataConversion(stationDataTable){
+  console.log(stationDataTable);
+  Object.entries(stationDataTable).forEach(([stationName, stationData]) => {
+    const station = stationData.data
+    Object.entries(station).forEach(([key, variable]) => {
+      if (!Array.isArray(variable.value)) {
+        variable.value= [variable.value]}
+
+      if (key === 'air_pressure'){
+        variable.units = 'kPa';
+        variable.value = variable.value.map(v => {
+          const resultKPa = pressureToKPa(v);
+          //console.log(`Value: ${v}, Converted: ${resultKPa.converted_value}`);
+          return resultKPa.converted_value}); 
+      }
+      if (key === 'wind_speed'){
+        variable.units = 'Kmh';
+        variable.value = variable.value.map(v => {
+          const resultKmh = windSpeedToKmh(v);
+          //console.log(`Value: ${v}, Converted: ${resultKmh.converted_value}`);
+          return resultKmh.converted_value}); 
+      }
+
+      if (key === 'wind_speed_of_gust'){
+        variable.units = 'Kmh';
+        variable.value = variable.value.map(v => {
+          const resultKmh = windSpeedToKmh(v);
+          //console.log(`Value: ${v}, Converted: ${resultKmh.converted_value}`);
+          return resultKmh.converted_value}); 
+      }
+      
+      
+      //console.log(station)
+    })
+
+  })
+  console.log(stationDataTable);
+  return stationDataTable
+
 }
     

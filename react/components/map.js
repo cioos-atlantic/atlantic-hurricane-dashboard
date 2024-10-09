@@ -123,10 +123,10 @@ function RecentStationData(data){
   Object.keys(station_data[len-1]).forEach(element => {
     const value = station_data[len-1][element]
     if (element.includes('(time|')) {
-      console.log(value)
+      //console.log(value)
       //const datetime = new Date(value * 1).toLocaleString()
       data_obj['datetime'] = formatCioosDateTime(value)
-      console.log(data_obj['datetime'])
+      //console.log(data_obj['datetime'])
     }
     else{
         //WARNING: Ugly regex ahead

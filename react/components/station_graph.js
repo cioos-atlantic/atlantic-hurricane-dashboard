@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart, LineElement, LinearScale, PointElement, CategoryScale, Tooltip, Legend, LineController } from 'chart.js';
-import {windSpeedToKnots, windSpeedToKmh, tempToDegreeF, tempToDegreeC, pressureToKPa, pressureToInHg, windHeightToM, windHeightToFt} from './utils/unit_conversion.js'
+
 
 // Register necessary components, including the Line controller
 Chart.register(LineController, LineElement, LinearScale, PointElement, CategoryScale, Tooltip, Legend);
@@ -33,17 +33,11 @@ function RenderChart({ chartData, stationName }) {
       const datasets = Object.entries(chartData.data)
         .filter(([key]) => key !== 'time') // Exclude 'time' from datasets
         .map(([key, variable]) => {
-          console.log(`Processing key: ${key}`); // Log the key being processed
-          if (!Array.isArray( variable.value)) {
-            variable.value= [ variable.value]}
+          //console.log(`Processing key: ${key}`); 
+          if (!Array.isArray(variable.value)) {
+            variable.value= [variable.value]}
           
-          if (key === 'air_pressure'){
-            variable.units = 'kPa';
-            variable.value = variable.value.map(v => {
-              const resultKPa = pressureToKPa(v);
-              console.log(`Value: ${v}, Converted: ${resultKPa.converted_value}`);
-              return resultKPa.converted_value}); 
-          }
+          
           return{
           label: `${variable.std_name} (${variable.units})` || key, //  std_name if available
           data: variable.value || [], // Ensure that value exists
@@ -61,7 +55,15 @@ function RenderChart({ chartData, stationName }) {
         },
         options: {
           scales: {
+            x: {
+              grid: {
+                display: true, // Show grid on the x-axis
+              },
+            },
             y: {
+              grid: {
+                display: true, // Show grid on the y-axis
+              },
               beginAtZero: true,
             },
           },
@@ -72,7 +74,7 @@ function RenderChart({ chartData, stationName }) {
               position: 'bottom',
             },
             title: {
-              display: true,
+              display: false,
               text: `Data for ${stationName}`,
             },
           },
@@ -96,7 +98,20 @@ function RenderChart({ chartData, stationName }) {
     };
   }, [chartData, stationName]); // Re-run effect if chartData or stationName changes
 
-  return <canvas ref={chartRef} style={{ width: '700px', height: '400px' }} />; // Render the canvas
+  return (
+    
+      <canvas
+        ref={chartRef}
+        style={{
+          top: 0,
+          left: 0,
+          width: '500px',
+          height: '300px', // You can keep this if you want to maintain responsiveness
+          aspectRatio: '409 / 409', // Maintain a 1:1 aspect ratio if you want
+        }}
+      />
+    
+  );
 }
 
 // Function to generate a random color for chart lines
