@@ -13,8 +13,8 @@ import station_names from "../data/station/names.json"
 
 import HurricaneIcon from '../public/hurricane.svg'
 import TropicalStormIcon from '../public/tropical-storm.svg'
-import {formatCioosStations, formatCioosDateTime} from './station_formats'
-import {RenderChart} from './station_graph.js'
+import {formatCioosStations, formatCioosDateTime, parseData} from './station_formats'
+import RenderChart from './station_graph.js'
 
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
@@ -249,6 +249,8 @@ export default function Map({ children, storm_data, station_data }) {
     storm_radius = remap_coord_array(storm_data.rad.features[0].geometry.coordinates);
   }
 
+  const parsedStationData = parseData(station_data);
+
   // console.log("hurricane_icon: ", HurricaneIcon.src)
   // console.log("hurricon_div: ", hurricon_div)
   // console.log("hurricon: ", hurricon)
@@ -312,13 +314,16 @@ export default function Map({ children, storm_data, station_data }) {
             <LayersControl.Overlay checked name="Stations">
               <LayerGroup>
                 { 
+                  
+
                   Object.entries(station_data).map((element) => {
                     const data_link = "https://cioosatlantic.ca/erddap/tabledap/" + element[0] + ".html"
                     const data = RecentStationData(element[1].properties.station_data)
                     const station_name = element[1].properties.station
                     const display_name = (station_name in station_names) ? station_names[station_name]['display']:station_name
 
-                    console.log("Station Name:", station_name);
+                    //console.log("Station Name:", station_name);
+                    //console.log(parsedStationData[station_name])
                     
                     return (
                       <Marker 
@@ -334,10 +339,10 @@ export default function Map({ children, storm_data, station_data }) {
                             
                             <div>
                               <h4>{display_name}</h4>
-                              <h4>{station_name}</h4>
+                              
                               <RenderChart  
-                              targetStationName={station_name}
-                              chartData={station_data}
+                              chartData={parsedStationData[station_name]}
+                              stationName={station_name}
                               />
                             </div>
                             {data}

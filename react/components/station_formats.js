@@ -83,3 +83,69 @@ export function formatCioosDateTime(date_str){
   const timestamp = date.toLocaleString('en-US', options);
   return timestamp
 }
+
+
+export function parseData(fullStationData) {
+  //console.log(JSON.parse(chartData));
+  const stationDataTable = {}; 
+
+
+  const attributes_of_interest = ['sea_surface_wave_significant_height',
+    'sea_surface_wave_maximum_height', "wind_speed_of_gust", "air_temperature", "time", "sea_surface_temperature", "wind_speed", "air_pressure"]
+
+  Object.entries(fullStationData).forEach(([station_name, station_details]) => {
+    //console.log(`Station_name: ${station_name}`);
+    //console.log(`station_details: ${station_details.properties.station_data}`);
+    const stationEntries= station_details.properties.station_data
+
+    const station_data = JSON.parse(stationEntries);
+    //console.log(station_data)
+
+
+    const re_match = /(?<var_name>[\w_]+)\s\((?<standard_name>[\w_]+)\|(?<units>[\w\s\/()-]+)\|(?<long_name>[\w\s\d\/()]+)\)/g; 
+
+ 
+    //let field_value = undefined;
+    let field_obj = undefined;
+        
+    station_data.forEach((row) => {
+    //console.log("Row:", row);
+
+      Object.keys(row).forEach((field) => {
+        //console.log(field)
+        
+        //field_value = row[field]
+        //console.log(field);
+        const names = [...field.matchAll(re_match)];
+        if (names.length > 0) {
+          field_obj = {};
+          //console.log(names[0])
+
+          field_obj.var_name = names[0].groups["var_name"];
+          field_obj.std_name = names[0].groups["standard_name"];
+          field_obj.units = names[0].groups["units"];
+          field_obj.long_name = names[0].groups["long_name"];
+          field_obj.value = row[field];}
+          
+          if (attributes_of_interest.includes(field_obj.std_name)){
+            if (!stationDataTable[station_name]) {
+              stationDataTable[station_name] = { data: {} };}  // Initialize the station entry if not found
+            
+            const station = stationDataTable[station_name];
+            // Check if the std_name field already exists in the station data
+            if (!station.data[field_obj.std_name]) {
+                // Create a new entry for this field
+              station.data[field_obj.std_name] = field_obj;}
+            else {
+              // If the field already exists, append the value
+              const existingField = station.data[field_obj.std_name];
+          
+              if (!Array.isArray(existingField.value)) {
+                existingField.value = [existingField.value];}
+              existingField.value.push(field_obj.value);};
+      }});});
+      });
+    console.log(stationDataTable) 
+    return stationDataTable 
+}
+    
