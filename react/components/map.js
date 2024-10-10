@@ -182,7 +182,11 @@ function RecentStationData(data) {
 }
 
 function PointDetails(point) {
-  // console.log("POINT Data: ", point);
+  // If properties has no items, it's an empty point object and should return
+  // immediately
+  if (Object.keys(point.properties).length == 0) {
+    return (<></>);
+  }
 
   // ECCC and IBTRACS have multiple ways to define a storm type, some overlap and others are unique
   const storm_types = {
@@ -197,10 +201,6 @@ function PointDetails(point) {
     "HR": "Hurricane",
     "PT": "Post-Tropical Storm",
   };
-
-  if (point === empty_point_obj) {
-    return (<></>);
-  }
 
   // ECCC and IBTRACS use different names for the same kinds of information.  Sometimes, within IBTRACS, several different fields may possibly contain the appropriate value
   // ECCC uses TIMESTAMP and IBTRACS uses ISO_TIME
@@ -349,9 +349,10 @@ export default function Map({ children, storm_data, station_data }) {
                     const data = RecentStationData(element[1].properties.station_data)
                     const station_name = element[1].properties.station
                     const display_name = (station_name in station_names) ? station_names[station_name]['display'] : station_name
+
                     return (
                       <Marker
-                        key={element.station}
+                        key={"station-marker-" + station_name}
                         position={flip_coords(element[1].geometry.coordinates)}
                       //eventHandlers={{click : )}}
                       >
