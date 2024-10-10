@@ -21,7 +21,7 @@ export const empty_storm_obj = {
  * @param {float} nw_rad North-West Quadrant, radius of wind speed in nautical miles
  */
 export function build_wind_radii(storm_data_pt, speed, storm_center, ne_rad, se_rad, sw_rad, nw_rad) {
-    console.debug(speed, storm_center, ne_rad, se_rad, sw_rad, nw_rad);
+    // console.debug(speed, storm_center, ne_rad, se_rad, sw_rad, nw_rad);
 
     let final_polygon = {
         "type": "Feature",
@@ -52,7 +52,7 @@ export function build_wind_radii(storm_data_pt, speed, storm_center, ne_rad, se_
     const sw_rad_m = sw_rad * nmi_to_m;
     const nw_rad_m = nw_rad * nmi_to_m;
 
-    console.debug(`NE: ${ne_rad_m}m SE: ${se_rad_m}m SW: ${sw_rad_m}m NW: ${nw_rad_m}m`);
+    // console.debug(`NE: ${ne_rad_m}m SE: ${se_rad_m}m SW: ${sw_rad_m}m NW: ${nw_rad_m}m`);
 
     let radius = NaN;
     let rad_coords = [];
@@ -91,9 +91,9 @@ export function build_wind_radii(storm_data_pt, speed, storm_center, ne_rad, se_
     const flat_coords = [].concat.apply([], rad_coords);
     const final_bbox = geolib.getBounds(flat_coords);
 
-    console.debug("Final geometry of quads: ", rad_coords);
-    console.debug("Flattened coords for calculating bounding box: ", flat_coords);
-    console.debug("Final Bounding Box: ", final_bbox);
+    // console.debug("Final geometry of quads: ", rad_coords);
+    // console.debug("Flattened coords for calculating bounding box: ", flat_coords);
+    // console.debug("Final Bounding Box: ", final_bbox);
 
     final_polygon.geometry.coordinates = coords_to_array(rad_coords);
 
@@ -146,8 +146,8 @@ export function build_quadrant(storm_center, radius, quadrant) {
     // of the last point to the end of the coordinate list
     quadrant_points.push(quadrant_points[0]);
 
-    console.debug(`Original Coordinates: ${storm_center}`)
-    console.debug(`Quadrant ${quadrant} arc points:`, quadrant_points);
+    // console.debug(`Original Coordinates: ${storm_center}`)
+    // console.debug(`Quadrant ${quadrant} arc points:`, quadrant_points);
 
     return quadrant_points;
 }
@@ -220,10 +220,10 @@ export function populateStormDetails(event, storm_data, setSelectedStorm, setSto
             }
         }
 
-        console.debug("Wind Radius Parts:", wind_rad_parts);
+        // console.debug("Wind Radius Parts:", wind_rad_parts);
 
         for (let wind_speed in wind_rad_parts) {
-            console.debug(`Building wind speed radii for: ${wind_speed}knots`);
+            // console.debug(`Building wind speed radii for: ${wind_speed}knots`);
 
             wind_rad_polys.push(build_wind_radii(
                 storm_pt,
@@ -236,7 +236,7 @@ export function populateStormDetails(event, storm_data, setSelectedStorm, setSto
             ));
         }
 
-        console.debug("Final Polygons: ", wind_rad_polys);
+        // console.debug("Final Polygons: ", wind_rad_polys);
     });
 
 

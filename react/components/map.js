@@ -237,6 +237,8 @@ export default function Map({ children, storm_data, station_data }) {
   // Points always there, even not in storm seasons
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
 
+  // console.debug("Hover Marker: ", hover_marker.id, hover_marker.properties.TIMESTAMP);
+
   // console.log("Data");
   // console.log(Object.entries(station_data));
   // console.log(station_data);
@@ -382,7 +384,7 @@ export default function Map({ children, storm_data, station_data }) {
                   storm_data.rad.features.map(radii => {
                     // console.debug("Mapping radii...", radii);
 
-                    let display_radii = radii;
+                    let display_radii = true;
                     if (hover_marker.properties.TIMESTAMP != radii.properties.TIMESTAMP) {
                       display_radii = false;
                     }
@@ -405,11 +407,15 @@ export default function Map({ children, storm_data, station_data }) {
                       //     <p>Timestamp: {radii.properties.TIMESTAMP}</p>
                       //   </Popup>
                       // </Polygon>
-                      <GeoJSON 
-                        key={radii.properties.TIMESTAMP + radii.properties.WINDFORCE}
-                        data={display_radii} 
-                        style={path_options}
-                      />
+                      display_radii ? (                        
+                        <GeoJSON 
+                          key={radii.id}
+                          data={radii} 
+                          style={path_options}
+                        />
+                      ):(
+                          <></>
+                      )
                     );
                   })
                 }
