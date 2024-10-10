@@ -3,6 +3,13 @@ import * as geolib from 'geolib';
 
 export const nmi_to_m = 1852.216;
 
+export const empty_storm_obj = {
+    pts: { features: [] },
+    err: { features: [] },
+    lin: { features: [] },
+    rad: { features: [] },
+};
+
 /**
  * Generates a polygon of wind speed radius based on supplied values;
  * 
@@ -172,3 +179,88 @@ export function bounds_to_array(bounds_obj) {
     return [bounds_obj.maxLng, bounds_obj.maxLat, bounds_obj.minLng, bounds_obj.minLat];
 }
 
+export function populateStormDetails(event, storm_data, setSelectedStorm, setStormPoints) {
+    console.log("Set Selected storm to: " + storm_data.data[0].properties.NAME);
+    setSelectedStorm(storm_data.data[0].properties.NAME);
+
+    console.debug("Printing out storm properties");
+    console.debug(storm_data);
+
+    let wind_rad_polys = [],
+        wind_spd_rad_dir = null,
+        wind_rad_parts = {},
+        storm_features = {
+            pts: { features: [] },
+            err: { features: [] },
+            lin: { features: [] },
+            rad: { features: [] },
+        };
+
+
+    storm_data.data.forEach((storm_pt, idx) => {
+        // console.debug("Storm Point: ", idx, storm_pt);
+        wind_rad_parts = {};
+        for (let field in storm_pt.properties) {
+            // Dropping null fields 
+            if (!storm_pt.properties[field]) {
+                delete storm_data.data[idx].properties[field];
+            }
+            // Calculating wind radius points based on wind speed radii quadrant distances
+            else {
+                wind_spd_rad_dir = field.match(/^\w+R(?<speed>\d+)\w+(?<direction>NE|SE|NW|SW)$/);
+
+                if (wind_spd_rad_dir) {
+                    // console.debug(wind_spd_rad_dir);
+                    if (!wind_rad_parts[wind_spd_rad_dir.groups["speed"]]) {
+                        wind_rad_parts[wind_spd_rad_dir.groups["speed"]] = {};
+                    }
+
+                    wind_rad_parts[wind_spd_rad_dir.groups["speed"]][wind_spd_rad_dir.groups["direction"]] = storm_pt.properties[field];
+                }
+            }
+        }
+
+        console.debug("Wind Radius Parts:", wind_rad_parts);
+
+        for (let wind_speed in wind_rad_parts) {
+            console.debug(`Building wind speed radii for: ${wind_speed}knots`);
+
+            wind_rad_polys.push(build_wind_radii(
+                storm_pt,
+                parseInt(wind_speed),
+                storm_pt.geometry.coordinates,
+                wind_rad_parts[wind_speed]['NE'],
+                wind_rad_parts[wind_speed]['SE'],
+                wind_rad_parts[wind_speed]['SW'],
+                wind_rad_parts[wind_speed]['NW']
+            ));
+        }
+
+        console.debug("Final Polygons: ", wind_rad_polys);
+    });
+
+
+    // const filtered = forecasts.map(source => {
+    //    return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") 
+    // })[0];
+    setStormPoints(empty_storm_obj);
+
+    for (var i in storm_data.data) {
+        switch (storm_data.data[i].geometry.type) {
+            case "Point":
+                storm_features.pts.features.push(storm_data.data[i])
+                break;
+            // case "LineString":
+            //   break;
+            // case "Polygon":
+            //   break;
+        }
+    }
+
+    if (wind_rad_polys) {
+        console.debug("Adding polygons to storm features");
+        storm_features.rad.features = wind_rad_polys;
+    }
+
+    setStormPoints(storm_features);
+}

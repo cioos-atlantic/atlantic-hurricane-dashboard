@@ -1,7 +1,12 @@
+import React, { useState, useMemo } from "react";
+import { empty_storm_obj, populateStormDetails } from '../lib/storm_utils';
+
 import styles from './active_storm_list.module.css'
 import { parse, format } from 'date-fns';
 
-export default function ActiveStormList({ active_storm_data, onPopulateStormDetails, selected_storm }) {
+export default function ActiveStormList({ active_storm_data, setStormPoints }) {
+  const [selected_storm, setSelectedStorm] = useState("");
+
   let ib_storm_list = []
   let storm_details = {}
   
@@ -28,7 +33,7 @@ export default function ActiveStormList({ active_storm_data, onPopulateStormDeta
           {ib_storm_list.map(storm_name => {
             return (
               <li key={storm_name + storm_details[storm_name].year} className={(storm_name == selected_storm ? styles.selected_storm : '')}>
-                <a onClick={(e) => { onPopulateStormDetails(e, storm_details[storm_name]) }}>{storm_name}</a>
+                <a onClick={(e) => { populateStormDetails(e, storm_details[storm_name], setSelectedStorm, setStormPoints) }}>{storm_name}</a>
               </li>
             )
           })}
