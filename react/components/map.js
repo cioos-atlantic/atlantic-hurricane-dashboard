@@ -312,37 +312,6 @@ export default function Map({ children, storm_data, station_data }) {
                 />
               </LayerGroup>
             </LayersControl.Overlay>
-            <LayersControl.Overlay checked name="Error Cone">
-              <LayerGroup>
-                {
-                  err_cone.length > 0 &&
-                  <Polygon positions={err_cone} />
-                }
-              </LayerGroup>
-            </LayersControl.Overlay>
-            <LayersControl.Overlay checked name="Points">
-              <LayerGroup>
-                {
-                  storm_data.pts.features.map(point => {
-                    const position = flip_coords(point.geometry.coordinates);
-
-                    // console.log(point);
-
-                    return (
-                      <Marker
-                        key={point.id}
-                        position={position}
-                        eventHandlers={{
-                          mouseover: (event) => setHoverMarker(point),
-                        }}
-                        icon={hurricon}
-                      >
-                      </Marker>
-                    );
-                  })
-                }
-              </LayerGroup>
-            </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Stations">
               <LayerGroup>
                 {
@@ -365,6 +334,37 @@ export default function Map({ children, storm_data, station_data }) {
                         </Popup>
                       </Marker>
                     )
+                  })
+                }
+              </LayerGroup>
+            </LayersControl.Overlay>
+            <LayersControl.Overlay checked name="Error Cone">
+              <LayerGroup>
+                {
+                  err_cone.length > 0 &&
+                  <Polygon positions={err_cone} />
+                }
+              </LayerGroup>
+            </LayersControl.Overlay>
+            <LayersControl.Overlay checked name="Points">
+              <LayerGroup>
+                {
+                  storm_data.pts.features.map(point => {
+                    const position = flip_coords(point.geometry.coordinates);
+
+                    console.log(point);
+
+                    return (
+                      <Marker
+                        key={point.id}
+                        position={position}
+                        eventHandlers={{
+                          mouseover: (event) => setHoverMarker(point),
+                        }}
+                        icon={hurricon}
+                      >
+                      </Marker>
+                    );
                   })
                 }
               </LayerGroup>
