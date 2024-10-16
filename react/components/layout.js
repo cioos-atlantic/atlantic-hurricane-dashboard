@@ -9,6 +9,7 @@ import FooterNav from './footer_nav'
 import Drawer from '../components/drawer'
 import StormSearch from "@/components/storm_search";
 import ActiveStormList from "@/components/active_storm_list";
+import HistoricalStormList from "@/components/historical_storm_list";
 
 import dynamic from "next/dynamic";
 
@@ -56,6 +57,14 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
   );
 
   <main><MapWithNoSSR station_data={station_data}></MapWithNoSSR></main>
+
+
+
+
+  const HistoricalMapWithNoSSR = useMemo(
+    () => dynamic(() => import("../components/map_historical"), { ssr: false }),
+    []
+  );
   
 
   // console.log(querystring.storms)
@@ -122,8 +131,10 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
       setStormPoints(data);
     });
   }
-
+  console.log(querystring)
   const active_storms = querystring.query.storms == "active"
+  const historical_storms = querystring.query.storms == "historical"
+
 
   return (
     <div className={styles.body}>
@@ -155,7 +166,8 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
               active_storm_data={active_storm_data}
               onPopulateStormDetails={populateStormDetails}
             />
-          ) : (
+          ) : historical_storms ? ( <HistoricalStormList
+          />) : (
             <StormSearch
               onSearch={updateStormList}
               onPopulateStormDetails={populateStormDetails}
@@ -168,7 +180,11 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
             />
           )}
         </Drawer>
-        <MapWithNoSSR storm_data={storm_points} station_data={station_data}></MapWithNoSSR>
+        {active_storms && (
+        <MapWithNoSSR storm_data={storm_points} station_data={station_data}></MapWithNoSSR>)}
+        {historical_storms && (
+          <HistoricalMapWithNoSSR ></HistoricalMapWithNoSSR>
+        )}
       </main>
       <footer>
         <FooterNav></FooterNav>
