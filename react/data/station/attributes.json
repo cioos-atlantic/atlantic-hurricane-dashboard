@@ -1,26 +1,26 @@
 {
     "sea_surface_wave_significant_height":{
         "name":"Wave Height (Avg)",
-        "definition":"Wave height bla bla bla"
+        "definition":"Wave height definition"
     },
     "sea_surface_wave_maximum_height":{
         "name":"Wave Height (Max)",
-        "definition":"Maximum recorded wave height within x wave period"
+        "definition":"Wave height definition"
     },
     "air_temperature":{
         "name":"Temperature (Air)",
-        "definition": "Air temperature recorded"
+        "definition": "Air temperature definition"
     },
     "sea_surface_temperature": {
         "name":"Temperature (Sea Surface)",
-        "definition":"Temperature but make it sea surfacey"
+        "definition":"Sea Surface Temperature definition"
     },
     "air_pressure":{
         "name":"Air Pressure",
-        "definition":"Air pressure explanation"
+        "definition":"Air pressure definition"
     },
     "relative_humidity":{
         "name":"Humidity",
-        "definition":"How humid the air is"
+        "definition":"Humidity definition"
     }
 }
