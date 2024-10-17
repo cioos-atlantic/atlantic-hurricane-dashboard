@@ -10,6 +10,7 @@ import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 
 import station_names from "../data/station/names.json"
+import attributes_of_interest from "../data/station/attributes.json"
 
 import HurricaneIcon from '../public/hurricane.svg'
 import TropicalStormIcon from '../public/tropical-storm.svg'
@@ -134,29 +135,20 @@ function RecentStationData(data){
   })
 
   //TODO: Clean up
-  const attributes_of_interest = {
-    'sea_surface_wave_significant_height':'Wave Height (Avg)',
-    'sea_surface_wave_maximum_height':'Wave Height (Max)',
-    'air_temperature':'Temperature (Air)',
-    'sea_surface_temperature': 'Temperature (Sea Surface)',
-    'air_pressure':'Air Pressure',
-    'relative_humidity':'Humidity'
-  }
   // Separate section for wind since the arrows need to be drawn
   if(data_obj['wind_from_direction']){
     const wind_direction = (180 + parseInt(data_obj['wind_from_direction'].value)) % 360
-    children.push(<strong>Wind:  </strong>)
-    children.push(<Image class="wind_arrow" alt={wind_direction} src="arrow.svg" height={20} width={20} 
+    children.push(<span title="Wind speed and direction"><strong>Wind:  </strong></span>)
+    children.push(<Image className="wind_arrow" alt={wind_direction} src="arrow.svg" height={20} width={20} 
       style={{ transform: 'rotate(' + (wind_direction) + 'deg)' }}></Image>)
   }
   if(data_obj['wind_speed']){
-    children.push(<span>   {(parseFloat(data_obj['wind_speed'].value).toFixed(1))} {data_obj['wind_speed'].units}</span>)}
-  Object.entries(attributes_of_interest).forEach(entry =>{
-    const key = entry[0]
-    const val = entry[1]
+    children.push(<span>   {(parseFloat(data_obj['wind_speed'].value).toFixed(1))} {data_obj['wind_speed'].units}<br></br></span>)}
+  for(const [key,value] of Object.entries(attributes_of_interest)){
     if(data_obj[key] && data_obj[key].value){
-        children.push(<p><strong>{val}:</strong> {(parseFloat(data_obj[key].value).toFixed(1))} {data_obj[key].units}</p>)}
-  })
+      children.push(<span title={value["definition"]}><strong>{value["name"]}: </strong></span>) 
+      children.push(<span>{(parseFloat(data_obj[key].value).toFixed(1))} {data_obj[key].units}<br></br></span>)}
+    }
   let station_info = (
     <div className="station_pane">
       <p>{data_obj['datetime']}</p>
@@ -220,9 +212,6 @@ export default function Map({ children, storm_data, station_data }) {
   // Add parameter for points
   // Points always there, even not in storm seasons
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
-  console.log("Data");
-  console.log(Object.entries(station_data));
-  console.log(station_data);
   const hurricon = new Icon({
     iconUrl: HurricaneIcon.src,
     iconRetinaUrl: HurricaneIcon.src,
@@ -337,6 +326,7 @@ export default function Map({ children, storm_data, station_data }) {
                           <Popup> 
                             <h3>{display_name}</h3>
                             {data}
+                            <br></br>
                             <a href={data_link} target="_blank">Full data</a>
                           </Popup>
                         </Marker>
