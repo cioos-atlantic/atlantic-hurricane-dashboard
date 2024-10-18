@@ -27,6 +27,7 @@ export default async function handler(req, res) {
                 'column_units':[],
                 'column_std_names':[],
                 'column_long_names':[],
+                'column_raw_names':[],
                 'rows':[]
             };
             const parsed_data = JSON.parse(station_data[station_name]['properties']['station_data']);
@@ -39,8 +40,19 @@ export default async function handler(req, res) {
                     station_data_formatted['column_std_names'].push(names[0].groups["standard_name"]);
                     station_data_formatted['column_units'].push(names[0].groups["units"]);
                     station_data_formatted['column_long_names'].push(names[0].groups["long_name"]);
+                    station_data_formatted['column_raw_names'].push(field);
                 }
             })
+
+            parsed_data.forEach((row) => {
+                let row_data = []
+                station_data_formatted['column_raw_names'].forEach((column) => {
+                    row_data.push(row[column])
+                })
+                station_data_formatted['rows'].push(row_data)
+            })
+            
+
             station_data[station_name]['properties']['station_data'] = station_data_formatted
           
             //station_data[station_name]['properties']['station_data']
