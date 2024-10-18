@@ -6,6 +6,7 @@ export default function ActiveStormList({ active_storm_data, onPopulateStormDeta
   let storm_details = {}
   
   console.log("Selected Storm: " + selected_storm)
+  console.log(active_storm_data)
 
   active_storm_data.ib_data.features.map(storm_point => {
     if (!ib_storm_list.includes(storm_point.properties.NAME)) {
@@ -28,7 +29,7 @@ export default function ActiveStormList({ active_storm_data, onPopulateStormDeta
           {ib_storm_list.map(storm_name => {
             return (
               <li key={storm_name + storm_details[storm_name].year} className={(storm_name == selected_storm ? styles.selected_storm : '')}>
-                <a onClick={(e) => { onPopulateStormDetails(e, storm_details[storm_name]) }}>{storm_name}</a>
+                <a onClick={(e) => { onPopulateStormDetails(e, storm_details[storm_name]) }}>{`${storm_name}`}</a>
               </li>
             )
           })}

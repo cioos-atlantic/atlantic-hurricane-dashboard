@@ -9,7 +9,7 @@ import FooterNav from './footer_nav'
 import Drawer from '../components/drawer'
 import StormSearch from "@/components/storm_search";
 import ActiveStormList from "@/components/active_storm_list";
-import HistoricalStormList from "@/components/historical_storm_list";
+import HistoricalStormList from "../pages/api/historical_storm_list";
 
 import dynamic from "next/dynamic";
 
