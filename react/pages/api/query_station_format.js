@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         console.log('getting features...')
         let station_data = {}
         const features = result['erddap_data']['features']
-        const re_match = /(?<var_name>[\w_]+)\s\((?<standard_name>[\w_]+)\|(?<units>[\w\s\/()-]+)\|(?<long_name>[\w\s\d\/()]+)\)/g; 
+        const re_match = /(?<var_name>.*)\s\((?<standard_name>.*)\|(?<units>.*)\|(?<long_name>.*)\)/g; 
         for (let feature in features){
             const station_name = features[feature]['properties']['station']
             station_data[station_name] = features[feature]
