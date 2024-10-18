@@ -2,6 +2,7 @@
 //import { parse, format } from 'date-fns';
 import storm_list from '../../data/forecasts/list.json'
 import CustomButton from '../../custom/custom-button.js';
+
 //import {forecastDataDir, getStormData} from '../../lib/storms.js';
 
 export default function HistoricalStormList() {
@@ -33,7 +34,20 @@ export async function handleClick(storm)  {
   console.log('Button clicked for', storm.name);
   const storm_name= storm.name;
   const storm_year= storm.year;
-  const storm_source = storm.source;
+
+  let storm_source;
+  
+  // if condition because of what list.json looks like eccc instead of ECCC
+  if (storm.source === 'eccc'){
+    storm_source = "ECCC";
+  }
+  else if (storm.source === 'ibtracs'){
+    storm_source = "IBTRACS"
+  }
+  //console.log(storm_source)
+
+
+  
 
   // Construct query parameters
   const query = new URLSearchParams({
@@ -48,7 +62,7 @@ export async function handleClick(storm)  {
 
   //console.log(process)
   const resource = await fetch(`/api/historical_storms?${query}`);
-  console.log(resource);
+  
   const historical_storm_data = await resource.json();
 
   console.log(historical_storm_data);
