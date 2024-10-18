@@ -11,6 +11,7 @@ import StormSearch from "@/components/storm_search";
 import ActiveStormList from "@/components/active_storm_list";
 import HistoricalStormList from "../pages/api/historical_storm_list";
 
+
 import dynamic from "next/dynamic";
 
 // NOTE:  This data and form was used early on for 
@@ -43,6 +44,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
   const [storm_timeline, setStormTimeline] = useState([]);
   const [storm_points, setStormPoints] = useState(empty_storm_obj);
   const [station_points, setStationPoints] = useState([empty_station_obj]);
+  const [historicalStormData, setHistoricalStormData] = useState({}); // State for storing historical storm data
 
   
   // useMemo() tells React to "memorize" the map component.
@@ -61,10 +63,15 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
 
 
 
-  const HistoricalMapWithNoSSR = useMemo(
-    () => dynamic(() => import("../components/map_historical"), { ssr: false }),
+  const DefaultMapWithNoSSR = useMemo(
+    () => dynamic(() => import("../components/default_map"), { ssr: false }),
     []
   );
+   // Function to handle harvested historical storm data
+   function handleHarvestHistoricalData (data) {
+    console.log("Harvested Historical Storm Data:", data);
+    setHistoricalStormData(data); // Update the state with the harvested data
+  };
   
 
   // console.log(querystring.storms)
@@ -113,6 +120,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     }
     
     setStormPoints(storm_features);
+    //console.log(storm_points)
   }
 
   function populateTimeline(event, storm_obj) {
@@ -166,7 +174,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
               active_storm_data={active_storm_data}
               onPopulateStormDetails={populateStormDetails}
             />
-          ) : historical_storms ? ( <HistoricalStormList
+          ) : historical_storms ? ( <HistoricalStormList onHarvestData={handleHarvestHistoricalData}
           />) : (
             <StormSearch
               onSearch={updateStormList}
@@ -181,9 +189,14 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
           )}
         </Drawer>
         {active_storms && (
-        <MapWithNoSSR storm_data={storm_points} station_data={station_data}></MapWithNoSSR>)}
+        <MapWithNoSSR storm_data={storm_points} station_data={station_data} source_type={"active"}></MapWithNoSSR>)}
         {historical_storms && (
-          <HistoricalMapWithNoSSR ></HistoricalMapWithNoSSR>
+          // Check if historicalStormData is empty
+          Object.keys(historicalStormData).length === 0 ? (
+            <DefaultMapWithNoSSR station_data={station_data} />
+          ) : (
+            <MapWithNoSSR storm_data={historicalStormData} station_data={station_data} source_type={"historical"} />
+          )
         )}
       </main>
       <footer>

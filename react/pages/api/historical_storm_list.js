@@ -5,8 +5,11 @@ import CustomButton from '../../custom/custom-button.js';
 
 //import {forecastDataDir, getStormData} from '../../lib/storms.js';
 
-export default function HistoricalStormList() {
-  console.log("historical")
+export default function HistoricalStormList({onHarvestData}) {
+  onHarvestData= onHarvestData
+  console.log("Historical Storms Loading...");
+
+  
   //console.log(storm_list)
 
   return (
@@ -18,7 +21,7 @@ export default function HistoricalStormList() {
         {storm_list.map((storm, index) => {
           return (
             <li key={storm.name + storm.year} className={(storm.name)}>
-              <a onClick={(e) => {handleClick(storm)}}>{`${storm.name}-${storm.year}`}</a>
+              <a onClick={(e) => {handleClick(storm, onHarvestData)}}>{`${storm.name}-${storm.year}`}</a>
             </li>
           )
         })}
@@ -30,7 +33,7 @@ export default function HistoricalStormList() {
 
 }
 
-export async function handleClick(storm)  {
+export async function handleClick(storm, onHarvestData)  {
   console.log('Button clicked for', storm.name);
   const storm_name= storm.name;
   const storm_year= storm.year;
@@ -46,8 +49,6 @@ export async function handleClick(storm)  {
   }
   //console.log(storm_source)
 
-
-  
 
   // Construct query parameters
   const query = new URLSearchParams({
@@ -67,13 +68,14 @@ export async function handleClick(storm)  {
 
   console.log(historical_storm_data);
 
+   // Trigger the callback to send data back to the parent
+   if (onHarvestData) {
+    onHarvestData(historical_storm_data);
+  }
+
+
   
 
 
-  if (storm_source === "eccc"){
-    //const storm_data = getStormData(storm_name, storm_source)
-
-    //console.log(storm_data)
-    
-  }
+  
 };

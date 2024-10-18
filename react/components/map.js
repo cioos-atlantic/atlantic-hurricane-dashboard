@@ -216,13 +216,72 @@ function PointDetails(point) {
   )
 }
 
-export default function Map({ children, storm_data, station_data }) {
+function parseHistoricalData(storm_data){
+  let storm_features = {
+    // create an empty object to store the storm_points
+    pts:{features:[]},
+    err:{features:[]},
+    lin:{features:[]},
+    rad:{features:[]},
+  };
+  
+
+  let storm_details = {}
+  let ib_storm_list = []
+  //console.log("storm_data")
+  //console.log(storm_data.ib_data.features)
+  storm_data.ib_data.features.map(storm_point => {
+    if (!ib_storm_list.includes(storm_point.properties.NAME)) {
+      ib_storm_list.push(storm_point.properties.NAME)
+      storm_details[storm_point.properties.NAME] = {
+        source: "ibtracs", 
+        year: storm_point.properties.SEASON, 
+        data: []
+      }
+    }
+    storm_details[storm_point.properties.NAME].data.push(storm_point)
+});
+
+  //console.log(storm_details)
+  // Extract the storm key dynamically
+  let stormName = Object.keys(storm_details)[0];
+
+  // Extract the storm data using the key
+  let storm_info = storm_details[stormName];
+
+  for(let i in storm_info.data){
+    
+    switch(storm_info.data[i].geometry.type){
+      case "Point":
+        storm_features.pts.features.push(storm_info.data[i])
+        break;
+      // case "LineString":
+      //   break;
+      // case "Polygon":
+      //   break;
+    }
+  }
+
+  
+  console.log(storm_features);
+  return storm_features;
+};
+
+export default function Map({ children, storm_data, station_data, source_type }) {
   // Add parameter for points
   // Points always there, even not in storm seasons
+
+  if (source_type === "historical"){
+    storm_data = parseHistoricalData(storm_data)
+
+    
+    
+  }// end of historical if
+
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
-  console.log("Data");
+  //console.log("Data");
   console.log(Object.entries(station_data));
-  console.log(station_data);
+  //console.log(station_data);
   const hurricon = new Icon({
     iconUrl: HurricaneIcon.src,
     iconRetinaUrl: HurricaneIcon.src,
