@@ -280,7 +280,7 @@ export default function Map({ children, storm_data, station_data, source_type })
 
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
   //console.log("Data");
-  console.log(Object.entries(station_data));
+  //console.log(Object.entries(station_data));
   //console.log(station_data);
   const hurricon = new Icon({
     iconUrl: HurricaneIcon.src,

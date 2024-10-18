@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from './layout.module.css'
@@ -10,6 +10,7 @@ import Drawer from '../components/drawer'
 import StormSearch from "@/components/storm_search";
 import ActiveStormList from "@/components/active_storm_list";
 import HistoricalStormList from "../pages/api/historical_storm_list";
+import { useRouter } from 'next/router';
 
 
 import dynamic from "next/dynamic";
@@ -46,6 +47,8 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
   const [station_points, setStationPoints] = useState([empty_station_obj]);
   const [historicalStormData, setHistoricalStormData] = useState({}); // State for storing historical storm data
 
+  const router = useRouter();
+
   
   // useMemo() tells React to "memorize" the map component.
   // Wthout this, the map will get redrawn by many interactions 
@@ -68,10 +71,30 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     []
   );
    // Function to handle harvested historical storm data
-   function handleHarvestHistoricalData (data) {
+  function handleHarvestHistoricalData (data) {
     console.log("Harvested Historical Storm Data:", data);
+    //console.log(data.ib_data.features)
+    //if(data.ib_data.features){}
+
+    // Return nothing if the array is empty because the user will be redirected
+    if (data.ib_data.features.length === 0) {
+      return null;
+    }
+
     setHistoricalStormData(data); // Update the state with the harvested data
   };
+
+  useEffect(() => {
+    // Check if stormData is an empty array
+    if (historicalStormData?.ib_data?.features?.length === 0 === 0) {
+      // Redirect to the 404 page
+      router.replace('/404'); 
+      //TODO 
+      // fix 404
+    }
+  }, [historicalStormData]);
+
+
   
 
   // console.log(querystring.storms)
