@@ -170,6 +170,16 @@ function RecentStationData(data){
 
 function PointDetails(point) {
   // ECCC and IBTRACS have multiple ways to define a storm type, some overlap and others are unique
+  const [isVisible, setIsVisible] = useState(true);
+  useEffect(() => {
+    // Set a timer to hide the map container after 20 seconds
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+    }, 10000); // 20000 milliseconds = 20 seconds
+
+    // Cleanup function to clear the timer if the component unmounts or if the timer changes
+    return () => clearTimeout(timer);
+  }, []);
   const storm_types = {
     "MX": "Mixture",
     "NR": "Not Reported",
@@ -197,7 +207,7 @@ function PointDetails(point) {
   const MINPRESS = fetch_value(point, ["MSLP", "WMO_PRES", "USA_PRES"]);
 
 
-  return (
+  return (isVisible &&(
     <div className="info_pane">
       <div>
         <h3>{STORMNAME}</h3>
@@ -214,7 +224,7 @@ function PointDetails(point) {
         }
       </div>
     </div>
-  )
+  ))
 }
 
 function parseHistoricalData(storm_data){
@@ -274,6 +284,7 @@ export default function Map({ children, storm_data, station_data, source_type })
   const router = useRouter();
   //console.log(storm_data)
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
+
 
   //console.log(source_type)
   //console.log(storm_data)
