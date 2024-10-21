@@ -76,7 +76,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     //console.log(data.ib_data.features)
     //if(data.ib_data.features){}
     setHistoricalStormData(data); // Update the state with the harvested data
-    console.log("Historical Storm Data set:", data);
+    //console.log("Historical Storm Data set:", data);
   };
 
   useEffect(() => {
@@ -90,6 +90,10 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
       // fix 404
     }
   }, [historicalStormData]);
+
+  if (historicalStormData?.ib_data?.features?.length === 0) {
+    return null;
+  }
 
 
   

@@ -1,5 +1,5 @@
 // https://iconoir.com/ icon library that can be installed via npm
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { parseISO, format } from 'date-fns';
 import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, Polyline } from 'react-leaflet'
 import { useMap, useMapEvent, useMapEvents } from 'react-leaflet/hooks'
@@ -13,6 +13,7 @@ import station_names from "../data/station/names.json"
 
 import HurricaneIcon from '../public/hurricane.svg'
 import TropicalStormIcon from '../public/tropical-storm.svg'
+import { useRouter } from 'next/router';
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
@@ -270,6 +271,29 @@ function parseHistoricalData(storm_data){
 export default function Map({ children, storm_data, station_data, source_type }) {
   // Add parameter for points
   // Points always there, even not in storm seasons
+  const router = useRouter();
+  //console.log(storm_data)
+  const [hover_marker, setHoverMarker] = useState(empty_point_obj);
+
+  //console.log(source_type)
+  //console.log(storm_data)
+
+
+  /*useEffect(() => { // not useful, implemented in the layout after handleHarvestHistoricalData
+    // Check if stormData is an empty array
+
+    if (source_type === "historical" && (storm_data?.ib_data?.features?.length === 0)) {
+      console.log("Empty array, redirecting to 404...");
+      // Redirect to the 404 page
+      router.replace('/404'); 
+      //TODO 
+      // fix 404
+    }
+  }, [source_type, storm_data, router]);
+    // Early return if we are redirecting
+    if (source_type === "historical" && storm_data?.ib_data?.features?.length === 0) {
+      return null; // Prevent further rendering
+    }*/
 
   if (source_type === "historical"){
     storm_data = parseHistoricalData(storm_data)
@@ -278,7 +302,7 @@ export default function Map({ children, storm_data, station_data, source_type })
     
   }// end of historical if
 
-  const [hover_marker, setHoverMarker] = useState(empty_point_obj);
+  
   //console.log("Data");
   //console.log(Object.entries(station_data));
   //console.log(station_data);
