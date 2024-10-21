@@ -3,6 +3,11 @@ import { wfs_query } from "./wfs_test";
 export default async function handler(req, res) {
     const source = ["ERDDAP"]
     const source_type = "HISTORICAL"
+    const time =  (req.query["time"]) ? req.query["time"] : "";
+    const lat =  (req.query["lat"]) ? req.query["lat"] : ""; // can set max atlantic region lat
+    const lon =  (req.query["lon"]) ? req.query["lon"] : ""; // can set max atlantic region lat
+
+    
 
 
     try {
