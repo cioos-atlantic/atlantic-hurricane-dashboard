@@ -14,6 +14,7 @@ import station_names from "../data/station/names.json"
 import HurricaneIcon from '../public/hurricane.svg'
 import TropicalStormIcon from '../public/tropical-storm.svg'
 import { useRouter } from 'next/router';
+import {handleStormHoveredData} from './handle_storm_hovered_data'
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
@@ -103,6 +104,9 @@ function fetch_value(point, property_list){
 
 
 const empty_point_obj = { properties: {}, geometry: {} }
+
+
+
 
 // Have it as a dictionary with time as keys and values as values?
 function Station_Variable(name, std_name,  value, units){
@@ -303,6 +307,7 @@ export default function Map({ children, storm_data, station_data, source_type })
   //console.log(storm_data)
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
   function handleMouseOver(point) {
+    handleStormHoveredData(point)
     setHoverMarker(point); // Set the hovered marker
   };
 
