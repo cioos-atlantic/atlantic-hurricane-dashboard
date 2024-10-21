@@ -171,15 +171,33 @@ function RecentStationData(data){
 function PointDetails(point) {
   // ECCC and IBTRACS have multiple ways to define a storm type, some overlap and others are unique
   const [isVisible, setIsVisible] = useState(true);
+  const [hoverTimer, setHoverTimer] = useState(null); // Timer state
   useEffect(() => {
-    // Set a timer to hide the map container after 20 seconds
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-    }, 10000); // 20000 milliseconds = 20 seconds
+    if (point !== empty_point_obj) {
+      setIsVisible(true); // Show the info pane when point changes
 
-    // Cleanup function to clear the timer if the component unmounts or if the timer changes
-    return () => clearTimeout(timer);
-  }, []);
+      // Clear any existing timer
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+      }
+      
+      // Set a new timer for 10 seconds
+      const timer = setTimeout(() => {
+        setIsVisible(false); // Hide info pane after 10 seconds
+      }, 10000);
+      setHoverTimer(timer); // Store the timer ID
+    }
+    
+    return () => {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer); // Cleanup timer on unmount or change
+      }
+    };
+  }, [point]);
+
+  if (point === empty_point_obj) {
+    return null; // Don't render anything if point is empty
+  }
   const storm_types = {
     "MX": "Mixture",
     "NR": "Not Reported",
@@ -274,7 +292,7 @@ function parseHistoricalData(storm_data){
   }
 
   
-  console.log(storm_features);
+  //console.log(storm_features);
   return storm_features;
 };
 
@@ -284,6 +302,9 @@ export default function Map({ children, storm_data, station_data, source_type })
   const router = useRouter();
   //console.log(storm_data)
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
+  function handleMouseOver(point) {
+    setHoverMarker(point); // Set the hovered marker
+  };
 
 
   //console.log(source_type)
@@ -404,7 +425,8 @@ export default function Map({ children, storm_data, station_data, source_type })
                         key={point.properties.TIMESTAMP}
                         position={position}
                         eventHandlers={{
-                          mouseover: (event) => setHoverMarker(point),
+                          mouseover: (event) => handleMouseOver(point),
+                          mouseout: () => {}, // No action on mouse out; handled by the timer
                         }}
                         icon={hurricon}
                       >

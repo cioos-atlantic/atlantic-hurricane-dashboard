@@ -1,7 +1,7 @@
 //import styles from './active_storm_list.module.css'
 //import { parse, format } from 'date-fns';
-import storm_list from '../../data/forecasts/list.json'
-import CustomButton from '../../custom/custom-button.js';
+import storm_list from '../data/forecasts/list.json'
+import CustomButton from '../custom/custom-button.js';
 
 //import {forecastDataDir, getStormData} from '../../lib/storms.js';
 
