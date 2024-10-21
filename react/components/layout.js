@@ -75,18 +75,15 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     console.log("Harvested Historical Storm Data:", data);
     //console.log(data.ib_data.features)
     //if(data.ib_data.features){}
-
-    // Return nothing if the array is empty because the user will be redirected
-    if (data.ib_data.features.length === 0) {
-      return null;
-    }
-
     setHistoricalStormData(data); // Update the state with the harvested data
+    console.log("Historical Storm Data set:", data);
   };
 
   useEffect(() => {
     // Check if stormData is an empty array
-    if (historicalStormData?.ib_data?.features?.length === 0 === 0) {
+
+    if (historicalStormData?.ib_data?.features?.length === 0) {
+      console.log("Empty array, redirecting to 404...");
       // Redirect to the 404 page
       router.replace('/404'); 
       //TODO 
