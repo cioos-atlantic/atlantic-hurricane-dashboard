@@ -4,6 +4,7 @@ react/node_modules/
 react/.next/**/*.*
 react/.next/trace
 react/package-lock.json
+node_modules/
 
 __pycache__/
 

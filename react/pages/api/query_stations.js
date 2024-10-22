@@ -15,6 +15,7 @@ export default async function handler(req, res) {
         console.log('getting features...')
         let station_recent = {}
         const features = result['erddap_data']['features']
+        //console.log(result);
         for (let feature in features){
             station_recent[features[feature]['properties']['station']] = features[feature]
         }

@@ -13,6 +13,9 @@ import station_names from "../data/station/names.json"
 
 import HurricaneIcon from '../public/hurricane.svg'
 import TropicalStormIcon from '../public/tropical-storm.svg'
+import {formatCioosStations, formatCioosDateTime, parseData} from './station_formats'
+import RenderChart from './station_graph.js'
+
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
@@ -120,8 +123,10 @@ function RecentStationData(data){
   Object.keys(station_data[len-1]).forEach(element => {
     const value = station_data[len-1][element]
     if (element.includes('(time|')) {
-      const datetime = new Date(value * 1).toLocaleString()
-      data_obj['datetime'] = datetime
+      //console.log(value)
+      //const datetime = new Date(value * 1).toLocaleString()
+      data_obj['datetime'] = formatCioosDateTime(value)
+      //console.log(data_obj['datetime'])
     }
     else{
         //WARNING: Ugly regex ahead
@@ -134,29 +139,11 @@ function RecentStationData(data){
   })
 
   //TODO: Clean up
-  const attributes_of_interest = {
-    'sea_surface_wave_significant_height':'Wave Height (Avg)',
-    'sea_surface_wave_maximum_height':'Wave Height (Max)',
-    'air_temperature':'Temperature (Air)',
-    'sea_surface_temperature': 'Temperature (Sea Surface)',
-    'air_pressure':'Air Pressure',
-    'relative_humidity':'Humidity'
-  }
-  // Separate section for wind since the arrows need to be drawn
-  if(data_obj['wind_from_direction']){
-    const wind_direction = (180 + parseInt(data_obj['wind_from_direction'].value)) % 360
-    children.push(<strong>Wind:  </strong>)
-    children.push(<Image class="wind_arrow" alt={wind_direction} src="arrow.svg" height={20} width={20} 
-      style={{ transform: 'rotate(' + (wind_direction) + 'deg)' }}></Image>)
-  }
-  if(data_obj['wind_speed']){
-    children.push(<span>   {(parseFloat(data_obj['wind_speed'].value).toFixed(1))} {data_obj['wind_speed'].units}</span>)}
-  Object.entries(attributes_of_interest).forEach(entry =>{
-    const key = entry[0]
-    const val = entry[1]
-    if(data_obj[key] && data_obj[key].value){
-        children.push(<p><strong>{val}:</strong> {(parseFloat(data_obj[key].value).toFixed(1))} {data_obj[key].units}</p>)}
-  })
+ formatCioosStations(data_obj, children)
+
+      
+
+  //console.log(children);
   let station_info = (
     <div className="station_pane">
       <p>{data_obj['datetime']}</p>
@@ -164,7 +151,9 @@ function RecentStationData(data){
     </div>
   )
 
+  //console.log(station_info)
   return station_info;
+  
 }
 
 function PointDetails(point) {
@@ -260,6 +249,8 @@ export default function Map({ children, storm_data, station_data }) {
     storm_radius = remap_coord_array(storm_data.rad.features[0].geometry.coordinates);
   }
 
+  const parsedStationData = parseData(station_data);
+
   // console.log("hurricane_icon: ", HurricaneIcon.src)
   // console.log("hurricon_div: ", hurricon_div)
   // console.log("hurricon: ", hurricon)
@@ -323,19 +314,37 @@ export default function Map({ children, storm_data, station_data }) {
             <LayersControl.Overlay checked name="Stations">
               <LayerGroup>
                 { 
+                  
+
                   Object.entries(station_data).map((element) => {
                     const data_link = "https://cioosatlantic.ca/erddap/tabledap/" + element[0] + ".html"
                     const data = RecentStationData(element[1].properties.station_data)
                     const station_name = element[1].properties.station
                     const display_name = (station_name in station_names) ? station_names[station_name]['display']:station_name
+
+                    //console.log("Station Name:", station_name);
+                    //console.log(parsedStationData[station_name])
+                    
                     return (
                       <Marker 
                         key={element.station} 
                         position={flip_coords(element[1].geometry.coordinates)}
                         //eventHandlers={{click : )}}
                         >
-                          <Popup> 
-                            <h3>{display_name}</h3>
+                          <Popup 
+                            contentStyle={{
+                              width: 'auto', // Adjust width based on content (chart)
+                              padding: '20px', // Optional padding around chart
+                              }}> 
+                            
+                            <div>
+                              <h4>{display_name}</h4>
+                              
+                              <RenderChart  
+                              chartData={parsedStationData[station_name]}
+                              stationName={station_name}
+                              />
+                            </div>
                             {data}
                             <a href={data_link} target="_blank">Full data</a>
                           </Popup>
