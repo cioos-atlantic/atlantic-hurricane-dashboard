@@ -250,6 +250,7 @@ function PointDetails(point) {
 }
 
 function parseHistoricalData(storm_data){
+  //console.log(storm_data)
   let storm_features = {
     // create an empty object to store the storm_points
     pts:{features:[]},
@@ -303,11 +304,12 @@ function parseHistoricalData(storm_data){
 export default function Map({ children, storm_data, station_data, source_type }) {
   // Add parameter for points
   // Points always there, even not in storm seasons
+
   const router = useRouter();
   //console.log(storm_data)
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
   function handleMouseOver(point) {
-    handleStormHoveredData(point)
+    handleStormHoveredData(point);
     setHoverMarker(point); // Set the hovered marker
   };
 
@@ -334,6 +336,7 @@ export default function Map({ children, storm_data, station_data, source_type })
 
   if (source_type === "historical"){
     storm_data = parseHistoricalData(storm_data)
+    //console.log(station_data)
 
     
     

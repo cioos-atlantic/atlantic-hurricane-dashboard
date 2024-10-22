@@ -75,7 +75,9 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     console.log("Harvested Historical Storm Data:", data);
     //console.log(data.ib_data.features)
     //if(data.ib_data.features){}
-    setHistoricalStormData(data); // Update the state with the harvested data
+    setHistoricalStormData(data.storm_data);  // Set the storm data
+    setStationPoints(data.station_data);  // Set the station data
+     // Update the state with the harvested data
     //console.log("Historical Storm Data set:", data);
   };
 
@@ -219,7 +221,7 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
           Object.keys(historicalStormData).length === 0 ? (
             <DefaultMapWithNoSSR station_data={station_data} />
           ) : (
-            <MapWithNoSSR storm_data={historicalStormData} station_data={station_data} source_type={"historical"} />
+            <MapWithNoSSR storm_data={historicalStormData} station_data={station_points} source_type={"historical"} />
           )
         )}
       </main>

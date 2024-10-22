@@ -65,6 +65,12 @@ export async function handleClick(storm, onHarvestData)  {
   const resource = await fetch(`/api/historical_storms?${query}`);
   
   const historical_storm_data = await resource.json();
+  const [minLon, minLat, maxLon, maxLat] = historical_storm_data.ib_data.bbox
+  console.log(minLon, minLat, maxLon, maxLat)
+
+
+
+
 
   console.log(historical_storm_data);
 
