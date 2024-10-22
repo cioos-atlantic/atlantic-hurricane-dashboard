@@ -9,41 +9,28 @@ import FooterNav from './footer_nav'
 import Drawer from '../components/drawer'
 import StormSearch from "@/components/storm_search";
 import ActiveStormList from "@/components/active_storm_list";
-
+import { empty_storm_obj } from '../lib/storm_utils';
 import dynamic from "next/dynamic";
-
-// NOTE:  This data and form was used early on for 
-//        testing purposes and will be removed.
-//        
-//        The data represented here should be swapped 
-//        out in favour of data from the WFS service
-import storm_list from '../data/forecasts/list.json'
 
 import ErddapHandler from "../pages/api/query_stations";
 
 export const siteTitle = 'Atlantic Hurricane Dashboard'
 
-export const empty_storm_obj = {
-  pts:{features:[]},
-  err:{features:[]},
-  lin:{features:[]},
-  rad:{features:[]},
-};
-
 export const empty_station_obj = {
-  pts:{features:[]}
+  pts: { features: [] }
 };
 
 export default function Layout({ children, home, topNav, logo, active_storm_data, station_data, querystring }) {
 
   const [storms, setStorms] = useState([]);
-  const [selected_storm, setSelectedStorm] = useState("");
   const [selected_forecast, setSelectedForecast] = useState({});
   const [storm_timeline, setStormTimeline] = useState([]);
   const [storm_points, setStormPoints] = useState(empty_storm_obj);
   const [station_points, setStationPoints] = useState([empty_station_obj]);
 
-  
+  const active_storms = querystring.query.storms == "active";
+  const historical_storms = querystring.query.storms == "historical";
+
   // useMemo() tells React to "memorize" the map component.
   // Wthout this, the map will get redrawn by many interactions 
   // and cause flashing - this lets us update map layers without
@@ -55,75 +42,8 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     [],
   );
 
-  <main><MapWithNoSSR station_data={station_data}></MapWithNoSSR></main>
-  
-
   // console.log(querystring.storms)
   // console.log(active_storm_data.season)
-
-  // const data = get_forecast_sources();
-
-  function updateStormList(event) { 
-    const filtered_storms = event.target.value != "" ? storm_list.filter(storm => {
-      const storm_index = storm.name + storm.year;
-      return (
-        storm_index.toLowerCase().indexOf(event.target.value.toLowerCase()) > -1)
-    }) : [];
-
-    setStorms(filtered_storms);
-    
-  }
-
-  function populateStormDetails(event, storm_data) {
-    console.log("Set Selected storm to: " + storm_data.data[0].properties.NAME);
-    setSelectedStorm(storm_data.data[0].properties.NAME);
-
-    // const filtered = forecasts.map(source => {
-    //    return source.storm.filter(storm_part => storm_part.storm == storm_obj.name && storm_part.file_type == "pts") 
-    // })[0];
-    setStormPoints(empty_storm_obj);
-    
-    // console.log(storm_obj);
-    let storm_features = {
-      pts:{features:[]},
-      err:{features:[]},
-      lin:{features:[]},
-      rad:{features:[]},
-    };
-    
-    for(var i in storm_data.data){
-      switch(storm_data.data[i].geometry.type){
-        case "Point":
-          storm_features.pts.features.push(storm_data.data[i])
-          break;
-        // case "LineString":
-        //   break;
-        // case "Polygon":
-        //   break;
-      }
-    }
-    
-    setStormPoints(storm_features);
-  }
-
-  function populateTimeline(event, storm_obj) {
-    // console.log(event.target.style)
-    const url = `/api/forecast_info?path=${storm_obj.path}`
-    setSelectedForecast(storm_obj);
-    setStormPoints(empty_storm_obj);
-
-    fetch(url).then(res => {
-      if (res.ok) {
-        return res.json();
-      }
-      throw res;
-    }).then(data => {
-      console.log("Storm Data: ", data);
-      setStormPoints(data);
-    });
-  }
-
-  const active_storms = querystring.query.storms == "active"
 
   return (
     <div className={styles.body}>
@@ -150,23 +70,23 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
       </header>
       <main className="body">
         <Drawer element_id="left-side" classes="left">
-          {active_storms ? (
-            <ActiveStormList 
-              active_storm_data={active_storm_data}
-              onPopulateStormDetails={populateStormDetails}
-            />
-          ) : (
-            <StormSearch
-              onSearch={updateStormList}
-              onPopulateStormDetails={populateStormDetails}
-              onPopulateTimeline={populateTimeline}
-              active_storm_data={active_storm_data}
-              storms={storms}
-              selected_storm={selected_storm}
-              selected_forecast={selected_forecast}
-              storm_timeline={storm_timeline}
-            />
-          )}
+          {
+            active_storms ? (
+              <ActiveStormList
+                active_storm_data={active_storm_data}
+                setStormPoints={setStormPoints}
+              />
+            ) :
+            historical_storms ? (
+              <>
+                <div>Placeholder for Historical Storms Page</div>
+              </>
+            ) : (
+              <>
+                <div>Placeholder for Home Page</div>
+              </>
+            )
+          }
         </Drawer>
         <MapWithNoSSR storm_data={storm_points} station_data={station_data}></MapWithNoSSR>
       </main>

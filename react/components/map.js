@@ -1,7 +1,7 @@
 // https://iconoir.com/ icon library that can be installed via npm
 import React, { useState, useMemo } from "react";
 import { parseISO, format } from 'date-fns';
-import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, Polyline } from 'react-leaflet'
+import { MapContainer, TileLayer, WMSTileLayer, LayersControl, FeatureGroup, LayerGroup, Marker, Popup, Polygon, Polyline, GeoJSON } from 'react-leaflet'
 import { useMap, useMapEvent, useMapEvents } from 'react-leaflet/hooks'
 import { Icon, DivIcon, Point } from 'leaflet'
 import Image from "next/image";
@@ -21,40 +21,40 @@ const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
 
 const hurricane_categories = {
-  "5":{
-    "min":157,
-    "max":null,
-    "name": {"en": "Category 5", "fr": "catégorie 5"}
+  "5": {
+    "min": 157,
+    "max": null,
+    "name": { "en": "Category 5", "fr": "catégorie 5" }
   },
-  "4":{
-    "min":113,
-    "max":136,
-    "name": {"en": "Category 4", "fr": "catégorie 4"}
+  "4": {
+    "min": 113,
+    "max": 136,
+    "name": { "en": "Category 4", "fr": "catégorie 4" }
   },
-  "3":{
-    "min":96,
-    "max":112,
-    "name": {"en": "Category 3", "fr": "catégorie 3"}
+  "3": {
+    "min": 96,
+    "max": 112,
+    "name": { "en": "Category 3", "fr": "catégorie 3" }
   },
-  "2":{
-    "min":83,
-    "max":95,
-    "name": {"en": "Category 2", "fr": "catégorie 2"}
+  "2": {
+    "min": 83,
+    "max": 95,
+    "name": { "en": "Category 2", "fr": "catégorie 2" }
   },
-  "1":{
-    "min":64,
-    "max":82,
-    "name": {"en": "Category 1", "fr": "catégorie 1"}
+  "1": {
+    "min": 64,
+    "max": 82,
+    "name": { "en": "Category 1", "fr": "catégorie 1" }
   },
-  "TS":{
-    "min":34,
-    "max":63,
-    "name": {"en": "Tropical Storm", "fr": "Tempête tropicale"}
+  "TS": {
+    "min": 34,
+    "max": 63,
+    "name": { "en": "Tropical Storm", "fr": "Tempête tropicale" }
   },
-  "TD":{
+  "TD": {
     "min": 33,
     "max": null,
-    "name": {"en": "Tropical Depression", "fr": "Dépression tropicale"}
+    "name": { "en": "Tropical Depression", "fr": "Dépression tropicale" }
   },
 }
 
@@ -88,11 +88,11 @@ function flip_coords(coordinates) {
  * @param {object} point the storm point object
  * @param {array} property_list list of properties that may have the appropriate value
  */
-function fetch_value(point, property_list){
+function fetch_value(point, property_list) {
   let return_value = null;
-  
+
   property_list.every(value => {
-    if (point.properties[value] !== undefined && point.properties[value] !== null){
+    if (point.properties[value] !== undefined && point.properties[value] !== null) {
       return_value = point.properties[value];
       return false;
     }
@@ -107,49 +107,46 @@ function fetch_value(point, property_list){
 const empty_point_obj = { properties: {}, geometry: {} }
 
 // Have it as a dictionary with time as keys and values as values?
-function Station_Variable(name, std_name,  value, units){
+function Station_Variable(name, std_name, value, units) {
   this.name = name;
   this.standard_name = std_name;
   this.value = value;
   this.units = units;
 }
 
-function RecentStationData(data){
+function RecentStationData(data) {
   const station_data = JSON.parse(data)
   const len = Object.keys(station_data).length
   let data_obj = {}
   let children = []
   // Will always be most recently added
-  Object.keys(station_data[len-1]).forEach(element => {
-    const value = station_data[len-1][element]
+  Object.keys(station_data[len - 1]).forEach(element => {
+    const value = station_data[len - 1][element]
     if (element.includes('(time|')) {
       //console.log(value)
       //const datetime = new Date(value * 1).toLocaleString()
       data_obj['datetime'] = formatCioosDateTime(value)
       //console.log(data_obj['datetime'])
     }
-    else{
-        //WARNING: Ugly regex ahead
-        //Name (standard_name | units | long_name)
-        const standard_name = element.match("\\((.*?)\\|")[1];
-        const units = element.match("\\|(.*?)\\|")[1];
-        const long_name = element.match("[^\\|]*\\|[^\\|]*\\|(.*?)\\)")[1];
-        data_obj[standard_name] = new Station_Variable(long_name, standard_name, value, units);
+    else {
+      //WARNING: Ugly regex ahead
+      //Name (standard_name | units | long_name)
+      const standard_name = element.match("\\((.*?)\\|")[1];
+      const units = element.match("\\|(.*?)\\|")[1];
+      const long_name = element.match("[^\\|]*\\|[^\\|]*\\|(.*?)\\)")[1];
+      data_obj[standard_name] = new Station_Variable(long_name, standard_name, value, units);
     }
   })
 
-  //TODO: Clean up
+
  formatCioosStations(data_obj, children)
 
-      
-
-  //console.log(children);
   let station_info = (
     <div className="station_pane">
       <p>{data_obj['datetime']}</p>
       {children}
     </div>
-  )
+  );
 
   //console.log(station_info)
   return station_info;
@@ -157,6 +154,12 @@ function RecentStationData(data){
 }
 
 function PointDetails(point) {
+  // If properties has no items, it's an empty point object and should return
+  // immediately
+  if (Object.keys(point.properties).length == 0) {
+    return (<></>);
+  }
+
   // ECCC and IBTRACS have multiple ways to define a storm type, some overlap and others are unique
   const storm_types = {
     "MX": "Mixture",
@@ -171,13 +174,9 @@ function PointDetails(point) {
     "PT": "Post-Tropical Storm",
   };
 
-  if (point == empty_point_obj) {
-    return (<></>);
-  }
-
   // ECCC and IBTRACS use different names for the same kinds of information.  Sometimes, within IBTRACS, several different fields may possibly contain the appropriate value
   // ECCC uses TIMESTAMP and IBTRACS uses ISO_TIME
-  const TIMESTAMP = fetch_value(point, ["TIMESTAMP", "ISO_TIME"]);
+  const TIMESTAMP = format(parseISO(fetch_value(point, ["TIMESTAMP", "ISO_TIME"])), 'PP pp X');
   const STORMNAME = fetch_value(point, ["STORMNAME", "NAME"]);
   const STORMTYPE = fetch_value(point, ["STORMTYPE", "NATURE"]);
   const STORMFORCE = fetch_value(point, ["STORMFORCE", "USA_SSHS"]);
@@ -192,7 +191,7 @@ function PointDetails(point) {
         <p><strong>Storm Type:</strong> {storm_types[STORMTYPE]}</p>
         <p><strong>Storm Status:</strong> {point.properties.TCDVLP}</p>
         <p><strong>Storm Category:</strong> {STORMFORCE}</p>
-        <p><strong>Timestamp:</strong> {format(parseISO(TIMESTAMP), 'PP pp X')}</p>
+        <p><strong>Timestamp:</strong> {TIMESTAMP}</p>
         <p><strong>Lat/Long:</strong> {point.properties.LAT}&deg; N, {point.properties.LON}&deg; W</p>
         <p><strong>Max Windspeed:</strong> {MAXWIND} knots ({(MAXWIND * 1.84).toFixed(2)} km/h)</p>
         <p><strong>Pressure:</strong> {MINPRESS}mb</p>
@@ -209,9 +208,13 @@ export default function Map({ children, storm_data, station_data }) {
   // Add parameter for points
   // Points always there, even not in storm seasons
   const [hover_marker, setHoverMarker] = useState(empty_point_obj);
-  console.log("Data");
-  console.log(Object.entries(station_data));
-  console.log(station_data);
+
+  // console.debug("Hover Marker: ", hover_marker.id, hover_marker.properties.TIMESTAMP);
+
+  // console.log("Data");
+  // console.log(Object.entries(station_data));
+  // console.log(station_data);
+
   const hurricon = new Icon({
     iconUrl: HurricaneIcon.src,
     iconRetinaUrl: HurricaneIcon.src,
@@ -296,9 +299,12 @@ export default function Map({ children, storm_data, station_data }) {
                 {
                   storm_data.pts.features.map(point => {
                     const position = flip_coords(point.geometry.coordinates);
+
+                    console.log(point);
+
                     return (
                       <Marker
-                        key={point.properties.TIMESTAMP}
+                        key={point.id}
                         position={position}
                         eventHandlers={{
                           mouseover: (event) => setHoverMarker(point),
@@ -367,27 +373,40 @@ export default function Map({ children, storm_data, station_data }) {
                 {
                   storm_data.rad.features.length > 0 &&
                   storm_data.rad.features.map(radii => {
+                    // console.debug("Mapping radii...", radii);
 
-                    let fixed_coords = remap_coord_array(radii.geometry.coordinates[0]);
+                    let display_radii = true;
                     if (hover_marker.properties.TIMESTAMP != radii.properties.TIMESTAMP) {
-                      fixed_coords = false;
+                      display_radii = false;
                     }
 
-                    const path_options = { className: 'eccc-rad-'.concat(radii.properties.WINDFORCE) };
+                    const path_options = { className: 'wind-rad-'.concat(radii.properties.WINDFORCE) };
+                    // const positions = radii.geometry.coordinates.map((coord_array) => {return coord_array[0]});
+                    
+                    // console.debug("Multipolygon Positions: ", positions);
 
                     return (
-                      <Polygon
-                        key={radii.properties.TIMESTAMP + radii.properties.WINDFORCE}
-                        positions={fixed_coords}
-                        pathOptions={path_options}
+                      // <Polygon
+                      //   key={radii.properties.TIMESTAMP + radii.properties.WINDFORCE}
+                      //   positions={positions}
+                      //   pathOptions={path_options}
 
-                      >
-                        <Popup>
-                          <h3>{radii.properties.STORMNAME}</h3>
-                          <p>Wind force: {radii.properties.WINDFORCE}</p>
-                          <p>Timestamp: {radii.properties.TIMESTAMP}</p>
-                        </Popup>
-                      </Polygon>
+                      // >
+                      //   <Popup>
+                      //     <h3>{radii.properties.STORMNAME}</h3>
+                      //     <p>Wind force: {radii.properties.WINDFORCE}</p>
+                      //     <p>Timestamp: {radii.properties.TIMESTAMP}</p>
+                      //   </Popup>
+                      // </Polygon>
+                      display_radii ? (                        
+                        <GeoJSON 
+                          key={radii.id}
+                          data={radii} 
+                          style={path_options}
+                        />
+                      ):(
+                          <></>
+                      )
                     );
                   })
                 }
