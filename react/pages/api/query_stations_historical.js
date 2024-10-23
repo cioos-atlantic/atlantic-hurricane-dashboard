@@ -3,10 +3,15 @@ import { wfs_query } from "./wfs_test";
 export default async function handler(req, res) {
     const source = ["ERDDAP"]
     const source_type = "HISTORICAL"
+    const storm_name = (req.query["name"]) ? req.query["name"] : "";
+    const season = (req.query["season"]) ? req.query["season"] : "";
     /*const time =  (req.query["time"]) ? req.query["time"] : "";
     const lat =  (req.query["lat"]) ? req.query["lat"] : ""; // can set max atlantic region lat
     const lon =  (req.query["lon"]) ? req.query["lon"] : ""; // can set max atlantic region lat*/
-    const filters= [`min_lon=${req.query["min_lon"]}`, `min_lat=${req.query["min_lat"]}`, `max_lon=${req.query["max_lon"]}`, `max_lat=${req.query["max_lat"]}`, `min_time>=${req.query["min_time"]}`, `max_time<=${req.query["max_time"]}`]
+    //const filters= [`min_lon>=${req.query["min_lon"]}`, `min_lat>=${req.query["min_lat"]}`, `max_lon<=${req.query["max_lon"]}`, `max_lat<=${req.query["max_lat"]}`, `min_time>=${req.query["min_time"]}`, `max_time<=${req.query["max_time"]}`]
+    const filters=[`storm='${season}_${storm_name}'`]
+    //const filters= [ `min_time BETWEEN ${req.query["min_time"]}`, `${req.query["max_time"]}`]
+    
 
     console.log(filters)
 

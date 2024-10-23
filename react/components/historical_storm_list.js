@@ -1,10 +1,21 @@
 //import styles from './active_storm_list.module.css'
 //import { parse, format } from 'date-fns';
-import storm_list from '../data/forecasts/list.json'
+//import storm_list from '../data/forecasts/list.json'
 import CustomButton from '../custom/custom-button.js';
 import { addDays, subDays, lightFormat } from "date-fns";
 
 //import {forecastDataDir, getStormData} from '../../lib/storms.js';
+
+const storm_list = [
+  { "name": "FIONA", "year": 2022, "source":"eccc" },
+  { "name": "ERNESTO", "year": 2018, "source":"eccc" },
+  { "name": "EARL", "year": 2022, "source":"eccc" },
+  { "name": "LEE", "year": 2017, "source":"eccc" },
+  { "name": "IRMA", "year": 2017, "source":"eccc" },
+  { "name": "BLAMMO", "year": 1999, "source":"ibtracs" },
+  { "name": "CLAUDETTE", "year": 2015, "source":"ibtracs" },
+  
+]
 
 export default function HistoricalStormList({onHarvestData}) {
   onHarvestData= onHarvestData
@@ -67,13 +78,15 @@ export async function handleClick(storm, onHarvestData)  {
   const resource = await fetch(`/api/historical_storms?${query}`);
   
   const historical_storm_data = await resource.json();
-  const [min_lon, min_lat, max_lon, max_lat, max_storm_time, min_storm_time] = getStationQueryParams (historical_storm_data)
+  //const [min_lon, min_lat, max_lon, max_lat, max_storm_time, min_storm_time] = getStationQueryParams (historical_storm_data)
 
-  console.log(min_lon, min_lat, max_lon, max_lat, max_storm_time, min_storm_time);
+  //console.log(min_lon, min_lat, max_lon, max_lat, max_storm_time, min_storm_time);
 
-  const historical_station_data = await getStationData(min_lon, min_lat, max_lon, max_lat, max_storm_time, min_storm_time )
+  //const historical_station_data = await getStationData(min_lon, min_lat, max_lon, max_lat, max_storm_time, min_storm_time )
 
   //console.log(historical_station_data)
+  const station_resource = await fetch(`/api/query_stations_historical?${query}`);
+  const historical_station_data = await station_resource.json();
 
    // Trigger the callback to send data back to the parent
    if (onHarvestData) {

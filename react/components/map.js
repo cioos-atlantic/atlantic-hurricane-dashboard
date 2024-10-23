@@ -336,6 +336,7 @@ export default function Map({ children, storm_data, station_data, source_type })
 
   if (source_type === "historical"){
     storm_data = parseHistoricalData(storm_data)
+    console.log(station_data)
     //console.log(station_data)
 
     
