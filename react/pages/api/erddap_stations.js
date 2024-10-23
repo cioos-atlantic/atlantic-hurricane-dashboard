@@ -5,11 +5,6 @@ export default async function handler(req, res) {
     const source = ["ERDDAP"]
     const source_type = "ACTIVE"
     try {
-        /*
-        const result = await wfs_query(storm_name, season, source, source_type)
-        res.status(200).json({ "storm_name": storm_name, "season": season, "source": source, "source_type": source_type, ...result })
-        */
-
         // Ask for a station, get the data
         const result = await wfs_query("","",source,source_type)
         let station_data = {}
@@ -18,7 +13,6 @@ export default async function handler(req, res) {
         for (let feature in features){
             const station_name = features[feature]['properties']['station']
             // Can change the WFS query to only get one station, but for now easier to filter out here
-            // Doesn't work for first item in list?
             if(!station || station==station_name){
                 const parsed_data = JSON.parse(features[feature]['properties']['station_data']);
                 if(station_data[station_name]) {
@@ -46,32 +40,19 @@ export default async function handler(req, res) {
                             station_data_formatted['column_raw_names'].push(field);
                         }
                     })
-                    //station_data[station_name]['properties']['station_data']
-                    //Get station_data (first element)
-                    
                     station_data[station_name]['properties']['station_data'] = station_data_formatted;
                 }
-
-                //let station_row_data = []
                 const station_column_data = station_data[station_name]['properties']['station_data']['column_raw_names']
                 parsed_data.forEach((row) => {
                     let row_data = []
                     station_column_data.forEach((column) => {
                         row_data.push(row[column])
                     })
-                    //station_row_data.push(row_data)
                     station_data[station_name]['properties']['station_data']['rows'].push(row_data)
-
                 })
             }
-            
         }
-        if(station_data){
-            res.status(200).json(station_data)
-        }
-        else{
-            res.status(200).json("error")
-        }
+        res.status(200).json(station_data)
     } catch (err) {
         res.status(500).json({ error: err.message })
     }
