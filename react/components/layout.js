@@ -13,34 +13,20 @@ import HistoricalStormList from "./historical_storm_list";
 import { useRouter } from 'next/router';
 
 
+import { empty_storm_obj } from '../lib/storm_utils';
 import dynamic from "next/dynamic";
-
-// NOTE:  This data and form was used early on for 
-//        testing purposes and will be removed.
-//        
-//        The data represented here should be swapped 
-//        out in favour of data from the WFS service
-import storm_list from '../data/forecasts/list.json'
 
 import ErddapHandler from "../pages/api/query_stations";
 
 export const siteTitle = 'Atlantic Hurricane Dashboard'
 
-export const empty_storm_obj = {
-  pts:{features:[]},
-  err:{features:[]},
-  lin:{features:[]},
-  rad:{features:[]},
-};
-
 export const empty_station_obj = {
-  pts:{features:[]}
+  pts: { features: [] }
 };
 
 export default function Layout({ children, home, topNav, logo, active_storm_data, station_data, querystring }) {
 
   const [storms, setStorms] = useState([]);
-  const [selected_storm, setSelectedStorm] = useState("");
   const [selected_forecast, setSelectedForecast] = useState({});
   const [storm_timeline, setStormTimeline] = useState([]);
   const [storm_points, setStormPoints] = useState(empty_storm_obj);
@@ -49,7 +35,9 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
 
   const router = useRouter();
 
-  
+  const active_storms = querystring.query.storms == "active";
+  const historical_storms = querystring.query.storms == "historical";
+
   // useMemo() tells React to "memorize" the map component.
   // Wthout this, the map will get redrawn by many interactions 
   // and cause flashing - this lets us update map layers without
@@ -166,8 +154,8 @@ export default function Layout({ children, home, topNav, logo, active_storm_data
     });
   }
   console.log(querystring)
-  const active_storms = querystring.query.storms == "active"
-  const historical_storms = querystring.query.storms == "historical"
+  //const active_storms = querystring.query.storms == "active"
+  //const historical_storms = querystring.query.storms == "historical"
 
 
   return (
