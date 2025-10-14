@@ -259,7 +259,10 @@ export default function Map({ children, station_data, storm_data, source_type, s
           />} {/* Calling the EditControl function here */}
         </MapContainer>
 
-        { map && (<Drawer
+        { 
+        // Render drawer if map object is set
+        map && (
+          <Drawer
             element_id="left-side"
             classes="left"
             source_type={source_type}
@@ -268,7 +271,9 @@ export default function Map({ children, station_data, storm_data, source_type, s
             dispatch={dispatch}
             map={map}
             storm_data={storm_data}
-          />)}
+          />
+          )
+        }
       </div>
     </div>
   )
