@@ -3,6 +3,7 @@ import Layout from './layout';
 import dynamic from 'next/dynamic';
 import { basePath } from '@/next.config';
 import { getHistoricalStormList } from '@/components/historical_storm/historical_storm_utils';
+import { empty_storm_obj, empty_station_obj } from '@/components/point_defaults';
 
 /* 
 TODO: Add calls for recent storms (if there is no query string/filter supplied)
@@ -10,8 +11,8 @@ Pass down filtered storms and station data to map components for proper renderin
 */
 
 export default function HistoricalStormsPage() {
-  const [station_points, setStationPoints] = useState({});
-  const [stormList, setStormList] = useState([]);
+  const [station_points, setStationPoints] = useState(empty_station_obj);
+  const [storm_data, setStormList] = useState(empty_storm_obj);
 
   // useMemo() tells React to "memorize" the map component.
   // Without this, the map will get redrawn by many interactions 
@@ -24,6 +25,14 @@ export default function HistoricalStormsPage() {
     [],
   );
 
+
+  // TODO: Replace this with calls similar to active storms, fetch storm data to 
+  // feed map and decouple the fetching of storm data from the 
+  // getHistoricalStormList() funciton, this function can then be focused on 
+  // creating the storm list from the storm data as a parameter rather than 
+  // doing everything.
+
+
   // Fetch storm data using filters or the last year (if no filters specified)
   // TODO: Add historical storm filters to this block and logic to decide when to use which list
   useEffect(() => {
@@ -31,6 +40,7 @@ export default function HistoricalStormsPage() {
       try {
         const fetchedStormList = await getHistoricalStormList();
         setStormList(fetchedStormList);
+        console.debug("Fetched Historical Storm Data: ", fetchedStormList);
       } catch (error) {
         console.error('Error fetching storm list:', error);
       }
@@ -49,6 +59,7 @@ export default function HistoricalStormsPage() {
 
           <MapWithNoSSR
             station_data={station_points}
+            // storm_data={storm_data}
             source_type={"historical"}
             setStationPoints={setStationPoints}
           />
