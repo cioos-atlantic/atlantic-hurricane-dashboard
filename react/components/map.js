@@ -267,6 +267,7 @@ export default function Map({ children, station_data, storm_data, source_type, s
             state={state}
             dispatch={dispatch}
             map={map}
+            storm_data={storm_data}
           />)}
       </div>
     </div>

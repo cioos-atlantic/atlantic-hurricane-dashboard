@@ -28,7 +28,7 @@ export default function Drawer({ children, element_id, classes, source_type, set
       break;
   }
 
-  if(!state) return(<></>);
+  if (!state) return (<></>);
 
   return (
     <>
@@ -78,7 +78,7 @@ export default function Drawer({ children, element_id, classes, source_type, set
                   polyFilterCoords={state.polyFilterCoords}
                   filterQuery={state.filterQuery}
                   filterStormName={state.filterStormName}
-                                showFilterSelected={state.showFilterSelected}
+                  showFilterSelected={state.showFilterSelected}
 
                 />
               ) :
