@@ -143,8 +143,6 @@ export function RenderDateFilter({state, dispatch, setShowFilterOptions}){
 
 
 export function DateDisplay({ setStartDate, setEndDate, setShowDateSelection, startDate, endDate }) {
-  const map = useMap();
-
   const slotProps = {
     popper: { sx: { zIndex: 9999 }, },
 
@@ -198,12 +196,7 @@ export function DateDisplay({ setStartDate, setEndDate, setShowDateSelection, st
         border: '2px solid #e55162',
         borderRadius: '10px',
         zIndex: '9001',
-
-
       }}
-
-      onMouseOver={map.dragging.disable()}
-      onMouseOut={map.dragging.enable()}
     >
       <CardContent
         className='date-card-content'
