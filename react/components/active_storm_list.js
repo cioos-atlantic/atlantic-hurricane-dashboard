@@ -67,8 +67,14 @@ export default function ActiveStormList({ storm_data, setStormPoints, map, Leafl
 
   // let ib_storm_list = []
   // let storm_details = {}
+  let active_storms = false;
 
-  let active_storms = Object.entries(storm_data.list).length > 0;
+  try {
+    active_storms = Object.entries(storm_data.list).length > 0;
+  }
+  catch (ex) {
+    console.error("EXCEPTION: ", ex, storm_data);
+  }
 
   console.log("Selected Storm: " + selected_storm);
 
