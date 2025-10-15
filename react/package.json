@@ -6,7 +6,8 @@
     "dev": "next dev -p 3500",
     "build": "next build",
     "start": "next start -p 3600",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky"
   },
   "dependencies": {
     "@antv/g2": "^5.2.12",
@@ -49,5 +50,8 @@
     "react-plotly.js": "^2.6.0",
     "react-responsive": "^10.0.0",
     "swr": "^2.3.2"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }
