@@ -7,8 +7,9 @@ export default function station_data_format(features, filter_station) {
         const re_match = /(?<var_name>.*)\s\((?<standard_name>.*)\|(?<units>.*)\|(?<long_name>.*)\)/g; 
         for (let feature in features){
             const station_name = features[feature]['properties']['station']
+            const station_id = features[feature]['properties']['station_id']
             // Can change the WFS query to only get one station, but for now easier to filter out here
-            if(!filter_station || filter_station==station_name){
+            if(!filter_station || filter_station==station_id){
                 const parsed_data = JSON.parse(features[feature]['properties']['station_data']);
                 if(station_data[station_name]) {
                     //Theory that data is already sorted, but perhaps not so - it's not - all alphabetical

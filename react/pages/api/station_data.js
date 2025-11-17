@@ -10,11 +10,10 @@ export default async function handler(req, res) {
 
     try {
         result = await wfs_data_query(filter_station,filter_storm)
-        features = result['erddap_data']['features']
+        features = result['station_data']['features']
         const station_data = station_data_format(features, filter_station)
-        res.status(200).json('hello')
-        console.log(station_data)
+        res.status(200).json(station_data)
     } catch (err) {
-        res.status(200).json({ result })
+        res.status(200).json('err')
     }
 }

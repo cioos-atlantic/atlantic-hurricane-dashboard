@@ -3,9 +3,6 @@ import { flip_coords } from "@/lib/storm_utils";
 import { Marker, Tooltip, Popup, Icon } from "react-leaflet";
 import { getDisplayName } from "./utils/station_data_format_util";
 
-
-
-
 /**
  * 
  * @param {[Object]} station_data Station Data object after being retrieved from WFS and processed. 
@@ -37,18 +34,12 @@ export default function StationMarker({station_data, time = new Date(), selected
   const display_name = station_values?.properties?.dataset_title
   const station = station_values?.properties?.station || ""
 
-  const exclude_var = ['time', 'latitude', 'longitude', 'wind_from_direction', 'relative_humidity',
-    'sea_surface_wave_from_direction', 'sea_surface_wave_maximum_period'
-  ]
-  const standardNames = station_values?.properties?.station_data?.column_std_names
-
   // Data for station doesn't exist at the provided time
   const redIcon = new L.Icon.Default({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/refs/heads/master/img/marker-icon-2x-red.png'
   })
 
   const blueIcon = new L.Icon.Default()
-  let selectedIcon = new L.Icon.Default()
 
   return (
     <Marker
@@ -57,7 +48,6 @@ export default function StationMarker({station_data, time = new Date(), selected
       icon={getMarkerIcon(selected_station, station_name)}
       eventHandlers={{
         click: (e) => {
-          console.log(e, "SETTING SELECTED STATION", station_data);
           dispatch({
             type: 'SET_SELECTED_STATION_AND_OPEN_DASHBOARD',
             payload: station_data,
