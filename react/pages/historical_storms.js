@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { basePath } from '@/next.config';
 import { getHistoricalStormList } from '@/components/historical_storm/historical_storm_utils';
 import { empty_storm_obj, empty_station_obj } from '@/components/point_defaults';
+import * as storm_utils from '@/lib/storm_utils'
 
 /* 
 TODO: Add calls for recent storms (if there is no query string/filter supplied)
@@ -32,6 +33,40 @@ export default function HistoricalStormsPage() {
   // creating the storm list from the storm data as a parameter rather than 
   // doing everything.
 
+  // Fetch active storm data
+  useEffect(() => {
+    console.debug("Fetching Active Storm data...");
+    fetch(`${basePath}/api/active_storms`)
+      .then((res) => res.json())
+      .then((active_storm_data) => {
+        let storm_details = {};
+
+        console.debug("Active Storm Data from /api/active_storms", active_storm_data);
+
+        if (active_storm_data.ib_data?.features.length > 0 || active_storm_data.eccc_data?.features.length > 0) {
+
+          active_storm_data.ib_data?.features.map(storm_point => {
+            if (!(storm_point.properties.NAME in storm_details)) {
+              storm_details[storm_point.properties.NAME] = {
+                source: "ibtracs",
+                year: storm_point.properties.SEASON,
+                data: []
+              }
+            }
+
+            storm_details[storm_point.properties.NAME].data.push(storm_point)
+          })
+        }
+        console.debug("Storm Details from /api/active_storms", storm_details);
+
+        const storm_points = storm_utils.build_ib_active_storm_features(storm_details);
+
+        console.debug("Final storm points built from active storm data", storm_points);
+        setStormPoints(storm_points);
+
+        // setActiveStormLoading(false);
+      })
+  }, []);
 
   // Fetch storm data using filters or the last year (if no filters specified)
   // TODO: Add historical storm filters to this block and logic to decide when to use which list
