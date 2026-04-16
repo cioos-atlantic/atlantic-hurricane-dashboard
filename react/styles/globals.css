@@ -1076,6 +1076,7 @@ button.filter-badge{
 
 .marker-cluster-large {
   background-color: rgba(0, 0, 205, 0.7);
+  color: white; /* White text for better contrast on large clusters */
 }
 
 .marker-cluster-large div {
