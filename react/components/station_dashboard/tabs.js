@@ -78,15 +78,7 @@ export default function BasicTabs({stationName, stationData, stationSummaryText,
    */
   
   //console.log(stationName, stationData, stationSummaryText, variablePresence, selectedTab, setSelectedTab)
-  console.log(stationData)
-
-  const timeData = get_station_field_data(stationData, "time", "column_std_names").data;
-  const directionData = get_station_field_data(stationData, 'wind_from_direction', "column_std_names").data;
-  const  windSpeedData = processWindSpeeds(stationData);
-
-  console.log(windSpeedData);
-  console.log(timeData, directionData, windSpeedData);
-
+  
   function generateGraph(selectedVar){
     
     return (
@@ -99,14 +91,27 @@ export default function BasicTabs({stationName, stationData, stationSummaryText,
        />
    </div>
     )
-   }
+  }
+  if(stationData === undefined){
+    return
+  }
+  let timeData, directionData, windSpeedData = []
+
+  try{
+  timeData = get_station_field_data(stationData, "time", "column_std_names").data;
+  directionData = get_station_field_data(stationData, 'wind_from_direction', "column_std_names").data;
+  windSpeedData = processWindSpeeds(stationData);
+  }
+  catch(error){
+    console.error(error)
+  }
 
   const [value, setValue] = React.useState(0);
   //const [hasData, setHasData] = React.useState(true); // State to track if data is available
 
   const data_link = "https://cioosatlantic.ca/erddap/tabledap/" + stationName + ".html"
   const handleChange = (event, newValue) => {
-    console.log(newValue)
+    //console.log(newValue)
     setSelectedTab(newValue);
   };
 
