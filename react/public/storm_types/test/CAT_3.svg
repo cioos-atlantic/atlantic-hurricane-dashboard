@@ -1,7 +1,13 @@
 <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(60,60)" stroke="black" stroke-width="2">
-    <circle r="50" fill="#F3722C" fill-opacity="0.2"/>
-    <circle r="40" fill="#F3722C" fill-opacity="0.35"/>
-    <circle r="30" fill="#F3722C" fill-opacity="0.5"/>  
+  <g transform="translate(60,60)">
+    <circle r="50" fill="#F3722C" stroke="black" stroke-width="4"/>
+    <text 
+      text-anchor="middle" 
+      dominant-baseline="central" 
+      font-size="30px" 
+      font-weight="bold" 
+      fill="black">
+      CAT 3
+    </text>
   </g>
 </svg>

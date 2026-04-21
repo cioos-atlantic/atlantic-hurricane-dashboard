@@ -58,25 +58,3 @@ export function createSvgIconWithText(text = "A", fill = "#0077be", size = 40, t
 
 
 
-export function createSvgIconWithText(text = "A", fill = "#0077be", size = 40, textColor = 'white') {
-    const fontSize = (size / 2) - 2;
-     
-    const svg = `
-      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="${size / 2}" cy="${size / 2}" r="${size / 2 - 2}" fill="${fill}" 
-                stroke="black" stroke-width="1.5" />
-        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-              fill="${textColor}" font-size="${fontSize}" font-family="Arial, sans-serif"
-              >
-          ${text}
-        </text>
-      </svg>
-    `;
-    
-    return L.divIcon({
-      html: svg,
-      className: '',
-      iconSize: [size, size],
-      iconAnchor: [size / 2, size / 2],
-    });
-  };

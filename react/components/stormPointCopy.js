@@ -71,7 +71,7 @@ export default function StormMarker({ storm_point_data, storm_point_hover, dispa
         
             
         })();
-    }, [ storm_point_data, isSelected]);
+    }, [ storm_point_data, isSelected, ]);
 
     if (!isMounted || !customIcon) return null;
 
