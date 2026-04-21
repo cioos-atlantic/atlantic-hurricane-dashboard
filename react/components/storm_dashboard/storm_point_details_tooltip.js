@@ -2,7 +2,8 @@ import { parseISO, format } from 'date-fns';
 import { fetch_value } from "@/lib/storm_utils";
 import React from "react";
 import { storm_type_info } from "@/lib/storm_class";
-
+import { getStormCategory } from './utils';
+import { storm_cat } from '@/lib/storm_cat';
 
 
 
@@ -46,17 +47,18 @@ export default function StormPointDetailsTooltip({ storm_point_hover }) {
     const STORMNAME = fetch_value(storm_point_hover, ["STORMNAME", "NAME"]) || fallbackValue;
     const STORMTYPE = fetch_value(storm_point_hover, ["STORMTYPE", "NATURE"]) || fallbackValue;
     const STORMFORCE = fetch_value(storm_point_hover, ["STORMFORCE", "USA_SSHS"]) || fallbackValue;
-    const MAXWIND = fetch_value(storm_point_hover, ["MAXWIND", "WMO_WIND", "USA_WIND"]) || fallbackValue;;
-    const MINPRESS = fetch_value(storm_point_hover, ["MSLP", "WMO_PRES", "USA_PRES"]) || fallbackValue;;
+    const MAXWIND = fetch_value(storm_point_hover, ["MAXWIND", "WMO_WIND", "USA_WIND"]) || fallbackValue;
+    const MINPRESS = fetch_value(storm_point_hover, ["MSLP", "WMO_PRES", "USA_PRES"]) || fallbackValue;
+    const STORMCAT = getStormCategory(storm_point_hover) || "";
 
 
 
     return (
 
          <div >
-            <div><strong>{STORMNAME}</strong></div>
-                <div><strong>Type:</strong> {storm_type_info[STORMTYPE]["name"]["en"]}</div>
-                <div><strong>Category:</strong> {STORMFORCE}</div>
+            <div><strong>{STORMNAME}</strong></div>       
+                <div><strong>Category:</strong> {storm_cat[STORMCAT]?.name?.en || STORMCAT}</div>
+                 <div><strong>Max Windspeed:</strong> {MAXWIND} knots ({(MAXWIND * 1.84).toFixed(2)} km/h)</div>
                 <div><strong>Timestamp:</strong> {TIMESTAMP}</div>
                 <em>Click for more details</em>
                 

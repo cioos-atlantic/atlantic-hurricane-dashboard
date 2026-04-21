@@ -14,7 +14,7 @@ import { RenderFilter } from "./Filter/filter";
 import { RenderSpatialFilter } from "./Filter/Edit_spatial_filter";
 import CustomZoomControl from "./custom_zoom_control";
 import { RenderDashboards } from "./Dashboard/dashboard";
-import StormMarker from "./stormPoint";
+import StormMarker from "./stormPointCopy";
 import { mapReducer, initialMapState } from "./mapReducer";
 import InfoScreen from "./message_screens/info_screen";
 import { IconButton } from "@mui/material";
