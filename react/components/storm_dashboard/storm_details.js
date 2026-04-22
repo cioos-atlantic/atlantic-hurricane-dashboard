@@ -39,7 +39,8 @@ export function StormSummaryText({storm_point_hover}){
   
             }}>
              
-                    <StormType STORMTYPE={STORMTYPE}/>
+                    {//<StormType STORMTYPE={STORMTYPE}/>
+                    }
                   <div><strong>Storm Status:</strong> {STORMSTATUS}</div>
                   <StormCategory STORMCAT={STORMCAT} />
                   <div><strong>Timestamp:</strong> {TIMESTAMP}</div>
