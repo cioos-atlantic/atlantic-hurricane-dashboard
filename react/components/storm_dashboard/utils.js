@@ -71,9 +71,10 @@ export function getStormCategory(storm_point_data) {
       
     if (windSpeed >= cat.min && windSpeed < cat.max) {
       
+      console.log(`Storm category determined: ${key} for wind speed ${windSpeed} km/h`);
       return key;
     }
   }
-
+  console.log(`No matching storm category found for wind speed ${windSpeed} km/h`);
   return "NR";
 }
