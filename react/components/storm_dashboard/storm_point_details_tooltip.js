@@ -60,7 +60,7 @@ export default function StormPointDetailsTooltip({ storm_point_hover }) {
                 <div><strong>Category:</strong> {storm_cat[STORMCAT]?.name?.en || STORMCAT}</div>
                  <div><strong>Max Windspeed:</strong> {MAXWIND} knots ({(MAXWIND * 1.84).toFixed(2)} km/h)</div>
                 <div><strong>Timestamp:</strong> {TIMESTAMP}</div>
-                <em>Click for more details</em>
+                <em>Click storm point for more details</em>
                 
                 
 

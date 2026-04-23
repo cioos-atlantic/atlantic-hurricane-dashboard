@@ -43,6 +43,7 @@ export default function StormMarker({ storm_point_data, storm_point_hover, dispa
     }, []);
 
     const isSelected = storm_point_data.id === storm_point_hover?.id;
+    console.log(`Marker for storm point with category ${storm_cat[getStormCategory(storm_point_data)].name.en || "Unknown"}`)
     
 
 
@@ -64,6 +65,8 @@ export default function StormMarker({ storm_point_data, storm_point_hover, dispa
                 `,
                 iconSize: isSelected ? [70, 70] : [40, 40],
                 iconAnchor: isSelected ? [35, 35] : [20, 20]
+                //iconSize: [40, 40],
+                //iconAnchor: [20, 20]
             });
 
             setCustomIcon(icon);
@@ -81,6 +84,7 @@ export default function StormMarker({ storm_point_data, storm_point_hover, dispa
             position={position}
             ref={markerRef}
             zIndexOffset={isSelected ? 1000 : 0}
+            aria-label={`Marker for storm point with category ${storm_cat[getStormCategory(storm_point_data)].name.en || "Unknown"}`}
 
             eventHandlers={{
                 mouseover: () => {
@@ -108,6 +112,7 @@ export default function StormMarker({ storm_point_data, storm_point_hover, dispa
         >
             {storm_point_hover && (
                 <Popup
+                    offset={[0, -40]}
                     closeButton={false}
                     autoPan={false}
                     closeOnEscapeKey={false}
@@ -115,7 +120,7 @@ export default function StormMarker({ storm_point_data, storm_point_hover, dispa
                     interactive={false}
                 >
                     <StormPointDetailsTooltip
-                        storm_point_hover={storm_point_data}
+                        storm_point_hover={storm_point_hover}
                     />
                 </Popup>
             )}
