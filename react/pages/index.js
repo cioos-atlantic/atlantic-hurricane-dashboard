@@ -12,17 +12,14 @@
 
 
 import { useRouter } from 'next/router'
+import { useEffect } from "react";
 import queryString from 'query-string';
 import Layout from '../components/layout'
 import { basePath } from '@/next.config';
+import { useNavWithHash } from '@/components/utils/navigation';
 
 
-const top_nav = [
-  { name: "Home", href: basePath },
-  { name: "Active Storms", href: basePath + "?storms=active" },
-  { name: "Historical Storms", href: basePath + "?storms=historical" },
-  { name: "About Hurricanes", href: basePath + "?storms=hurricanes" },
-]
+
 
 const logo = {
   src: `${basePath}/cioos-atlantic_EN.svg`,
@@ -33,6 +30,7 @@ const logo = {
 export default function StormDashboard() {
   const router = useRouter()
   const qs = queryString.parseUrl(process.env.BASE_URL + router.asPath)
+  const nav = useNavWithHash();
 
 
   
@@ -42,7 +40,7 @@ export default function StormDashboard() {
 
     
     <Layout 
-      topNav={top_nav} 
+      topNav={nav} 
       logo={logo} 
       querystring={qs}
     ></Layout>
