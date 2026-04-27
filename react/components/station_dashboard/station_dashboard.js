@@ -42,10 +42,13 @@ export default function StationDashboard({state, dispatch, station_descriptions,
   const station_id = stationValues?.properties?.station_id
   const storm = stationValues?.properties?.storm
 
+  const erddapSource = stationValues?.properties?.source_url || ""
+  const datasetId = stationValues?.properties?.dataset || ""
+  const dataLink = erddapSource + "/tabledap/" + datasetId 
+
   useEffect(() => {
     const fetchData = async () => {
       try{
-        console.log(station_id)
         const query = new URLSearchParams({station_id, storm}).toString();
         const response = await fetch(`${basePath}/api/station_data?${query}`)
         const data = await response.json();
@@ -203,6 +206,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         >
             <BasicTabs
               stationName={stationName}
+              sourceDataLink={dataLink}
               stationData={api_data[stationName]?.properties?.station_data}
               stationSummaryText={dataText}
               variablePresence={variablePresence}

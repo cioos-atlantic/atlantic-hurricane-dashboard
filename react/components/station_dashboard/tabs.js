@@ -68,7 +68,7 @@ function a11yProps(index) {
  * selected category. The Summary tab includes station summary text and a link to view full data. The
  * Wind Speed, Temperature, Waves, and
  */
-export default function BasicTabs({stationName, stationData, stationSummaryText, variablePresence, selectedTab, setSelectedTab, hoverPointTime}) {
+export default function BasicTabs({stationName, sourceDataLink, stationData, stationSummaryText, variablePresence, selectedTab, setSelectedTab, hoverPointTime}) {
   /**
    * The function `generateGraph` returns a JSX element containing a chart component with specified
    * data and styling.
@@ -108,10 +108,7 @@ export default function BasicTabs({stationName, stationData, stationSummaryText,
 
   const [value, setValue] = React.useState(0);
   //const [hasData, setHasData] = React.useState(true); // State to track if data is available
-
-  const data_link = "https://cioosatlantic.ca/erddap/tabledap/" + stationName + ".html"
   const handleChange = (event, newValue) => {
-    //console.log(newValue)
     setSelectedTab(newValue);
   };
 
@@ -177,7 +174,7 @@ export default function BasicTabs({stationName, stationData, stationSummaryText,
       <CustomTabPanel value={selectedTab} index={0}>
         {stationSummaryText}
         <div className="data-footer">
-                <a href={data_link} target="_blank">Full data</a>
+                <a href={sourceDataLink} target="_blank">Full data</a>
         </div>
       </CustomTabPanel>
       <CustomTabPanel value={selectedTab} index={1}>

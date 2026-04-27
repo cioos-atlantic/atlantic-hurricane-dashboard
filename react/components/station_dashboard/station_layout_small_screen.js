@@ -32,6 +32,8 @@ export default function StationDataLayout({stationName, stationData, stationSumm
   }
 
   const dataLink = "https://cioosatlantic.ca/erddap/tabledap/" + stationName + ".html"
+  console.log("here comes data")
+  console.log(stationData)
 
   return (
     <Box sx={{ width: "100%",
