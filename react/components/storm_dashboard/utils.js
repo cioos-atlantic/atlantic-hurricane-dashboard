@@ -59,11 +59,11 @@ export function getStormCategory(storm_point_data) {
   (storm_point_data?.properties?.["MAXWIND"] ??
    storm_point_data?.properties?.["USA_WIND"] ??
    storm_point_data?.properties?.["WMO_WIND"]);
-  console.log("windSpeed in knots:", windKnots);
+  //console.log("windSpeed in knots:", windKnots);
   const windSpeed = windKnots ? (windKnots * 1.84) : null; // Convert knots to km/h
-   console.log("windSpeed in km/h:", windSpeed);
+   //console.log("windSpeed in km/h:", windSpeed);
 
-  console.log("getStormCategory called with windSpeed:", windSpeed);
+  //console.log("getStormCategory called with windSpeed:", windSpeed);
   
 
   for (const [key, cat] of Object.entries(storm_cat)) {
@@ -71,7 +71,7 @@ export function getStormCategory(storm_point_data) {
       
     if (windSpeed >= cat.min && windSpeed < cat.max) {
       
-      console.log(`Storm category determined: ${key} for wind speed ${windSpeed} km/h`);
+      //console.log(`Storm category determined: ${key} for wind speed ${windSpeed} km/h`);
       return key;
     }
   }
