@@ -76,7 +76,7 @@ export function remap_coord_array(coordinates) {
  * @returns {array}
  */
 export function flip_coords(coordinates) {
-    console.log("Flipping coordinates: ", coordinates);
+    //console.log("Flipping coordinates: ", coordinates);
      try {
         return [coordinates[1], coordinates[0]];
     } catch (e) {
