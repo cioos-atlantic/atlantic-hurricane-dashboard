@@ -1058,3 +1058,14 @@ button.filter-badge{
 
 
 }
+
+.leaflet-control-zoomhome a {
+    font: bold 15px "Lucida Console",Monaco,monospace !important;
+}
+
+
+a.leaflet-control-zoomhome-in,
+a.leaflet-control-zoomhome-out {
+  font: bold 20px "Lucida Console",Monaco,monospace !important;
+  line-height: 26px;
+}

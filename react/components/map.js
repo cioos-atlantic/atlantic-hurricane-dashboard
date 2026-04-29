@@ -21,6 +21,7 @@ import { IconButton } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 import { useMediaQuery, Box, useTheme } from "@mui/material";
 import { LeafletHash } from "./leaflet_hash";
+import ZoomHomeControl from "./zoom_home";
 
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
@@ -107,7 +108,9 @@ export default function Map({ children, station_data, source_type,  setStationPo
           
         > 
         <LeafletHash />
-        <CustomZoomControl /> 
+        <ZoomHomeControl />
+        {//<CustomZoomControl />
+         }
           
           
 
