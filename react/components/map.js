@@ -119,40 +119,28 @@ export default function Map({ children, station_data, source_type,  setStationPo
               />
             </LayersControl.BaseLayer>
 
-            {/* CARTO Light */}
-            <LayersControl.BaseLayer name="Light">
-              <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a> &copy; <a href="https://carto.com/" target="_blank" rel="noopener noreferrer">CARTO</a>'
-              />
-            </LayersControl.BaseLayer>
-
-            {/* CARTO Dark */}
-            <LayersControl.BaseLayer name="Dark">
-              <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a> &copy; <a href="https://carto.com/" target="_blank" rel="noopener noreferrer">CARTO</a>'
-              />
-            </LayersControl.BaseLayer>
+          
 
             {/* OpenTopoMap */}
             <LayersControl.BaseLayer name="Terrain">
-              <TileLayer
-                url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-                attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a> | Map style: &copy; <a href="https://opentopomap.org" target="_blank" rel="noopener noreferrer">OpenTopoMap</a>'
-              />
+              <LayerGroup>
+                <TileLayer
+                  url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+                  attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a> | Map style: &copy; <a href="https://opentopomap.org" target="_blank" rel="noopener noreferrer">OpenTopoMap</a>'
+                />
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+
+              </LayerGroup>
+              
             </LayersControl.BaseLayer>
 
-            {/* ESRI Satellite */}
+            
+
+            {/* ESRI Satellite*/}
             <LayersControl.BaseLayer name="Satellite">
-              <TileLayer
-                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
-              />
-            </LayersControl.BaseLayer>
-
-            {/* ESRI Satellite + Labels */}
-            <LayersControl.BaseLayer name="Satellite + Labels">
               <LayerGroup>
                 <TileLayer
                   url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
@@ -163,27 +151,31 @@ export default function Map({ children, station_data, source_type,  setStationPo
                   attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
                 />
               </LayerGroup>
-              {/* ESRI Topographic Map */}
+              
             </LayersControl.BaseLayer>
+            
+            {/* ESRI Topographic Map */}
               <LayersControl.BaseLayer name="Topographic">
                 <TileLayer
                   url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
                   attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
                 />
               </LayersControl.BaseLayer>
-              {/* ESRI World Street Map */}
-              <LayersControl.BaseLayer name="Street Map">
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
-                  attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
-                />
-              </LayersControl.BaseLayer>
+             
                 {/* ESRI World Physical Map */}
               <LayersControl.BaseLayer name="Physical Map">
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}"
-                  attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
-                />
+                <LayerGroup>
+                    <TileLayer
+                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}"
+                    attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                    />
+                    <TileLayer
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                      attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                    />
+
+                </LayerGroup>
+                
               </LayersControl.BaseLayer>
 
               {/* ESRI NatGeo World Map */}
