@@ -10,7 +10,8 @@ import Grid from '@mui/material/Grid2';
 import { Box } from "@mui/material";
 import HeaderNav from "./header_nav";
 import { loadSpace } from "@usersnap/browser";
-
+import { TourProvider } from "@reactour/tour";
+import { getTourSteps } from "./Tour/tourSteps";
 
 
 import { basePath } from "@/next.config";
@@ -32,6 +33,7 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
   const [isMounted, setIsMounted] = useState(false);
 
   const router = useRouter();
+  const routerReady = router?.isReady;
 
   const spaceKey = 'dbba29d9-e060-4d56-8a09-923ef07e516d'
   // Will need to find some better way to store as secret
@@ -48,9 +50,18 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
   }, []);
 
 
-  const active_storms = querystring.query.storms == "active";
-  const historical_storms = querystring.query.storms == "historical";
-  const about_page = router?.query?.storms === "hurricanes";
+  const hasStations =
+  station_points && Object.keys(station_points).length > 0;
+
+  const mode = router?.query?.storms;
+  const hasStorms = Boolean(router?.query?.name);
+
+  const isActive = mode === "active";
+  const isHistorical = mode === "historical";
+  const isAbout = mode === "hurricanes";
+
+  const isTourReady =
+    routerReady && (hasStations !== undefined);
 
   // useMemo() tells React to "memorize" the map component.
   // Without this, the map will get redrawn by many interactions 
@@ -65,7 +76,7 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
 
   
   useEffect(() => {
-    if (active_storms) {
+    if (isActive) {
       setSourceType("active");
       fetch(`${basePath}/api/query_stations`)
         .then((res) => res.json())
@@ -73,12 +84,27 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
           setStationPoints(data);
         })
     };
-    if (historical_storms)
+    if (isHistorical)
       { setSourceType("historical")
         
       };
-  }, [active_storms, historical_storms]);
+  }, [isActive, isHistorical]);
 
+
+ 
+    
+  
+ 
+    
+  const steps = useMemo(() => {
+
+    return getTourSteps({
+      hasStorms,
+      hasStations,
+      isActive,
+      isHistorical,
+    });
+  }, [hasStorms, hasStations, isActive, isHistorical]);
   
 
   return (
@@ -147,21 +173,33 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
           
         </Grid>
       </header>
-      {!isMounted ? null : about_page ?  (
+      {!isMounted ? null : isAbout ?  (
         <About
             
             />):(<>
       <main className="body">
-        
-
-
-        <MapWithNoSSR
+        <TourProvider steps={steps}
+          styles={{
+            popover: base => ({
+              ...base,
+              zIndex: 10000000
+            })
+          }}
+        >
+          <MapWithNoSSR
           station_data={station_points}
           source_type={sourceType}
           setStationPoints={setStationPoints}
+          isTourReady={isTourReady}
           
 
         />
+
+        </TourProvider>
+        
+
+
+        
       </main>
       </>)}
       <footer>

@@ -1,5 +1,5 @@
 // https://iconoir.com/ icon library that can be installed via npm
-import React, { useState, useRef, useReducer } from "react";
+import React, { useState, useRef, useReducer, useMemo, useEffect } from "react";
 import { MapContainer, TileLayer, WMSTileLayer, LayersControl, LayerGroup } from 'react-leaflet'
 import Drawer from '@/components/drawer';
 import 'leaflet/dist/leaflet.css'
@@ -20,35 +20,81 @@ import InfoScreen from "./message_screens/info_screen";
 import { IconButton } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 import { useMediaQuery, Box, useTheme } from "@mui/material";
+import TourWrapper from "@/components/Tour/UseTour";
+import { getTourSteps } from "@/components/Tour/tourSteps";
+import { useTour } from "@reactour/tour";
+
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
 
 
-export default function Map({ children, station_data, source_type,  setStationPoints}) {
+export default function Map({ children, station_data, source_type,  setStationPoints, isTourReady}) {
 
   const clearShapesRef = useRef(null);
 
   const [state, dispatch] = useReducer(mapReducer, initialMapState);
   const [map, setMap] = useState()
   const theme = useTheme();
+  const { setIsOpen, setCurrentStep } = useTour();
+  const [showModal, setShowModal] = useState(true);
+ 
+
+  
+  const startTour = () => {
+    setShowModal(false);
+    setCurrentStep(0);
+    setIsOpen(true);
+    
+  };
+
+  const skipTour = () => {
+    setShowModal(false);
+    
+  };
+
+
+
+
+   
   
   
   console.debug("Storm Points in map.js: ", state.storm_points);
+  
 
-
+  
 
   return (
+    
     <div className="map_container">
       <div className='inner_container'>
-      {<InfoScreen
-          setInfo = {(state) =>dispatch({ type: "SET_INFO_GUIDE", payload: state})}
-          open={state.info}
-          onClose = {state.info}
-        />}
-        
+         
+       {showModal && (
+          <div className="tour-modal-overlay">
+            <div className="tour-modal">
+              <h2>Welcome 👋</h2>
+              <p>
+                Want a quick tour of how to explore storms and use the map?
+              </p>
 
-      { 
+              <div className="tour-actions">
+                <button
+                  onClick={startTour}
+                  className="primary"
+                  disabled={!isTourReady}
+                >
+                  Take a Tour
+                </button>
+
+                <button onClick={skipTour} className="secondary">
+                  No, thanks
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      
         <IconButton
           className="info-guide"
           sx={{ display: 'flex'
@@ -60,7 +106,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
         </IconButton>
 
       
-      }
+      
         
         { source_type === "historical" &&
           <RenderFilter
@@ -250,5 +296,6 @@ export default function Map({ children, station_data, source_type,  setStationPo
           />)}
       </div>
     </div>
+    
   )
 }
