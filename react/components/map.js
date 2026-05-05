@@ -218,7 +218,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
                 attribution='&copy; <a href="https://www.rainviewer.com/">RainViewer</a>'
               />)}
             </LayersControl.Overlay>*/}
-            <LayersControl.Overlay  name="Stations">
+            <LayersControl.Overlay  checked name="Stations">
               <LayerGroup>
                 {
                   station_data ? (
