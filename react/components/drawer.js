@@ -82,6 +82,7 @@ export default function Drawer({ children, element_id, classes, source_type, set
                                 filterQuery={state.filterQuery}
                                 filterStormName={state.filterStormName}
                                 showFilterSelected={state.showFilterSelected}
+                                isTour={state.isTour}
                                 
                         />
                         ) : 

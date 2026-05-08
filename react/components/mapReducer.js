@@ -1,4 +1,5 @@
 // mapReducer.js
+import { is } from "date-fns/locale";
 import { empty_point_obj, empty_station_obj, empty_storm_obj } from "./point_defaults";
 
 
@@ -25,7 +26,8 @@ export const initialMapState = {
   filterStormName:[],
   selectedStormNames:[],
   info:true,
-  showFilterSelected:true
+  showFilterSelected:true,
+  isTour: true
 };
 
 export function mapReducer(state, action) {
@@ -70,6 +72,8 @@ export function mapReducer(state, action) {
       return { ...state, showCatSelection: !state.showCatSelection };
     case 'SET_CAT_SELECTION':
       return { ...state, showCatSelection: action.payload };
+    case 'SET_TOUR':
+      return { ...state, isTour: action.payload };
     case 'SET_DATE_SELECTION':
       return { ...state, showDateSelection: action.payload };
       case "TOGGLE_DATE_SELECTION":
