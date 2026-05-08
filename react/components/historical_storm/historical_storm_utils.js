@@ -3,7 +3,6 @@ import {  build_storm_features } from "@/lib/storm_utils";
 import { flyToPoint } from "../storm_list_item";
 import { empty_station_obj } from "../point_defaults";
 import { basePath } from "@/next.config";
-import { tour_station_data, tour_storm_data } from "../Tour/tour_data";
 
 /**
  * This JavaScript function fetches historical storm data from an API based on a specified time range
@@ -318,7 +317,7 @@ export function addSearchParams(stormName, stormYear, router) {
  * based on the storm details, and sets the retrieved data for display on the map.
 
  */
-export async function handleClick( storm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation, setLoading, setIsDashOpen, setIsStormDashOpen,setIsStationDashOpen, isTour) {
+export async function handleClick( storm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation, setLoading, setIsDashOpen, setIsStormDashOpen,setIsStationDashOpen) {
 
   setIsDashOpen(false);
   setIsStationDashOpen(false);
@@ -356,19 +355,13 @@ export async function handleClick( storm, setStationPoints, setStormPoints, map,
   setLoading(true);
   try {
     const resource = await fetch(`${basePath}/api/historical_storms?${query}`);
-    const storm_data = isTour
-      ? tour_storm_data()
-      : await resource.json();
-   
+    const storm_data = await resource.json();
 
     
 
     //console.log(historical_station_data)
     const station_resource = await fetch(`${basePath}/api/query_stations_historical?${query}`);
-    const historical_station_data = isTour
-      ? tour_station_data()
-      : await station_resource.json();
-    
+    const historical_station_data = await station_resource.json();
 
     //console.log(Leaflet);
 

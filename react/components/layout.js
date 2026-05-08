@@ -10,7 +10,8 @@ import Grid from '@mui/material/Grid2';
 import { Box } from "@mui/material";
 import HeaderNav from "./header_nav";
 import { loadSpace } from "@usersnap/browser";
-
+import { TourProvider } from "@reactour/tour";
+import { getTourSteps } from "./Tour/tourSteps";
 
 
 import { basePath } from "@/next.config";
@@ -49,7 +50,8 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
   }, []);
 
 
- 
+  const hasStations =
+  station_points && Object.keys(station_points).length > 0;
 
   const mode = router?.query?.storms;
   const hasStorms = Boolean(router?.query?.name);
@@ -58,7 +60,9 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
   const isHistorical = mode === "historical";
   const isAbout = mode === "hurricanes";
 
-  
+  const isTourReady =
+    routerReady && (hasStations !== undefined);
+
   // useMemo() tells React to "memorize" the map component.
   // Without this, the map will get redrawn by many interactions 
   // and cause flashing - this lets us update map layers without
@@ -92,7 +96,15 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
   
  
     
- 
+  const steps = useMemo(() => {
+
+    return getTourSteps({
+      hasStorms,
+      hasStations,
+      isActive,
+      isHistorical,
+    });
+  }, [hasStorms, hasStations, isActive, isHistorical]);
   
 
   return (
@@ -166,18 +178,24 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
             
             />):(<>
       <main className="body">
-      
-       
+        <TourProvider steps={steps}
+          styles={{
+            popover: base => ({
+              ...base,
+              zIndex: 10000000
+            })
+          }}
+        >
           <MapWithNoSSR
           station_data={station_points}
           source_type={sourceType}
           setStationPoints={setStationPoints}
-          
+          isTourReady={isTourReady}
           
 
         />
 
-        
+        </TourProvider>
         
 
 

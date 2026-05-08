@@ -17,7 +17,7 @@ import {  FiltersSelected, FiltersSubmitted } from '../Filter/viewFilters.js';
  * clickable links, and allows users to search for specific storms by name or year.
  
  */
-export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, returnFilterResult, filterResult, drawerButtonClicked, startDate, endDate, startCategory, endCategory, polyFilterCoords, filterQuery, filterStormName, showFilterSelected, isTour }) {
+export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, returnFilterResult, filterResult, drawerButtonClicked, startDate, endDate, startCategory, endCategory, polyFilterCoords, filterQuery, filterStormName, showFilterSelected}) {
 
   const [loading, setLoading] = useState(false);
 
@@ -78,7 +78,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
             dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: selectedStorm.storm_id })
             
 
-            await handleClick(selectedStorm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation,setLoading, setIsDashOpen, setIsStormDashOpen,setIsStationDashOpen, isTour);
+            await handleClick(selectedStorm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation,setLoading, setIsDashOpen, setIsStormDashOpen,setIsStationDashOpen);
           }
         }
     }
