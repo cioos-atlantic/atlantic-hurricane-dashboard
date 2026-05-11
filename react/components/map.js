@@ -23,6 +23,7 @@ import { useMediaQuery, Box, useTheme } from "@mui/material";
 import TourWrapper from "@/components/Tour/UseTour";
 import { getTourSteps } from "@/components/Tour/tourSteps";
 import { useTour } from "@reactour/tour";
+import Tooltip from "@mui/material/Tooltip";
 
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
@@ -45,17 +46,18 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const startTour = () => {
   setShowModal(false);
   setTourStarted(true);
-
-  setTimeout(() => {
-    setCurrentStep(0);
-    setIsOpen(true);
-  }, 0);
-};
+  };
 
   const skipTour = () => {
     setShowModal(false);
     
   };
+  useEffect(() => {
+  if (tourStarted) {
+    setCurrentStep(0);
+    setIsOpen(true);
+  }
+  }, [tourStarted]);
 
 
 
@@ -81,7 +83,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
                 <button
                   onClick={startTour}
                   className="primary"
-                  disabled={!isTourReady}
+                  
                 >
                   Take a Tour
                 </button>
@@ -95,15 +97,17 @@ export default function Map({ children, station_data, source_type,  setStationPo
         )}
 
       
-        <IconButton
-          className="info-guide"
-          sx={{ display: 'flex'
-            }}
-          onClick={() => {
-            dispatch({ type: "SET_INFO_GUIDE", payload: true});
-          }}
-          ><InfoIcon />
-        </IconButton>
+        <Tooltip title="Take a tour of the tool features">
+          <IconButton
+            className="tour-reload"
+            sx={{ display: "flex" }}
+            onClick={() => {
+              setIsOpen(false);// Reset any open tour popovers
+              setShowModal(true)}}
+          >
+            <InfoIcon />
+          </IconButton>
+        </Tooltip>
 
       
       

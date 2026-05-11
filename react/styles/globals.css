@@ -935,17 +935,24 @@ button.filter-badge{
 
 }
 
-.info-guide{
+.tour-reload{
   z-index: 3000;
   position: fixed !important;
-  top: 68px !important;
+  top: 65px !important;
   right: 9px !important;
   text-align: center !important;
-  height: 35px !important;
-  width: 35px !important;
+  height: 38px !important;
+  width: 38px !important;
   padding: 0px !important;
   font-size: 0px !important;
   color:  #1E90FF !important;
+  border: white 3px solid !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+
+}
+
+.tour-reload :hover{
+  background:transparent !important;
 
 }
 
