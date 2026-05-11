@@ -265,7 +265,9 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
             sx={{ display: { xs: "none", md: "flex" },  left: drawerOpen ? `${drawerWidth}px` : 0,
             width: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%',   }}
             className='filter-icons-list'>
-            {
+            
+            <div className="filters">
+              {
               input_filters.map((input_filter, index) => {
                 return (
 
@@ -284,44 +286,29 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
                     endCategory={state.endCategory}
                   />
 
-                  </div>
-                )
-              })
-            }
+                    </div>
+                  )
+                })
+              }
 
 
-            <div className="filter-group">
-              <RenderDateFilter
-                state={state}
-                dispatch={dispatch}
-                setShowFilterOptions={setShowFilterOptions}
-              />
-            </div>
-            <div className="filter-group">
-              <RenderCategoryFilter
+              <div className="filter-group">
+                <RenderDateFilter
                   state={state}
                   dispatch={dispatch}
                   setShowFilterOptions={setShowFilterOptions}
                 />
+              </div>
+              <div className="filter-group">
+                <RenderCategoryFilter
+                    state={state}
+                    dispatch={dispatch}
+                    setShowFilterOptions={setShowFilterOptions}
+                  />
+              </div>
+
             </div>
             
-
-            {/*
-              filters.map((filter, index) => {
-                return (
-
-                  <div className="filter-group" key={index}>
-                    <Badges
-                      filter={filter}
-                      showFilterOptions={showFilterOptions}
-                      setShowFilterOptions={setShowFilterOptions}
-                      setSelectedOptions={setSelectedOptions}
-                      selectedOptions={selectedOptions}
-                    />
-                  </div>
-                )
-              })
-            */}
 
             <Button
               className="filter-submit-button"
