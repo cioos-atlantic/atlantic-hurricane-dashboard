@@ -52,12 +52,14 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
 
   
 
-  const mode = router?.query?.storms;
+  const mode = router?.query?.page;
+  
 
 
-  const isActive = mode === "active";
+  const isActive = mode === "active" || !mode; // Default to active if no mode is specified   
   const isHistorical = mode === "historical";
-  const isAbout = mode === "hurricanes";
+  const isAbout = mode === "about";
+  const isUserGuide = mode === "user-guide";
 
   const isTourReady =
     routerReady;
