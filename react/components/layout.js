@@ -50,18 +50,17 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
   }, []);
 
 
-  const hasStations =
-  station_points && Object.keys(station_points).length > 0;
+  
 
   const mode = router?.query?.storms;
-  const hasStorms = Boolean(router?.query?.name);
+
 
   const isActive = mode === "active";
   const isHistorical = mode === "historical";
   const isAbout = mode === "hurricanes";
 
   const isTourReady =
-    routerReady && (hasStations !== undefined);
+    routerReady;
 
   // useMemo() tells React to "memorize" the map component.
   // Without this, the map will get redrawn by many interactions 
@@ -99,12 +98,10 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
   const steps = useMemo(() => {
 
     return getTourSteps({
-      hasStorms,
-      hasStations,
       isActive,
       isHistorical,
     });
-  }, [hasStorms, hasStations, isActive, isHistorical]);
+  }, [ isActive, isHistorical]);
   
 
   return (
@@ -178,14 +175,8 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
             
             />):(<>
       <main className="body">
-        <TourProvider steps={steps}
-          styles={{
-            popover: base => ({
-              ...base,
-              zIndex: 10000000
-            })
-          }}
-        >
+       
+        
           <MapWithNoSSR
           station_data={station_points}
           source_type={sourceType}
@@ -195,7 +186,7 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
 
         />
 
-        </TourProvider>
+
         
 
 

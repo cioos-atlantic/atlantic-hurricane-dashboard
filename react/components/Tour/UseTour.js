@@ -1,6 +1,6 @@
 import { TourProvider } from "@reactour/tour";
 
-export default function UseTour({ steps, children }) {
+export default function TourWrapper({ steps, children }) {
   return (
     <TourProvider
       steps={steps}

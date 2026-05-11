@@ -38,15 +38,19 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const theme = useTheme();
   const { setIsOpen, setCurrentStep } = useTour();
   const [showModal, setShowModal] = useState(true);
+  const [tourStarted, setTourStarted] = useState(false);
  
 
   
   const startTour = () => {
-    setShowModal(false);
+  setShowModal(false);
+  setTourStarted(true);
+
+  setTimeout(() => {
     setCurrentStep(0);
     setIsOpen(true);
-    
-  };
+  }, 0);
+};
 
   const skipTour = () => {
     setShowModal(false);
@@ -62,11 +66,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
   console.debug("Storm Points in map.js: ", state.storm_points);
   
 
-  
-
-  return (
-    
-    <div className="map_container">
+  const mapContent = (<div className="map_container">
       <div className='inner_container'>
          
        {showModal && (
@@ -295,7 +295,19 @@ export default function Map({ children, station_data, source_type,  setStationPo
             map={map}
           />)}
       </div>
-    </div>
-    
-  )
+    </div>)
+
+  return  tourStarted ? (
+  <TourWrapper
+    steps={getTourSteps({
+      isActive: source_type === "active",
+      isHistorical: source_type === "historical",
+    })}
+      >
+        {mapContent}
+      </TourWrapper>
+    ) : (
+      mapContent
+    );
+  
 }
