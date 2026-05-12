@@ -12,6 +12,7 @@ import HeaderNav from "./header_nav";
 import { loadSpace } from "@usersnap/browser";
 import { TourProvider } from "@reactour/tour";
 import { getTourSteps } from "./Tour/tourSteps";
+import UserGuide from "@/pages/user-guide";
 
 
 import { basePath } from "@/next.config";
@@ -104,6 +105,27 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
       isHistorical,
     });
   }, [ isActive, isHistorical]);
+
+
+  if (!isMounted) return null;
+
+  let pageContent;
+
+  if (isAbout) {
+    pageContent = <About />;
+  } else if (isUserGuide) {
+    pageContent = <UserGuide />;
+  } else {
+    pageContent = (
+      <MapWithNoSSR
+        station_data={station_points}
+        source_type={sourceType}
+        setStationPoints={setStationPoints}
+        isTourReady={isTourReady}
+      />
+    );
+  }
+
   
 
   return (
@@ -139,21 +161,6 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
             
           </Grid>
           
-
-          {/* Content Section */}
-          <Grid size ='auto' >
-          
-            {home ? (
-              <>
-                {/* Home Page Header Content */}
-              </>
-            ) : (
-              <>
-                {/* Other Page Header Content */}
-              </>
-            )}
-
-          </Grid>
           
 
           {/* Navigation Section */}
@@ -172,29 +179,11 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
           
         </Grid>
       </header>
-      {!isMounted ? null : isAbout ?  (
-        <About
-            
-            />):(<>
       <main className="body">
-       
-        
-          <MapWithNoSSR
-          station_data={station_points}
-          source_type={sourceType}
-          setStationPoints={setStationPoints}
-          isTourReady={isTourReady}
-          
-
-        />
-
-
-        
-
-
-        
-      </main>
-      </>)}
+      
+        {pageContent}
+        </main>
+    
       <footer>
         <Box sx={{
           height:{ xs: '20px', sm: '30px', md: '35px', lg: '50px', xl: '50px', xxl: '50px' }, // if changed, remember to change the station dashboard bottom in the station_dashboard.js
