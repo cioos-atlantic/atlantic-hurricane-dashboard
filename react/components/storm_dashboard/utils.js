@@ -1,3 +1,6 @@
+import { storm_cat } from "@/lib/storm_cat";
+
+
 export function ProgressiveAnimation(data) {
     const delayPerPoint = 5; // ms delay between points
 
@@ -49,4 +52,29 @@ export function ProgressiveAnimation(data) {
     };
   
     return animation;
+}
+
+export function getStormCategory(storm_point_data) {
+  const windKnots =
+  (storm_point_data?.properties?.["MAXWIND"] ??
+   storm_point_data?.properties?.["USA_WIND"] ??
+   storm_point_data?.properties?.["WMO_WIND"]);
+  //console.log("windSpeed in knots:", windKnots);
+  const windSpeed = windKnots ? (windKnots * 1.84) : null; // Convert knots to km/h
+   //console.log("windSpeed in km/h:", windSpeed);
+
+  //console.log("getStormCategory called with windSpeed:", windSpeed);
+  
+
+  for (const [key, cat] of Object.entries(storm_cat)) {
+    if (key === "NR") continue;
+      
+    if (windSpeed >= cat.min && windSpeed < cat.max) {
+      
+      //console.log(`Storm category determined: ${key} for wind speed ${windSpeed} km/h`);
+      return key;
+    }
   }
+  console.log(`No matching storm category found for wind speed ${windSpeed} km/h`);
+  return "NR";
+}

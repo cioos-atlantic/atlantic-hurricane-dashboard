@@ -958,6 +958,14 @@ button.filter-badge{
   z-index: 9999;  /* Higher than the map */
   background: transparent; /* invisible but still intercepts touches */
 }
+.storm-marker {
+  transition: transform 0.15s ease;
+}
+
+.storm-marker.selected {
+  
+  z-index: 1000;
+}
 
 @media (hover: hover) and (pointer: fine) {
   header nav ul li a:hover {
