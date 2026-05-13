@@ -172,12 +172,12 @@ export async function wfs_query(storm_name, season, source, source_type, storm_i
     }
 
     if (get_erddap && source_type === "ACTIVE") {
-
+        // Example: https://cioosatlantic.ca/geoserver/ows?service=wfs&version=2.0.0&request=GetFeature&typeName=erddap_active_cache&sortby=station_id&outputFormat=application/json
         console.debug("Getting ERDDAP data");
         // cioos-atlantic:erddap_cache
-        wfs_sources.push("erddap_active_cache");
+        wfs_sources.push("erddap_active_cache_lite");
 
-        let erddap_source = "erddap_active_cache&sortby=station_id,max_time"
+        let erddap_source = "erddap_active_cache_lite&sortby=station_id,max_time"
         const erddap_features_url = build_wfs_query(workspace + erddap_source, [], source_type)
 
         console.debug("ERDDAP URL: ", erddap_features_url)
@@ -205,6 +205,25 @@ export async function wfs_query(storm_name, season, source, source_type, storm_i
         responses["erddap_data"] = await fetch_wfs_data(erddap_features_url);
     }
 
+    return responses;
+}
+
+export async function wfs_data_query(station_id, storm){
+    let responses = {};
+    let workspace = process.env.NEXT_PUBLIC_GEOSERVER_WORKSPACE + ":";
+    let station_data_source = ""
+    let data_filters = []
+    let source_type = 'ACTIVE'
+    data_filters.push('station_id=%27' + station_id + '%27')
+    if(storm == "ACTIVE"){
+        station_data_source = "erddap_active_cache&sortby=station_id,max_time"
+    }
+    else{
+        station_data_source = "erddap_historical_cache&sortby=station_id,max_time"
+        data_filters.push('storm=%27' + storm + '%27')
+    }
+    const station_data_url = build_wfs_query(workspace + station_data_source, data_filters, 'station_data')
+    responses['station_data'] = await fetch_wfs_data(station_data_url);
     return responses;
 }
 

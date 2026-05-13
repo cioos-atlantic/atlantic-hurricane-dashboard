@@ -65,6 +65,7 @@ export function get_station_data_value(station_data, row_position, column_name, 
 
 // state can select a standard variable?
 export function getStationDataText(data, time, isHistorical=false) {
+    if (!data) return null;
     let station_data = data?.properties?.station_data;
 
     const row_position = get_recent_row_position(data,time)
@@ -128,7 +129,7 @@ export function getColumnNameList(column_std_names, column_names, variable){
 
     };
   });
-  console.log(column_names_list)
+  //console.log(column_names_list)
   return column_names_list
 }
 

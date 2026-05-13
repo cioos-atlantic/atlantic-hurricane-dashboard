@@ -5,6 +5,9 @@ import Drawer from '@/components/drawer';
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
+//import "leaflet.markercluster/dist/MarkerCluster.css";
+//import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import MarkerClusterGroup from "react-leaflet-markercluster";
 import LineOfTravel from "@/components/line_of_travel";
 import WindSpeedRadius from "@/components/wind_radii";
 import SeaHeightRadius from "@/components/sea_height_radii";
@@ -203,19 +206,20 @@ export default function Map({ children, station_data, source_type,  setStationPo
                 />
               </LayerGroup>
             </LayersControl.Overlay>
-           {/* <LayersControl.Overlay checked name="Rain Radar">
-              {radarTime &&(<TileLayer
-                url={`https://tilecache.rainviewer.com/v2/radar/${radarTime}/256/{z}/{x}/{y}/2/1_1.png`}
-                opacity={0.6}
-                attribution='&copy; <a href="https://www.rainviewer.com/">RainViewer</a>'
-              />)}
-            </LayersControl.Overlay>*/}
+           
             <LayersControl.Overlay  checked name="Stations">
-              <LayerGroup>
+
+              <MarkerClusterGroup>
                 {
                   station_data ? (
                     Object.entries(station_data).map((station) => {
-                      const storm_timestamp = new Date(state.hover_marker.properties["TIMESTAMP"]);
+                      let storm_timestamp = new Date()
+                      if("TIMESTAMP" in state.hover_marker.properties){
+                        storm_timestamp = new Date(["TIMESTAMP"]);
+                      }
+                      console.log(JSON.stringify(state.hover_marker))
+                      console.log(storm_timestamp)
+                      console.log(station)
                       return (
                         <StationMarker
                           key={station[0]}
@@ -230,7 +234,8 @@ export default function Map({ children, station_data, source_type,  setStationPo
                     <></>
                   )
                 }
-              </LayerGroup>
+              </MarkerClusterGroup>
+             
             </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Error Cone">
               <LayerGroup>
