@@ -74,7 +74,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
        {showModal && (
           <div className="tour-modal-overlay">
             <div className="tour-modal">
-              <h2>Welcome 👋</h2>
+              <h2>Welcome</h2>
               <p>
                 Want a quick tour of how to explore storms and use the map?
               </p>
