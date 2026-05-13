@@ -958,6 +958,14 @@ button.filter-badge{
   z-index: 9999;  /* Higher than the map */
   background: transparent; /* invisible but still intercepts touches */
 }
+.storm-marker {
+  transition: transform 0.15s ease;
+}
+
+.storm-marker.selected {
+  
+  z-index: 1000;
+}
 
 @media (hover: hover) and (pointer: fine) {
   header nav ul li a:hover {
@@ -1040,7 +1048,7 @@ button.filter-badge{
   background-color: #e55162;
   color: white;
   }
-  /* 🔎 Focus styles for keyboard users */
+  /* Focus styles for keyboard users */
   .filters-speed-dial:focus-visible,
   .header-drawer-small-screens:focus-visible,
   .historical_storm_button:focus-visible,
@@ -1058,6 +1066,48 @@ button.filter-badge{
 
 
 }
+.marker-cluster-small {
+  background-color: rgba(135, 206, 250, 0.7);
+}
+
+.marker-cluster-small div {
+  background-color: rgba(135, 206, 250, 0.9);
+}
+
+.marker-cluster-medium {
+  background-color: rgba(30, 144, 255, 0.7);
+}
+
+.marker-cluster-medium div {
+  background-color: rgba(30, 144, 255, 0.9);
+}
+
+.marker-cluster-large {
+  background-color: rgba(0, 0, 205, 0.7);
+  color: white; /* White text for better contrast on large clusters */
+}
+
+.marker-cluster-large div {
+  background-color: rgba(0, 0, 205, 0.95);
+}
+
+.marker-cluster {
+	background-clip: padding-box;
+	border-radius: 20px;
+	}
+.marker-cluster div {
+	width: 30px;
+	height: 30px;
+	margin-left: 5px;
+	margin-top: 5px;
+
+	text-align: center;
+	border-radius: 15px;
+	font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	}
+.marker-cluster span {
+	line-height: 30px;
+	}
 
 .leaflet-control-zoomhome a {
     font: bold 15px "Lucida Console",Monaco,monospace !important;

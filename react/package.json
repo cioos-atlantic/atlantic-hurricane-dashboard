@@ -38,6 +38,7 @@
     "leaflet-draw": "^1.0.4",
     "leaflet-hash": "^0.2.1",
     "leaflet.zoomhome": "^1.0.0",
+    "leaflet.markercluster": "^1.5.3",
     "luxon": "^3.5.0",
     "next": "^15.2.4",
     "path": "^0.12.7",
@@ -51,6 +52,7 @@
     "react-icons": "^5.5.0",
     "react-leaflet": "^4.2.1",
     "react-leaflet-draw": "^0.20.6",
+    "react-leaflet-markercluster": "^4.2.1",
     "react-plotly.js": "^2.6.0",
     "react-responsive": "^10.0.0",
     "swr": "^2.3.2"
