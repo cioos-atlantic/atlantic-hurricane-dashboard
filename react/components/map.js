@@ -1,5 +1,5 @@
 // https://iconoir.com/ icon library that can be installed via npm
-import React, { useState, useRef, useReducer } from "react";
+import React, { useState, useRef, useReducer, useEffect } from "react";
 import { MapContainer, TileLayer, WMSTileLayer, LayersControl, LayerGroup } from 'react-leaflet'
 import Drawer from '@/components/drawer';
 import 'leaflet/dist/leaflet.css'
@@ -35,9 +35,13 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const [state, dispatch] = useReducer(mapReducer, initialMapState);
   const [map, setMap] = useState()
   const theme = useTheme();
+
   
   
   console.debug("Storm Points in map.js: ", state.storm_points);
+
+
+    
 
 
 
@@ -106,12 +110,89 @@ export default function Map({ children, station_data, source_type,  setStationPo
           
           
 
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-          />
+          
 
           <LayersControl position="bottomright">
+
+            {/* OpenStreetMap */}
+            <LayersControl.BaseLayer checked name="Open Street Map">
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>'
+              />
+            </LayersControl.BaseLayer>
+
+          
+
+            {/* OpenTopoMap */}
+            <LayersControl.BaseLayer name="Terrain">
+              <LayerGroup>
+                <TileLayer
+                  url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+                  attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a> | Map style: &copy; <a href="https://opentopomap.org" target="_blank" rel="noopener noreferrer">OpenTopoMap</a>'
+                />
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+
+              </LayerGroup>
+              
+            </LayersControl.BaseLayer>
+
+            
+
+            {/* ESRI Satellite*/}
+            <LayersControl.BaseLayer name="Satellite">
+              <LayerGroup>
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+              </LayerGroup>
+              
+            </LayersControl.BaseLayer>
+            
+            {/* ESRI Topographic Map */}
+              <LayersControl.BaseLayer name="Topographic">
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+              </LayersControl.BaseLayer>
+             
+                {/* ESRI World Physical Map */}
+              <LayersControl.BaseLayer name="Physical Map">
+                <LayerGroup>
+                    <TileLayer
+                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}"
+                    attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                    />
+                    <TileLayer
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                      attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                    />
+
+                </LayerGroup>
+                
+              </LayersControl.BaseLayer>
+
+              {/* ESRI NatGeo World Map */}
+              <LayersControl.BaseLayer name="NatGeo World Map">
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+              </LayersControl.BaseLayer>
+            
+
+          
+
+
             <LayersControl.Overlay checked name="ECCC Hurricane Response Zone">
               <LayerGroup>
                 <WMSTileLayer
@@ -125,7 +206,8 @@ export default function Map({ children, station_data, source_type,  setStationPo
                 />
               </LayerGroup>
             </LayersControl.Overlay>
-            <LayersControl.Overlay checked name="Stations">
+           
+            <LayersControl.Overlay  checked name="Stations">
 
               <MarkerClusterGroup>
                 {
