@@ -5,6 +5,9 @@ import Drawer from '@/components/drawer';
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
+//import "leaflet.markercluster/dist/MarkerCluster.css";
+//import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import MarkerClusterGroup from "react-leaflet-markercluster";
 import LineOfTravel from "@/components/line_of_travel";
 import WindSpeedRadius from "@/components/wind_radii";
 import SeaHeightRadius from "@/components/sea_height_radii";
@@ -123,7 +126,8 @@ export default function Map({ children, station_data, source_type,  setStationPo
               </LayerGroup>
             </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Stations">
-              <LayerGroup>
+
+              <MarkerClusterGroup>
                 {
                   station_data ? (
                     Object.entries(station_data).map((station) => {
@@ -148,7 +152,8 @@ export default function Map({ children, station_data, source_type,  setStationPo
                     <></>
                   )
                 }
-              </LayerGroup>
+              </MarkerClusterGroup>
+             
             </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Error Cone">
               <LayerGroup>
