@@ -178,7 +178,7 @@ export function RenderCategoryFilter({ dispatch, setShowFilterOptions, startCate
     startIcon={<CategoryOutlinedIcon />}
     endIcon={ !showCatSelection ? (<ShowOptions/>):(<CloseOptions/>)}
     sx={{...buttonStyle,
-      display: { xs: "none", md: "inline-flex" },
+      display: "inline-flex",
        }
     }>
       
@@ -187,7 +187,7 @@ export function RenderCategoryFilter({ dispatch, setShowFilterOptions, startCate
       
 
     </Button>
-    {smallScreenIconButton('Storm Category', handleIconClick, buttonStyle, CategoryOutlinedIcon)}
+    
     
 
     {showCatSelection && 

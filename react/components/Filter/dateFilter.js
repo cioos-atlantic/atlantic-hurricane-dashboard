@@ -23,13 +23,26 @@ export const shortcutsItems = [
   },
   
   {
-    label: 'This Month',
+    label: 'Last 7 Days',
+    getValue: () => {
+      const today = dayjs();
+      return [today.subtract(7, 'day'), today];
+    },
+  },
+  {
+    label: 'Current Month',
     getValue: () => {
       const today = dayjs();
       return [today.startOf('month'), today.endOf('month')];
     },
   },
-  
+  {
+    label: 'Last 30 Days',
+    getValue: () => {
+      const today = dayjs();
+      return [today.subtract(30, 'day'), today];
+    },
+  },
   {
     label: 'Last 1 year',
     getValue: () => {
@@ -88,7 +101,7 @@ export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, en
     startIcon={<CalendarMonthOutlinedIcon/>}
     endIcon={ showDateSelection ? (<ShowOptions/>):(<CloseOptions/>)}
     sx={{...buttonStyle,
-      display: { xs: "none", md: "inline-flex" }, }
+      display: "inline-flex" }
     }>
       
       Filter by Date
@@ -96,7 +109,7 @@ export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, en
       
 
     </Button>
-    {smallScreenIconButton('Filter by Date', handleIconClick, buttonStyle, CalendarMonthOutlinedIcon)}
+    
     
 
     {showDateSelection && 
@@ -132,7 +145,7 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
         //'& input': { color: '#e55162' }, // Change input text color
         '& .MuiOutlinedInput-root': {
           height:'40px !important',
-          fontSize:{sm:'12px !important', md:'14px !important'},
+          fontSize:'14px !important',
           '& fieldset': { borderColor: '#e55162' }, // Default border color
           '&:hover fieldset': { borderColor: '#d43b50' }, // Hover effect
           '&.Mui-focused fieldset': { borderColor: 'red' }, // Focused border color
@@ -141,8 +154,8 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
           height:'inherit !important',
         },
         '& .MuiInputLabel-root': {
-          fontSize:{sm:'14px !important', md:'16px !important'},
-          left: {sm:'-2px !important', md:'-3px !important'},
+          fontSize:'16px !important',
+          left: '-3px !important',
           
           
         }
@@ -165,7 +178,7 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
      >
       <CardContent
       className='date-card-content'
-      sx={{display: { xs: "none", md: "block" },}}>
+      sx={{display: 'block'}}>
       <Box >
             {shortcutsItems.map((shortcut, indx) => {
               return(
@@ -283,7 +296,7 @@ export function RangeSlider({ startDate, endDate, setStartDate, setEndDate }) {
       <Slider
       size="small"
       sx={{
-        width: '80%',
+        width: '85%',
         color: '#e55162',
         
       }}
