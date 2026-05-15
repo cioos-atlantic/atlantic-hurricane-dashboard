@@ -40,7 +40,7 @@ export default function Drawer({ children, element_id, classes, source_type, set
             <Box id={element_id} 
                     className={styles.drawer + " h-100 " + sideClass}
                     sx={{
-                        maxWidth:{xs:'258px', sm:'258px', md:'258px', lg:'258px',},
+                        maxWidth:'350px',
                         width:{xs:'100%', sm:'50%', md:'50%', lg:'50%',},
                         display: state.isDrawerOpen ? 'block' : 'none',
                     }}

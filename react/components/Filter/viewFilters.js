@@ -6,18 +6,15 @@ export function FiltersSelected({startDate, endDate, startCategory, endCategory,
   const isFiltered = startDate || endDate || startCategory || endCategory || polyFilterCoords || filterStormName.length;
   console.log(filterStormName)
   return( 
-    <Box className='view-filter-space'>
+    
       <Stack>
-        <Box className='historical_page_drawer_subheader'
-          sx={{
-            fontSize: '14px',
-            
-          }}
-          >Filter(s) Selected: </Box>
         <Box className='view-filters-content'>
-       { !isFiltered &&(<Box>
-            No Filters Selected!
+           { isFiltered > 0 &&(<Box>
+            Filter(s) Selected:
           </Box>)}
+          { !isFiltered &&(<Box>
+                No Filters Selected!
+              </Box>)}
           {filterStormName.length > 0 && (<Box>
             Storm Name(s): {filterStormName.join(", ")}
           </Box>)}
@@ -35,7 +32,7 @@ export function FiltersSelected({startDate, endDate, startCategory, endCategory,
         
 
       </Stack>
-    </Box>
+   
     
   )
 }
@@ -53,16 +50,13 @@ export function FiltersSubmitted({filterQuery}){
   filterQuery.stormName.length === 0;
  
   return(
-    <Box >
+    
       <Stack>
-        <Box className='historical_page_drawer_subheader'
-          sx={{
-            fontSize: '14px',
-            
-          }}
-          >Filter Query: </Box>
         
         <Box className='view-filters-content'>
+          {!isEmpty && (<Box>
+            Filter Query:
+          </Box>)}
           {filterQuery?.stormName != "" && (<Box>
             Storm Name(s): {filterQuery.stormName.join(", ")}
           </Box>)}
@@ -83,7 +77,7 @@ export function FiltersSubmitted({filterQuery}){
         
 
       </Stack>
-    </Box>
+    
     
   )
 }

@@ -51,18 +51,18 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
 
   useEffect(() => {
     if (startCategory != "" && endCategory != "") {
-      const stormMin = categories.find(item => item.value === startCategory)?.label;
-      const stormMax = categories.find(item => item.value === endCategory)?.label;
+      const stormMin = storm_category_list.find(item => item.value === startCategory)?.label;
+      const stormMax = storm_category_list.find(item => item.value === endCategory)?.label;
   
       setSliderText(
         <>
-          You&apos;ve selected storms from <strong>{storm_cat[stormMin].name.en}</strong> to <strong>{stormMax}</strong>. <br />
-          Category{' '}
+          You&apos;ve selected storms from <strong>{storm_cat[stormMin].name.en}</strong> to <strong>{storm_cat[stormMax].name.en}</strong>. <br />
+          {' '}
 
           <a href={storm_cat[stormMin]?.more_info_link}
              target="_blank"
              rel="noopener noreferrer">
-            <strong>{stormMin}</strong>
+            <strong>{storm_cat[stormMin].name.en}</strong>
           </a>
             - {storm_cat[stormMin]?.sub_info}. <br />
             {' '}
