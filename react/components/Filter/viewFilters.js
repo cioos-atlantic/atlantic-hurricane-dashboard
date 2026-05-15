@@ -53,7 +53,7 @@ export function FiltersSubmitted({filterQuery}){
   filterQuery.stormName.length === 0;
  
   return(
-    <Box className='view-filter-space'>
+    <Box >
       <Stack>
         <Box className='historical_page_drawer_subheader'
           sx={{

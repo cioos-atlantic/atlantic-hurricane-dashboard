@@ -26,6 +26,7 @@ import InfoScreen from "../message_screens/info_screen";
 import { empty_station_obj } from "../point_defaults";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { formatFilterDate, formatStormCategory, formatStormName } from "./filter_utils";
+import { FiltersSelected, FiltersSubmitted } from "./viewFilters";
 
 
 const ITEM_HEIGHT = 35;
@@ -45,7 +46,7 @@ export const ShowOptions = KeyboardDoubleArrowDownIcon;
 export const CloseOptions = KeyboardDoubleArrowUpIcon;
 
 
-export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, startDate, endDate, startCategory, endCategory, polyFilterCoords, isDrawerOpen, filterStormName, showDateSelection, showCatSelection  }) {
+export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, startDate, endDate, startCategory, endCategory, polyFilterCoords, isDrawerOpen, filterStormName, showDateSelection, showCatSelection,filterQuery, showFilterSelected }) {
   const [showFilterIcons, setShowFilterIcons] = useState(false);
   const [showFilterOptions, setShowFilterOptions] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -312,27 +313,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
                   showCatSelection={showCatSelection}
                 />
             </div>
-            <div className="filter-group">
-              (showFilterSelected )  ? (
-                <>
-                  <FiltersSelected
-                  startDate={startDate}
-                  endDate={endDate}
-                  startCategory={startCategory}
-                  endCategory={endCategory}
-                  polyFilterCoords={polyFilterCoords}
-                  filterStormName={filterStormName}/>
-                  
-                </>
-                ): (
-                  <>
-                  <FiltersSubmitted 
-                filterQuery={filterQuery}/>
-
-                
-                  </>
-                )
-            </div>
+            
 
             
 
@@ -365,6 +346,28 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
               onClick={handleClearAllFilters}>
               CLEAR FILTER QUERY
             </Button>
+
+            <div className="filter-group">
+              {(showFilterSelected)  ? (
+                <>
+                  <FiltersSelected
+                  startDate={startDate}
+                  endDate={endDate}
+                  startCategory={startCategory}
+                  endCategory={endCategory}
+                  polyFilterCoords={polyFilterCoords}
+                  filterStormName={filterStormName}/>
+                  
+                </>
+                ): (
+                  <>
+                  <FiltersSubmitted 
+                filterQuery={filterQuery}/>
+
+                
+                  </>
+                )}
+            </div>
           
           </Stack>
         

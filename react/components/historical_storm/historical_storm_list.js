@@ -144,6 +144,8 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
             filterStormName={filterStormName}
             showDateSelection={showDateSelection}
             showCatSelection={showCatSelection}
+            showFilterSelected={showFilterSelected}
+            filterQuery={filterQuery}
 
         />
 
