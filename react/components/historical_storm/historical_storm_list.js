@@ -8,6 +8,7 @@ import { RenderFilterResult } from '../Filter/renderFilterResult.js';
 import LoadingScreen from '../loading_screen.js';
 import { empty_station_obj } from '../point_defaults.js';
 import {  FiltersSelected, FiltersSubmitted } from '../Filter/viewFilters.js';
+import { RenderFilter } from '../Filter/filter.js';
 
 
 
@@ -17,7 +18,7 @@ import {  FiltersSelected, FiltersSubmitted } from '../Filter/viewFilters.js';
  * clickable links, and allows users to search for specific storms by name or year.
  
  */
-export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, returnFilterResult, filterResult, drawerButtonClicked, startDate, endDate, startCategory, endCategory, polyFilterCoords, filterQuery, filterStormName, showFilterSelected}) {
+export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, returnFilterResult, filterResult, drawerButtonClicked, startDate, endDate, startCategory, endCategory, polyFilterCoords, filterQuery, filterStormName, showFilterSelected, clearShapesRef, isDrawerOpen, showDateSelection, showCatSelection }) {
 
   const [loading, setLoading] = useState(false);
 
@@ -128,8 +129,33 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
           >Historical Storms: </Box>
           <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/>  {/* Bold line */}
 
+
+        <div className="view-filter-space">
+          <RenderFilter
+            clearShapesRef={clearShapesRef} // Pass the ref to 
+            dispatch={dispatch}
+            setStationPoints={setStationPoints}
+            startDate={startDate}
+            endDate={endDate}
+            startCategory={startCategory}
+            endCategory={endCategory}
+            polyFilterCoords={polyFilterCoords}
+            isDrawerOpen={isDrawerOpen}
+            filterStormName={filterStormName}
+            showDateSelection={showDateSelection}
+            showCatSelection={showCatSelection}
+
+        />
+
+        </div>
+      
+        
+      
+
+
+
           
-      {(showFilterSelected )  ? (
+      {/*(showFilterSelected )  ? (
         <>
           <FiltersSelected
           startDate={startDate}
@@ -145,11 +171,11 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
           <FiltersSubmitted 
         filterQuery={filterQuery}/>
 
-        <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/>
+        
           </>
-        )}
+        )*/}
       
-       
+       <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/>
 
       {returnFilterResult ?
         (<>

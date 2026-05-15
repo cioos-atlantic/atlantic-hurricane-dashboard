@@ -69,14 +69,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
       
       }
         
-        { source_type === "historical" &&
-          <RenderFilter
-          clearShapesRef={clearShapesRef} // Pass the ref to 
-          state={state}
-          dispatch={dispatch}
-          setStationPoints={setStationPoints}
-          />
-        }
+       
         {
           <RenderDashboards
             source_type={source_type}
@@ -334,6 +327,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
             state={state}
             dispatch={dispatch}
             map={map}
+            clearShapesRef= {clearShapesRef}
           />)}
       </div>
     </div>

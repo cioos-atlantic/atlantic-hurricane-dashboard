@@ -45,7 +45,7 @@ export const ShowOptions = KeyboardDoubleArrowDownIcon;
 export const CloseOptions = KeyboardDoubleArrowUpIcon;
 
 
-export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoints }) {
+export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, startDate, endDate, startCategory, endCategory, polyFilterCoords, isDrawerOpen, filterStormName, showDateSelection, showCatSelection  }) {
   const [showFilterIcons, setShowFilterIcons] = useState(false);
   const [showFilterOptions, setShowFilterOptions] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -72,7 +72,7 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
 
   const router = useRouter(); // Next.js useRouter
   const drawerWidth = 258;
-  const drawerOpen = state.isDrawerOpen;
+  const drawerOpen = isDrawerOpen;
 
 
   function handleClearAllFilters() {
@@ -107,12 +107,12 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
     
     const updatedParams = {
       //...selectedOptions, // Spread selected options correctly
-      startDate: state.startDate, // Ensure start and end dates are included
-      endDate: state.endDate,
-      polyCoords: state.polyFilterCoords,
-      startCategory: state.startCategory,
-      endCategory:state.endCategory,
-      stormName:state.filterStormName
+      startDate: startDate, // Ensure start and end dates are included
+      endDate: endDate,
+      polyCoords: polyFilterCoords,
+      startCategory: startCategory,
+      endCategory: endCategory,
+      stormName: filterStormName
 
     };
 
@@ -199,13 +199,13 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
                     showFilterOptions={showFilterOptions}
                     setShowFilterOptions={setShowFilterOptions}
                     dispatch={dispatch}
-                    filterStormName={state.filterStormName}
+                    filterStormName={filterStormName}
                     setFilterStormName= {setFilterStormName}
-                    startDate= {state.startDate} 
-                    endDate= {state.endDate}
-                    polyCoords= {state.polyFilterCoords}
-                    startCategory= {state.startCategory}
-                    endCategory={state.endCategory}
+                    startDate= {startDate} 
+                    endDate= {endDate}
+                    polyCoords= {polyFilterCoords}
+                    startCategory= {startCategory}
+                    endCategory={endCategory}
                   />
                 </div>
               )
@@ -214,9 +214,11 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
             }
             {openSpeedDial && (<div className="filter-group">
               <RenderDateFilter
-                state={state}
                 dispatch={dispatch}
                 setShowFilterOptions={setShowFilterOptions}
+                startDate= {startDate} 
+                endDate= {endDate}
+                showDateSelection= {showDateSelection}
 
               />
 
@@ -226,9 +228,11 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
             }
             {openSpeedDial && (<div className="filter-group">
               <RenderCategoryFilter
-                  state={state}
                   dispatch={dispatch}
                   setShowFilterOptions={setShowFilterOptions}
+                  startCategory={startCategory}
+                  endCategory={endCategory}
+                  showCatSelection={showCatSelection}
                 />
 
             </div>
@@ -260,10 +264,10 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
           </SpeedDial>
 
           <Stack
-            direction="row"
-            spacing={0.1}
-            sx={{ display: { xs: "none", md: "flex" },  left: drawerOpen ? `${drawerWidth}px` : 0,
-            width: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%',   }}
+            direction="column"
+            spacing={0.4}
+            sx={{ display: { xs: "none", md: "flex" }
+              }}
             className='filter-icons-list'>
             {
               input_filters.map((input_filter, index) => {
@@ -275,13 +279,13 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
                     showFilterOptions={showFilterOptions}
                     setShowFilterOptions={setShowFilterOptions}
                     dispatch={dispatch}
-                    filterStormName={state.filterStormName}
+                    filterStormName={filterStormName}
                     setFilterStormName= {setFilterStormName}
-                    startDate= {state.startDate} 
-                    endDate= {state.endDate}
-                    polyCoords= {state.polyFilterCoords}
-                    startCategory= {state.startCategory}
-                    endCategory={state.endCategory}
+                    startDate= {startDate} 
+                    endDate= {endDate}
+                    polyCoords= {polyFilterCoords}
+                    startCategory= {startCategory}
+                    endCategory={endCategory}
                   />
 
                   </div>
@@ -292,18 +296,44 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
 
             <div className="filter-group">
               <RenderDateFilter
-                state={state}
                 dispatch={dispatch}
                 setShowFilterOptions={setShowFilterOptions}
+                startDate= {startDate} 
+                endDate= {endDate}
+                showDateSelection= {showDateSelection}
               />
             </div>
             <div className="filter-group">
               <RenderCategoryFilter
-                  state={state}
                   dispatch={dispatch}
                   setShowFilterOptions={setShowFilterOptions}
+                  startCategory={startCategory}
+                  endCategory={endCategory}
+                  showCatSelection={showCatSelection}
                 />
             </div>
+            <div className="filter-group">
+              (showFilterSelected )  ? (
+                <>
+                  <FiltersSelected
+                  startDate={startDate}
+                  endDate={endDate}
+                  startCategory={startCategory}
+                  endCategory={endCategory}
+                  polyFilterCoords={polyFilterCoords}
+                  filterStormName={filterStormName}/>
+                  
+                </>
+                ): (
+                  <>
+                  <FiltersSubmitted 
+                filterQuery={filterQuery}/>
+
+                
+                  </>
+                )
+            </div>
+
             
 
             {/*
@@ -324,16 +354,16 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
             */}
 
             <Button
-              className="filter-submit-button"
+              className="filter-badge"
               onClick={handleFilterSubmit}
               startIcon={<PublishRoundedIcon />}>
-              Submit
+              Submit FILTER QUERY
             </Button>
             <Button
-              id="cancel-filter-icon"
-              className="filter-icons"
+              
+              className="filter-badge"
               onClick={handleClearAllFilters}>
-              X
+              CLEAR FILTER QUERY
             </Button>
           
           </Stack>

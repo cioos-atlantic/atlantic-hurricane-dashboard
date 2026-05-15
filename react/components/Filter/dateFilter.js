@@ -9,6 +9,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {Slider} from '@mui/material';
 import { smallScreenIconButton } from './filter_utils';
 import { ShowOptions, CloseOptions } from './filter';
+import Typography from "@mui/material/Typography";
 
 
 
@@ -22,26 +23,13 @@ export const shortcutsItems = [
   },
   
   {
-    label: 'Last 7 Days',
-    getValue: () => {
-      const today = dayjs();
-      return [today.subtract(7, 'day'), today];
-    },
-  },
-  {
-    label: 'Current Month',
+    label: 'This Month',
     getValue: () => {
       const today = dayjs();
       return [today.startOf('month'), today.endOf('month')];
     },
   },
-  {
-    label: 'Last 30 Days',
-    getValue: () => {
-      const today = dayjs();
-      return [today.subtract(30, 'day'), today];
-    },
-  },
+  
   {
     label: 'Last 1 year',
     getValue: () => {
@@ -66,9 +54,9 @@ const reset= { label: 'Reset', getValue: () => [null, null] };
 
 
 
-export function RenderDateFilter({state, dispatch, setShowFilterOptions}){
+export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, endDate, showDateSelection }) {
   //const [showDateSelection, setShowDateSelection] = useState(false); 
-  const hasValidDates = state.startDate?.isValid?.() && state.endDate?.isValid?.();
+  const hasValidDates = startDate?.isValid?.() && endDate?.isValid?.();
   const buttonStyle = {
     backgroundColor: hasValidDates ? '#e55162' : 'white',
     color: hasValidDates ? 'white' : '#e55162',
@@ -98,7 +86,7 @@ export function RenderDateFilter({state, dispatch, setShowFilterOptions}){
     aria-label="filter button for date selection"
     onClick= {handleIconClick}
     startIcon={<CalendarMonthOutlinedIcon/>}
-    endIcon={ !state.showDateSelection ? (<ShowOptions/>):(<CloseOptions/>)}
+    endIcon={ showDateSelection ? (<ShowOptions/>):(<CloseOptions/>)}
     sx={{...buttonStyle,
       display: { xs: "none", md: "inline-flex" }, }
     }>
@@ -111,10 +99,10 @@ export function RenderDateFilter({state, dispatch, setShowFilterOptions}){
     {smallScreenIconButton('Filter by Date', handleIconClick, buttonStyle, CalendarMonthOutlinedIcon)}
     
 
-    {state.showDateSelection && 
+    {showDateSelection && 
       (<DateDisplay 
-        startDate={state.startDate}
-        endDate={state.endDate}
+        startDate={startDate}
+        endDate={endDate}
         setStartDate = {(date) => dispatch({ type: "SET_START_DATE", payload: date })}
         setEndDate = {(date) => dispatch({ type: "SET_END_DATE", payload: date })}
         setShowDateSelection = {(date) => dispatch({ type: "SET_DATE_SELECTION", payload: date })}
@@ -143,7 +131,7 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
         '& label': { color: '#e55162' }, // Change label color
         //'& input': { color: '#e55162' }, // Change input text color
         '& .MuiOutlinedInput-root': {
-          height:{sm:'40px !important', md:'50px !important'},
+          height:'40px !important',
           fontSize:{sm:'12px !important', md:'14px !important'},
           '& fieldset': { borderColor: '#e55162' }, // Default border color
           '&:hover fieldset': { borderColor: '#d43b50' }, // Hover effect
@@ -173,22 +161,8 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
     setEndDate(newEndDate);}
   return(
     <Card
-     sx={{
-      position: 'absolute',
-      top:{xs: '6px', md: '100%',},
-      right:{xs: '100%', md: '0px',},
-      width:{xs: '270px', md: '320px',},
-      height:{xs: '250px',  md: 'inherit',},
-      overflow:{xs: 'scroll', md: 'hidden', },
-      padding: '6px',
-      backgroundColor: "#f4f4f4",
-      alignContent: 'center',
-      border: '2px solid #e55162',
-      borderRadius: '10px',
-      zIndex:'9001',
-      
-
-     }}>
+     className='input-filter'
+     >
       <CardContent
       className='date-card-content'
       sx={{display: { xs: "none", md: "block" },}}>
@@ -211,10 +185,11 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box 
           display="flex" 
-          flexDirection={{ xs: "row", md: "row" }} 
+          flexDirection="row" 
           gap={2} 
           justifyContent="center" // Centers horizontally
           alignItems="center" // Centers vertically
+          sx={{ paddingTop: '6px' }} // Allows wrapping on smaller screens
           >
 
           <DatePicker 
@@ -257,14 +232,14 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
           sx={{ display: 'flex', justifyContent: 'center', gap: '2px', width: '100%' }}>
             <Button 
               size="small"
-              className='filter-submit-button'
+              className='shortcut-button'
               onClick={() => {
                 setStartDate(null); // Reset to empty string
                 setEndDate(null);   // Reset to empty string
               }}>Clear</Button>
             <Button 
               size="small" 
-              className='filter-submit-button' 
+              className='shortcut-button' 
               onClick={()=> {setShowDateSelection(false)}}>Close</Button>
 
 
@@ -287,6 +262,10 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
 
 
 
+  
+  
+
+
 export function RangeSlider({ startDate, endDate, setStartDate, setEndDate }) {
   const currentYear = dayjs().year();
   
@@ -300,10 +279,11 @@ export function RangeSlider({ startDate, endDate, setStartDate, setEndDate }) {
   };
 
   return (
-    <Box sx={{ width: {sx: 130, md: 300} }}>
+    <Box sx={{ width: '100%'}}>
       <Slider
+      size="small"
       sx={{
-        width: '85%',
+        width: '80%',
         color: '#e55162',
         
       }}
@@ -314,56 +294,16 @@ export function RangeSlider({ startDate, endDate, setStartDate, setEndDate }) {
         min={1860}
         max={currentYear}
         marks={[
-          { value: 1860, label: '1860' },
-          { value: 1900, label: '1900' },
-          { value: 1980, label: '1980' },
+          { value: 1880, label: '1880' },
+          //{ value: 1900, label: '1900' },
+          { value: 1950, label: '1950' },
           { value: 2020, label: '2020' },
           
         ]}
       />
     </Box>
+
+        
   );
 }
 
-export function VerticalSlider({ startDate, endDate, setStartDate, setEndDate }) {
-  const currentYear = dayjs().year();
-  
-  // Independent state for the slider's range
-  const [value, setValue] = useState([1860, currentYear]);
-
-  const handleChange = (event, newValue) => {
-    event.propagation;
-    setValue(newValue);
-    setStartDate(dayjs().year(newValue[0]));
-    setEndDate(dayjs().year(newValue[1]));
-  };
-  function getAriaValueText(value) {
-    return `${value}°C`;
-  }
-
-  return (
-    <Box >
-
-      <Slider
-      sx={{
-        height: '200px',
-        color: '#e55162',
-      }}
-        orientation='vertical'
-        getAriaLabel={() => 'Year range'}
-        value={value}
-        onChange={handleChange}
-        valueLabelDisplay="auto"
-        min={1860}
-        max={currentYear}
-        marks={[
-          { value: 1860, label: '1860' },
-          { value: 1900, label: '1900' },
-          { value: 1980, label: '1980' },
-          { value: 2020, label: '2020' },
-          
-        ]}
-      />
-    </Box>
-  );
-}

@@ -30,7 +30,7 @@ export const storm_cat = {
     "more_info_link": "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html",
     "chart_color":'#7e7bb0'
   },
-  "CAT1": {
+  "C1": {
     "min": 118,
     "max": 153,
     "img_height": 38,
@@ -44,7 +44,7 @@ export const storm_cat = {
     "chart_color":'#a25d5e'
   }
   ,
-  "CAT2": {
+  "C2": {
     "min": 154,
     "max": 177,
     "img_height": 38,
@@ -58,7 +58,7 @@ export const storm_cat = {
     "chart_color":'#a25d5e'
   }
   ,
-  "CAT3": {
+  "C3": {
     "min": 178,
     "max": 208,
     "img_height": 38,
@@ -72,7 +72,7 @@ export const storm_cat = {
     "chart_color":'#a25d5e'
   }
   ,
-  "CAT4": {
+  "C4": {
     "min": 209,
     "max": 250,
     "img_height": 38,
@@ -86,7 +86,7 @@ export const storm_cat = {
     "chart_color":'#a25d5e'
   }
   ,
-  "CAT5": {
+  "C5": {
     "min": 251,
     "max": Infinity,
     "img_height": 38,

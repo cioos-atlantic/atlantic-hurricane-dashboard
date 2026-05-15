@@ -1,27 +1,25 @@
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import { useEffect, useState } from 'react';
 import { Box, Button, Card, CardContent, CardActions, Slider } from "@mui/material";
-import { storm_categories } from "@/lib/storm_class";
+//import { storm_categories } from "@/lib/storm_class";
+import {storm_cat} from "@/lib/storm_cat"
 import { ShowOptions, CloseOptions } from './filter';
 import { smallScreenIconButton } from './filter_utils';
 export const storm_category_list = [
-  { label: "5", value: 5 },
-  { label: "4", value: 4 },
-  { label: "3", value: 3 },
-  { label: "2", value: 2 },
-  { label: "1", value: 1 },
-  { label: "0", value: 0 },
-  { label: "-1", value: -1 },
-  { label: "-2", value: -2 },
-  { label: "-3", value: -3 },
-  { label: "-4", value: -4 },
-  { label: "-5", value: -5 },
+  { label: "C5", value: 5 },
+  { label: "C4", value: 4 },
+  { label: "C3", value: 3 },
+  { label: "C2", value: 2 },
+  { label: "C1", value: 1 },
+  { label: "TS", value: 0 },
+  { label: "TD", value: -1 },
+
 ]
 
 export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowCatSelection, startCategory, endCategory }) {
   const stormCategoryLink = "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html";
   const defaultText = <>
-  Adjust the slider to filter storms by category, from -5 (weakest) to 5 (strongest). <br />
+  Adjust the slider to filter storms by category, from Tropical Depression (TD)  to Category 5. <br />
   Learn more about {" "}
   <a href={stormCategoryLink}
      target="_blank"
@@ -90,31 +88,16 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
 
   return (
     <Card
-      sx={{
-        position: 'absolute',
-        top:{xs: '6px', md: '100%',},
-        right:{xs: '100%', md: '0px',},
-        width:{xs: '280px', md: '320px',},
-        height:{xs: '330px',  md: 'inherit',},
-        overflow:{xs: 'scroll', md: 'hidden', },
-        padding: '6px',
-        backgroundColor: "#f4f4f4",
-        alignContent: 'center',
-        border: '2px solid #e55162',
-        borderRadius: '10px',
-        zIndex:'9001',
-        
-
-      }}>
+      className='input-filter'>
         <CardContent className='date-card-content' sx={{fontSize: '13px'}}>
           {sliderText}
         </CardContent>
         <CardContent
           className='date-card-content'>
-            <Box sx={{ width: {sx: 130, md: 300} }}>
+            <Box sx={{ width: '100%' }}>
               <Slider
               sx={{
-                width: '85%',
+                width: '80%',
                 color: '#e55162',
                 
               }}
@@ -135,7 +118,7 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
                   sx={{ display: 'flex', justifyContent: 'center', gap: '2px', width: '100%' }}>
                     <Button 
                       size="small"
-                      className='filter-submit-button'
+                      className='shortcut-button'
                       onClick={() => {
                         setValue([minCategory, maxCategory]); // Reset slider range
                         setSliderText(defaultText); 
@@ -144,7 +127,7 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
                       }}>Clear</Button>
                     <Button 
                       size="small" 
-                      className='filter-submit-button' 
+                      className='shortcut-button' 
                       onClick={()=> {setShowCatSelection(false)}}>Close</Button>
         
         
@@ -159,10 +142,10 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
   );
 }
 
-export function RenderCategoryFilter({ state, dispatch, setShowFilterOptions }){
+export function RenderCategoryFilter({ dispatch, setShowFilterOptions, startCategory, endCategory, showCatSelection }){
   
   //const [showCatSelection, setShowCatSelection] = useState(false); 
-  const hasValidCategory = state.startCategory && state.endCategory;
+  const hasValidCategory = startCategory && endCategory;
   const buttonStyle = {
     backgroundColor: hasValidCategory  ? '#e55162' : 'white',
     color: hasValidCategory ? 'white' : '#e55162',
@@ -193,7 +176,7 @@ export function RenderCategoryFilter({ state, dispatch, setShowFilterOptions }){
     className="filter-badge"
     onClick= {handleIconClick}
     startIcon={<CategoryOutlinedIcon />}
-    endIcon={ !state.showCatSelection ? (<ShowOptions/>):(<CloseOptions/>)}
+    endIcon={ !showCatSelection ? (<ShowOptions/>):(<CloseOptions/>)}
     sx={{...buttonStyle,
       display: { xs: "none", md: "inline-flex" },
        }
@@ -207,15 +190,15 @@ export function RenderCategoryFilter({ state, dispatch, setShowFilterOptions }){
     {smallScreenIconButton('Storm Category', handleIconClick, buttonStyle, CategoryOutlinedIcon)}
     
 
-    {state.showCatSelection && 
+    {showCatSelection && 
       (<CategoryRangeSlider 
         setStartCategory = {(category) => dispatch({ type: "SET_START_CATEGORY", payload: category })}
         setEndCategory = {(category) => dispatch({ type: "SET_END_CATEGORY", payload: category })}
         setShowCatSelection={(status) => dispatch({ type: "SET_CAT_SELECTION", payload: status })}
-        startCategory={state.startCategory}
-        endCategory={state.endCategory}/>)}
+        startCategory={startCategory}
+        endCategory={endCategory}/>)}
 
-    {console.log(state.startCategory, state.endCategory)}
+    {console.log(startCategory, endCategory)}
     </>
 
 
