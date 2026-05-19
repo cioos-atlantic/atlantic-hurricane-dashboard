@@ -64,7 +64,7 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
              rel="noopener noreferrer">
             <strong>{storm_cat[stormMin].name.en}</strong>
           </a>
-            - {storm_cat[stormMin]?.sub_info}. <br />
+            - {storm_cat[stormMin]?.sub_info}. 
             {' '}
 
           <a href={storm_cat[stormMax]?.more_info_link}

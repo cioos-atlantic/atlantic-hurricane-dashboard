@@ -15,14 +15,14 @@ header {
   top: 0;
   background-color: #e55162; /* Light red background for header */
   z-index: 9000; /* High z-index to ensure header stays on top */
-  height: 60px;
+  height: 40px;
   
 }
 
 header img.logo {
   float: left; /* Align logo to the left */
   background-color: white; /* White background for logo */
-  height: 60px; /* Matches header height */
+  height: 40px; /* Matches header height */
   width: 80%; /* absolute width for logo */
   padding-left: 1.5rem; /* Spacing on left */
   padding-right: 1.5rem; /* Spacing on right */
@@ -452,11 +452,11 @@ footer {
 
 .historical_storm_search_result{
   text-align: left;
-  padding: 12px;
+  padding: 8px;
   background-color: white;
-  height: 300px;
+  height: 260px;
   border-radius: 4px;
-  max-height: 480PX;
+  max-height: 480px;
   width: 100%;
   overflow-y: auto;
   position: relative;
@@ -475,8 +475,9 @@ footer {
   top: 0;
   z-index: 1;
   background-color: lightgrey;
-  padding: 8px;
+  padding: 2px;
   border-bottom: 2px solid #ccc;
+  width: 100%;
 }
 
 
@@ -682,6 +683,8 @@ footer {
   background-color: #e55162 !important;
   color: white !important;
   font-weight: bold !important;
+  position: sticky;
+  bottom: 37px;
 
 }
 
@@ -744,7 +747,7 @@ footer {
   font-weight: bold !important;
   font-size: 12px !important;
   line-height: 1.5 !important;
-  
+  /*padding: 4px;
   /*border: 1px solid #e55162 !important;
   
   margin: 0.8px;
@@ -1124,7 +1127,7 @@ footer {
   .drawer_close_button {
     position: absolute;
     z-index: 1000;
-    top: 70px;
+    top: 50px;
     width: 40px !important;
     height: 40px !important;
     background-color: white;

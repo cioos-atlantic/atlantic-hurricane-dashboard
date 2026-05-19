@@ -47,6 +47,7 @@ export default function Drawer({ children, element_id, classes, source_type, set
                     onClick={(e) => e.stopPropagation()} // Prevent closing on internal clicks
             >
                 
+                
                 <Box className={styles.drawer_interior}
                     
                     >

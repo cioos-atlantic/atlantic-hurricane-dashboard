@@ -153,6 +153,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
         <LoadingScreen />
       ) : (
         <>
+
           
           <Stack
             direction="column"
@@ -160,6 +161,17 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
             sx={{ display: 'flex'
               }}
             className='filter-icons-list'>
+            
+            
+            
+            <Box className='historical_page_drawer_subheader'
+              sx={{
+                fontSize: '14px',
+                
+              }}
+              >Filter Storms</Box>
+            
+            
             {
               input_filters.map((input_filter, index) => {
                 return (
