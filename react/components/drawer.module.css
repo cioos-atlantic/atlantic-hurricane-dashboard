@@ -25,32 +25,9 @@
 }
 
 
-.closeButton {
-    position: absolute;
-    top: 61px; /* Adjust vertical position */
-    right: 4px; /* Adjust horizontal position */
-    width: 25px; /* Button width */
-    height:  25px; /* Button height */
-    background-color: transparent; /* Transparent background */
-    border: 2px solid #e55162; /* Border color */
-    border-radius: 50%; /* Circular shape */
-    color: #e55162; /* X color */
-    font-size: 10px; /* Font size for the X */
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Center the X inside the button */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
-}
 
-.closeButton:hover {
-    background-color: #e55162; /* Change background color on hover */
-    color: #ffffff; /* Change text color on hover */
-}
-.closeButton:focus {
-    outline: none; /* Remove outline when focused */
-    box-shadow: 0 0 0 3px rgba(229, 81, 98, 0.5); /* Add a glow around the button */
-}
+
+
 
 .openButton{
     position: absolute;
@@ -71,7 +48,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-size: 18px; /* Adjust font size for the icon */
+    
     
 }
 .openButton:hover {

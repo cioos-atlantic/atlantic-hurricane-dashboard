@@ -122,12 +122,13 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         <LoadingScreen/>
         ) : (
         <>
-          <Box className='historical_page_drawer_header'
+          {/*<Box className='historical_page_drawer_header'
           sx={{
             fontSize: { xs: '20px', sm: '20px', md: '24px', lg: '24px' }
           }}
           >Historical Storms: </Box>
-          <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/>  {/* Bold line */}
+          <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' , margin: '5px'}}/>  {/* Bold line */}
+          
 
 
         <div className="view-filter-space">
@@ -177,7 +178,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
           </>
         )*/}
       
-       <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/>
+       <hr style={{ height: '4px', backgroundColor: 'black', border: 'none', margin: '5px' }}/>
 
       {returnFilterResult ?
         (<>
@@ -204,7 +205,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         )}
 
 
-      <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/> 
+      <hr style={{ height: '4px', backgroundColor: 'black', border: 'none', margin: '5px' }}/> 
       <Button
       onClick={()=> {
         dispatch({ type: "CLOSE_STORM_TRACKS" })
@@ -214,7 +215,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
       }}
       className="cancel-search"
       >Clear Storm Tracks</Button>
-      <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/> 
+      <hr style={{ height: '4px', backgroundColor: 'black', border: 'none', margin: '5px' }}/> 
 
       
           
