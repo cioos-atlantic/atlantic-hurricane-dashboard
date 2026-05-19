@@ -95,6 +95,7 @@ export function RenderDateFilter({state, dispatch, setShowFilterOptions}){
     <>
     <Button
     className="filter-badge"
+    aria-label="filter button for date selection"
     onClick= {handleIconClick}
     startIcon={<CalendarMonthOutlinedIcon/>}
     endIcon={ !state.showDateSelection ? (<ShowOptions/>):(<CloseOptions/>)}

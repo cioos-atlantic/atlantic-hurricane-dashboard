@@ -55,3 +55,6 @@ export function createSvgIconWithText(text = "A", fill = "#0077be", size = 40, t
       iconAnchor: [size / 2, size / 2],
     });
   };
+
+
+
