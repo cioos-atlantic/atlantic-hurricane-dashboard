@@ -43,6 +43,10 @@ export function getTourSteps({ isActive, isHistorical, }) {
     {
       selector: ".leaflet-control-zoom",
       content: "Use zoom controls to explore."
+    },
+    {
+      selector: ".body",
+      content: "Have fun exploring this tool!"
     }
   );
 
