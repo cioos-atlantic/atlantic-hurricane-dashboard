@@ -22,7 +22,8 @@ import { mapReducer, initialMapState } from "./mapReducer";
 import InfoScreen from "./message_screens/info_screen";
 import { IconButton } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
-import { useMediaQuery, Box, useTheme } from "@mui/material";
+import { useMediaQuery, Box, useTheme, Button, Tooltip } from "@mui/material";
+import {FloatingDrawerPopper} from "./floating_drawer_popper";
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
@@ -35,6 +36,17 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const [state, dispatch] = useReducer(mapReducer, initialMapState);
   const [map, setMap] = useState()
   const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const handleFDPClick = (event) => {
+    dispatch({
+        type: "TOGGLE_DRAWER",
+        payload: !state.isDrawerOpen,
+    })
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popper' : undefined;
 
   
   
@@ -319,8 +331,27 @@ export default function Map({ children, station_data, source_type,  setStationPo
           setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
           />} {/* Calling the EditControl function here */}
         </MapContainer>
+        
+        { map && 
+        (<Tooltip
+            title={state.isDrawerOpen ? "Close storm menu" : "Open storm menu"}
+            arrow
+            sx={{
+                "& .MuiTooltip-tooltip": {
+                backgroundColor: "white",
+                color: "#e55162",
+                fontSize: "0.9rem",
+                },
+            }}>
+              <Button 
+          onClick={handleFDPClick} 
+          className='drawer_close_button'>
+          {anchorEl ? "X" : "<"}
+        </Button>
 
-        { map && (<Drawer
+          <FloatingDrawerPopper
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
             element_id="left-side"
             classes="left"
             source_type={source_type}
@@ -328,8 +359,15 @@ export default function Map({ children, station_data, source_type,  setStationPo
             state={state}
             dispatch={dispatch}
             map={map}
-            clearShapesRef= {clearShapesRef}
-          />)}
+            clearShapesRef={clearShapesRef}
+          />
+        
+
+            </Tooltip>
+        
+        
+
+         )}
       </div>
     </div>
   )
