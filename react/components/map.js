@@ -314,10 +314,11 @@ export default function Map({ children, station_data, source_type,  setStationPo
             </LayersControl.Overlay>
           </LayersControl>
 
-          {<RenderSpatialFilter
-          ref={clearShapesRef} 
-          setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
-          />} {/* Calling the EditControl function here */}
+          { source_type == "historical" &&
+              (<RenderSpatialFilter
+                ref={clearShapesRef} 
+                setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
+                />)} {/* Calling the EditControl function here */}
         </MapContainer>
 
         { map && (<Drawer
