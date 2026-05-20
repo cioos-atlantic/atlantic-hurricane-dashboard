@@ -531,7 +531,13 @@ def main():
         else:
             max_time = datetime.combine(max_time.date(), datetime.min.time()) + timedelta(hours=12)
         min_time = max_time - timedelta(days=active_data_period)
-        dataset_list = get_erddap_datasets(e, min_time, max_time, bbox)
+        
+        # Can focus on a specific dataset - adding to config skips the dataset search
+        dataset_list = []
+        if('dataset' in config['ERDDAP']):
+            dataset_list =  [config.get("ERDDAP", "dataset")]
+        else:
+            dataset_list = get_erddap_datasets(e, min_time, max_time, bbox)
         create_table_from_schema(pg_engine=engine, table_name=pg_erddap_cache_active_table, schema_file=erddap_cache_active_schema)
         # Store in shared list to reduce calls and avoid overwriting for active cache
         cached_data = []
