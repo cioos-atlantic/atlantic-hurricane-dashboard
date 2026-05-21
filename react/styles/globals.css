@@ -1153,3 +1153,20 @@ footer {
     outline: none; /* Remove outline when focused */
     box-shadow: 0 0 0 3px rgba(229, 81, 98, 0.5); /* Add a glow around the button */
 }
+.map_ruler{
+  position: absolute;
+  top: 180px !important; /* Position above the footer */
+  right: 10px !important; /* Position from the right edge */
+  z-index: 1000 !important; /* Ensure it appears above the map */
+  width: 34px !important;
+  height: 34px !important;
+  min-width: auto;
+  border: 2px solid rgba(0,0,0,0.2);
+  box-shadow: none;
+  border-radius: 4px;
+}
+
+.map_ruler:hover{
+  background-color: #ddd !important;
+  border: 2px solid #e55162;
+}
