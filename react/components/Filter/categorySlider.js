@@ -33,45 +33,55 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
   const values = storm_category_list.map(item => item.value);
   const minCategory = Math.min(...values);
   const maxCategory = Math.max(...values);
+ 
   
   // Independent state for the slider's range
   const [value, setValue] = useState([minCategory, maxCategory]);
+  const [startLabel, setStartLabel] = useState("");
+  const [endLabel, setEndLabel] = useState("");
 
-  const handleChange = (event, newValue) => {
+  const handleChange = (_, newValue) => {
+    if (!Array.isArray(newValue)) return;
+
+    const [start, end] = newValue;
+
     setValue(newValue);
-    setStartCategory(newValue[0]);
-    setEndCategory(newValue[1]);
+
+    
+    setStartLabel(storm_category_list.find(v => v.value === start)?.label);
+    setEndLabel(storm_category_list.find(v => v.value === end)?.label);
+
+    const startRange = startLabel ? storm_cat[startLabel] : null;
+    const endRange = endLabel ? storm_cat[endLabel] : null;
+
+    if (!startRange || !endRange) return;
+
+    setStartCategory(startRange.min);
+    setEndCategory(endRange.max);
   };
 
-
-  
-  
-  
-
-
   useEffect(() => {
-    if (startCategory != "" && endCategory != "") {
-      const stormMin = storm_category_list.find(item => item.value === startCategory)?.label;
-      const stormMax = storm_category_list.find(item => item.value === endCategory)?.label;
+    if (startLabel != "" && endLabel != "") {
+      
   
       setSliderText(
         <>
-          You&apos;ve selected storms from <strong>{storm_cat[stormMin].name.en}</strong> to <strong>{storm_cat[stormMax].name.en}</strong>. <br />
+          You&apos;ve selected storms from <strong>{storm_cat[startLabel]?.name.en}</strong> to <strong>{storm_cat[endLabel]?.name.en}</strong>. <br />
           {' '}
 
-          <a href={storm_cat[stormMin]?.more_info_link}
+          <a href={storm_cat[startLabel]?.more_info_link}
              target="_blank"
              rel="noopener noreferrer">
-            <strong>{storm_cat[stormMin].name.en}</strong>
+            <strong>{storm_cat[startLabel]?.name.en}</strong>
           </a>
-            - {storm_cat[stormMin]?.sub_info}. 
+            - {storm_cat[startLabel]?.sub_info}. 
             {' '}
 
-          <a href={storm_cat[stormMax]?.more_info_link}
+          <a href={storm_cat[endLabel]?.more_info_link}
             target="_blank"
             rel="noopener noreferrer">
-            <strong>{storm_cat[stormMax].name.en}</strong>
-          </a> - {storm_cat[stormMax]?.sub_info}. <br />
+            <strong>{storm_cat[endLabel]?.name.en}</strong>
+          </a> - {storm_cat[endLabel]?.sub_info}. <br />
           [See more details{' '}
           <a href={stormCategoryLink}
              target="_blank"
@@ -84,7 +94,7 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
       setSliderText(defaultText
       );
     }
-  }, [startCategory, endCategory]);
+  }, [startLabel, endLabel]);
 
   return (
     <Card

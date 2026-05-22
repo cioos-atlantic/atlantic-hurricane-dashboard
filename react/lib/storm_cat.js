@@ -88,7 +88,7 @@ export const storm_cat = {
   ,
   "C5": {
     "min": 251,
-    "max": Infinity,
+    "max": 9999,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 5", "fr": "catégorie 5" },

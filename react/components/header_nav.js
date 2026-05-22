@@ -5,6 +5,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 export default function HeaderNav({ children, navItems }) {
     const [headerDrawerOpen, setHeaderDrawerOpen] = useState(false);
+    
 
     const toggleDrawer = (open) => (event) => {
         if (event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
@@ -42,7 +43,7 @@ export default function HeaderNav({ children, navItems }) {
                     display: { xs: "none", md: "flex" },}}
             >
                 {navItems.map((link) => (
-                    <Box component="li" key={link.href}>
+                    <Box component="li" key={link.href} >
                         <a
                             href={link.href}
                             className="header-drawer-big-screens"

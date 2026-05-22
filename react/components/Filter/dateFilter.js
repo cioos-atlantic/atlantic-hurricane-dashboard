@@ -99,7 +99,7 @@ export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, en
     aria-label="filter button for date selection"
     onClick= {handleIconClick}
     startIcon={<CalendarMonthOutlinedIcon/>}
-    endIcon={ showDateSelection ? (<ShowOptions/>):(<CloseOptions/>)}
+    endIcon={ !showDateSelection ? (<ShowOptions/>):(<CloseOptions/>)}
     sx={{...buttonStyle,
       display: "inline-flex" }
     }>
