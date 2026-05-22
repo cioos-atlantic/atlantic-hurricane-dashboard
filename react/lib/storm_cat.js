@@ -5,10 +5,10 @@ import { basePath } from '@/next.config.js';
 export const storm_cat = {
   "TD": {
     "min": 0,
-    "max": 62,
+    "max": 33,
     "name": { "en": "Tropical Depression", "fr": "Dépression tropicale" },
     "img":  `${basePath}/storm_types/test/TD.svg`,
-    "sub_info":"sustained winds of below 63 km/h (34–63 knots)",
+    "sub_info":"sustained winds of below 62 km/h (33 knots)",
     "img_height": 20,
     "img_width": 20,
     "info": "This is when tropical disturbance acquires a spin, the maximum sustained wind speed is less than 34 knots (63 km/h).",
@@ -18,8 +18,8 @@ export const storm_cat = {
 
   },
   "TS": {
-    "min": 63,
-    "max": 117,
+    "min": 34,
+    "max": 63,
     "name": { "en": "Tropical Storm", "fr": "Tempête tropicale" },
     "img":  `${basePath}/storm_types/test/TS.svg`,
     "img_height": 38,
@@ -31,8 +31,8 @@ export const storm_cat = {
     "chart_color":'#7e7bb0'
   },
   "C1": {
-    "min": 118,
-    "max": 153,
+    "min": 64,
+    "max": 82,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 1", "fr": "catégorie 1" },
@@ -45,8 +45,8 @@ export const storm_cat = {
   }
   ,
   "C2": {
-    "min": 154,
-    "max": 177,
+    "min": 83,
+    "max": 95,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 2", "fr": "catégorie 2" },
@@ -59,8 +59,8 @@ export const storm_cat = {
   }
   ,
   "C3": {
-    "min": 178,
-    "max": 208,
+    "min": 96,
+    "max": 112,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 3", "fr": "catégorie 3" },
@@ -73,8 +73,8 @@ export const storm_cat = {
   }
   ,
   "C4": {
-    "min": 209,
-    "max": 250,
+    "min": 113,
+    "max": 136,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 4", "fr": "catégorie 4" },
@@ -87,7 +87,7 @@ export const storm_cat = {
   }
   ,
   "C5": {
-    "min": 251,
+    "min": 137,
     "max": 9999,
     "img_height": 38,
     "img_width": 20,
