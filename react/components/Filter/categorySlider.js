@@ -46,13 +46,16 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
     const [start, end] = newValue;
 
     setValue(newValue);
-
     
-    setStartLabel(storm_category_list.find(v => v.value === start)?.label);
-    setEndLabel(storm_category_list.find(v => v.value === end)?.label);
+    const newStartLabel = storm_category_list.find(v => v.value === start)?.label;
 
-    const startRange = startLabel ? storm_cat[startLabel] : null;
-    const endRange = endLabel ? storm_cat[endLabel] : null;
+    const newEndLabel = storm_category_list.find(v => v.value === end)?.label;
+
+    setStartLabel(newStartLabel);
+    setEndLabel(newEndLabel);
+
+    const startRange = newStartLabel ? storm_cat[newStartLabel] : null;
+    const endRange = newEndLabel ? storm_cat[newEndLabel] : null;
 
     if (!startRange || !endRange) return;
 
@@ -133,7 +136,9 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
                         setValue([minCategory, maxCategory]); // Reset slider range
                         setSliderText(defaultText); 
                         setStartCategory(""); 
-                        setEndCategory("");   
+                        setEndCategory(""); 
+                        setStartLabel("");
+                        setEndLabel("");  
                       }}>Clear</Button>
                     <Button 
                       size="small" 
