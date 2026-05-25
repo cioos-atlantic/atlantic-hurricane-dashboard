@@ -138,8 +138,8 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
     dispatch({ type: "SET_START_DATE", payload: null});
     dispatch({ type: "SET_END_DATE", payload: null});
     dispatch({ type: "SET_POLY_FILTER_COORDS", payload: ''});
-    dispatch({ type: "SET_START_CATEGORY", payload: ''});
-    dispatch({ type: "SET_END_CATEGORY", payload: ''});
+    dispatch({ type: "SET_START_CATEGORY", payload: null});
+    dispatch({ type: "SET_END_CATEGORY", payload: null});
     dispatch({ type: "SET_FILTER_STORM_NAME", payload: []});
     
 
