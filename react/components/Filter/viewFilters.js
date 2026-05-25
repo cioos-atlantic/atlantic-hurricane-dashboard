@@ -1,5 +1,6 @@
 import { Box, Stack } from "@mui/material";
 import dayjs from "dayjs";
+import { storm_cat } from "@/lib/storm_cat";
 
 export function FiltersSelected({startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName}){
   console.log(filterStormName);
@@ -22,7 +23,7 @@ export function FiltersSelected({startDate, endDate, startCategory, endCategory,
             Date Range: {dayjs(startDate).format('DD/MM/YYYY') } - {dayjs(endDate).format('DD/MM/YYYY') }
           </Box>)}
           {startCategory && endCategory && (<Box>
-            Category Range: ({startCategory} to {endCategory}) 
+            Category Range: ({getByField(startCategory, storm_cat, 'min')[0]} to {getByField(endCategory, storm_cat, 'max')[0]}) 
           </Box>)}
           {polyFilterCoords && (<Box>
             Spatial Range: Range selected
@@ -67,7 +68,7 @@ export function FiltersSubmitted({filterQuery}){
             Date Range: {dayjs(filterQuery.startDate).format('DD/MM/YYYY') } - {dayjs(filterQuery.endDate).format('DD/MM/YYYY') }
           </Box>)}
           {filterQuery?.startCategory && filterQuery?.endCategory && (<Box>
-            Category Range: ({filterQuery?.startCategory} to {filterQuery?.endCategory}) 
+            Category Range: ({getByField(filterQuery?.startCategory, storm_cat, 'min')[0]} to {getByField(filterQuery?.endCategory, storm_cat, 'max')[0]}) 
           </Box>)}
           {filterQuery?.polyCoords && (<Box>
             Spatial Range: Range selected
@@ -80,4 +81,12 @@ export function FiltersSubmitted({filterQuery}){
     
     
   )
+}
+
+
+
+function getByField(value, categories, field) {
+  return Object.entries(categories).find(([_, cat]) =>
+    cat[field] === value
+  );
 }
