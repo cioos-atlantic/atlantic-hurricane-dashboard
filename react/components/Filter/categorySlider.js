@@ -6,13 +6,13 @@ import {storm_cat} from "@/lib/storm_cat"
 import { ShowOptions, CloseOptions } from './filter';
 import { smallScreenIconButton } from './filter_utils';
 export const storm_category_list = [
-  { label: "C5", value: 5 },
-  { label: "C4", value: 4 },
-  { label: "C3", value: 3 },
-  { label: "C2", value: 2 },
-  { label: "C1", value: 1 },
-  { label: "TS", value: 0 },
-  { label: "TD", value: -1 },
+  { label: "C5", value: 6 },
+  { label: "C4", value: 5 },
+  { label: "C3", value: 4 },
+  { label: "C2", value: 3 },
+  { label: "C1", value: 2 },
+  { label: "TS", value: 1 },
+  { label: "TD", value: 0},
 
 ]
 

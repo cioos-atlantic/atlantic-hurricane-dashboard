@@ -3,9 +3,9 @@ import dayjs from "dayjs";
 import { storm_cat } from "@/lib/storm_cat";
 
 export function FiltersSelected({startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName}){
-  console.log(filterStormName);
+
   const isFiltered = startDate || endDate || startCategory || endCategory || polyFilterCoords || filterStormName.length;
-  console.log(filterStormName)
+  
   return( 
     
       <Stack>
@@ -22,7 +22,7 @@ export function FiltersSelected({startDate, endDate, startCategory, endCategory,
           {startDate && endDate && (<Box>
             Date Range: {dayjs(startDate).format('DD/MM/YYYY') } - {dayjs(endDate).format('DD/MM/YYYY') }
           </Box>)}
-          {startCategory && endCategory && (<Box>
+          {startCategory != null && endCategory != null && (<Box>
             Category Range: ({getByField(startCategory, storm_cat, 'min')[0]} to {getByField(endCategory, storm_cat, 'max')[0]}) 
           </Box>)}
           {polyFilterCoords && (<Box>
@@ -67,7 +67,7 @@ export function FiltersSubmitted({filterQuery}){
           {filterQuery?.startDate && filterQuery?.endDate && (<Box>
             Date Range: {dayjs(filterQuery.startDate).format('DD/MM/YYYY') } - {dayjs(filterQuery.endDate).format('DD/MM/YYYY') }
           </Box>)}
-          {filterQuery?.startCategory && filterQuery?.endCategory && (<Box>
+          {filterQuery?.startCategory != null && filterQuery?.endCategory != null && (<Box>
             Category Range: ({getByField(filterQuery?.startCategory, storm_cat, 'min')[0]} to {getByField(filterQuery?.endCategory, storm_cat, 'max')[0]}) 
           </Box>)}
           {filterQuery?.polyCoords && (<Box>
