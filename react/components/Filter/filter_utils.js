@@ -187,6 +187,9 @@ export function formatStormName(storm_list = []) {
   console.log(storm_list);
   //const storm_list = storm_names.split(",");
 
-  const formattedStormList = storm_list.join("_");
+  const formattedStormList = [];
+  if (storm_list.length > 0) {
+    formattedStormList.push(storm_list.join("_"));
+  }
   return formattedStormList;
 }

@@ -61,15 +61,8 @@ header_nav{
   width:100%
 
 }
-header_nav{
-  float: left; /* Align navigation links to the left */
-  width: 100%;
-  display: block;
-  justify-content: space-between;
-  padding: 0.1rem;
-  align-items: center;
 
-}
+
 .header_nav .menu_icon_small_screen{
   color:#ffffff;
   fill:#ffffff;
@@ -154,7 +147,7 @@ footer {
 }
 
 .leaflet-control-container .leaflet-bottom {
-  bottom: 50px; /* Adjust bottom to avoid overlapping footer */
+  bottom: 35px; /* Adjust bottom to avoid overlapping footer */
   
 }
 
@@ -1170,3 +1163,9 @@ footer {
   background-color: #ddd !important;
   border: 2px solid #e55162;
 }
+
+leaflet-control-attribution
+{bottom: 10px !important; /* Position above the footer */
+position: absolute !important;
+}
+
