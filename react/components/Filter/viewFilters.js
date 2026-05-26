@@ -24,7 +24,7 @@ export function FiltersSelected({startDate, endDate, startCategory, endCategory,
             Date Range: {dayjs(startDate).format('DD/MM/YYYY') } - {dayjs(endDate).format('DD/MM/YYYY') }
           </Box>)}
           {startCategory != null && endCategory != null ? (<Box>
-            Category Range: ({getByField(startCategory, storm_cat, 'min')[0]?.[1]?.name?.en} -{" "} {getByField(endCategory, storm_cat, 'max')[0]?.[1]?.name?.en}) 
+            Category Range: ({getByField(startCategory, storm_cat, 'min')[1]?.name?.en} -{" "} {getByField(endCategory, storm_cat, 'max')[1]?.name?.en}) 
           </Box>): null}
           {polyFilterCoords && (<Box>
             Spatial Range: Range selected
