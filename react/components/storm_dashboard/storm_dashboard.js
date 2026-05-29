@@ -7,6 +7,7 @@ import { StormSummaryText } from "./storm_details";
 import StormDataLayout from "./storm_layout_small_screen";
 import { convert_unit_data } from "../utils/unit_conversion";
 import { empty_point_obj } from "../point_defaults";
+import { getStormCategory } from "./utils";
 
 
 
@@ -57,7 +58,7 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
     stormTime.push(fetch_value(storm_point, ["TIMESTAMP", "ISO_TIME"]));
     storm_data_dict.direction[0].stormDir.data.push(storm_point.properties.STORM_DIR);
     
-    stormCategory.data.push(fetch_value(storm_point, ["STORMFORCE", "USA_SSHS"]));
+    
 
 
     // convert gust, storm speed and wind speed from knots to Kmh to synchronize with station chart
@@ -65,6 +66,8 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
     const stormWindSpeed_in_knots = fetch_value(storm_point, ["MAXWIND", "WMO_WIND", "USA_WIND"])
     const stormWindSpeed_in_Kmh = convert_unit_data(stormWindSpeed_in_knots, 'knots', 'km/h')
     const stormSpeed_in_Kmh = convert_unit_data(storm_point.properties.STORM_SPEED, 'knots', 'km/h')
+
+    stormCategory.data.push(getStormCategory(storm_point));
     
 
     storm_data_dict.speed[0].stormSpeed.data.push(stormSpeed_in_Kmh.value);
@@ -96,6 +99,7 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
 
 
   console.log(storm_data_dict);
+  console.log(stormCategory);
 
   const variablePresence={};
   Object.keys(storm_data_dict).forEach((key) => {
