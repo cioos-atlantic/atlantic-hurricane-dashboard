@@ -93,13 +93,13 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
       </Head>
       <header className={styles.header}>
         <Grid container alignItems="center" spacing={1}  
-        sx={{ justifyContent: 'space-between', flexWrap: 'nowrap',  maxHeight: { xs: '80px', sm: '100px', md: '120px', lg: '140px' }, // Responsive max height for the header 
+        sx={{ justifyContent: 'space-between', flexWrap: 'nowrap',  maxHeight: '40px', // Responsive max height for the header 
         //maxWidth: '50%'
         }}
         >
           {/* Logo Section */}
           <Grid size ='auto' 
-                sx={{maxWidth: '50%'}} >
+                sx={{maxWidth: '40%'}} >
           
               <a href={logo.href}>
                 <Image
@@ -166,7 +166,7 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
       </>)}
       <footer>
         <Box sx={{
-          height:{ xs: '20px', sm: '30px', md: '35px', lg: '50px', xl: '50px', xxl: '50px' }, // if changed, remember to change the station dashboard bottom in the station_dashboard.js
+          height:{ xs: '20px', sm: '30px', md: '35px',}, // if changed, remember to change the station dashboard bottom in the station_dashboard.js
         }}>
         <FooterNav></FooterNav>
         </Box>
