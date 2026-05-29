@@ -41,16 +41,16 @@ export function RenderDashboards({ source_type, time, state, dispatch
         className="dashboards"
         direction="row"
         sx={{
-            bottom: { xs: "20px", sm: "30px", md: "35px", lg: "50px", xl: "50px" },
+            bottom: { xs: "20px", sm: "30px", md: "35px"},
             width: {
             xs: "100%",
             md: "100%",
-            lg: state.isDrawerOpen ? "calc(100vw - 258px)" : "100%",
+            lg: state.isDrawerOpen ? "calc(100vw - 350px)" : "100%",
             },
             marginLeft: {
             xs: 0,
             md: 0,
-            lg: state.isDrawerOpen ? "258px" : 0,
+            lg: state.isDrawerOpen ? "350px" : 0,
             },
             gap: 0,
             display: "flex",
