@@ -1125,23 +1125,23 @@ footer {
 
 
 .drawer_close_button {
-  position: absolute;
-  z-index: 1000;
-  top: 50px;
+  position: absolute !important;
+  z-index: 1000 !important;
+  top: 50px !important;
   width: 40px !important;
   height: 40px !important;
-  background-color: white;
-  border: 2px solid #e55162;
-  border-radius: 50%;
-  color: #e55162;
-  font-size: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  font-weight: bolder;
-  min-width: auto;
+  background-color: white !important;
+  border: 2px solid #e55162 !important;
+  border-radius: 50% !important;
+  color: #e55162 !important;
+  font-size: 25px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+  font-weight: bolder !important;
+  min-width: auto !important;
 }
 
 
