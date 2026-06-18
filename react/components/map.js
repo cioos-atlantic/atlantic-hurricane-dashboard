@@ -1,5 +1,5 @@
 // https://iconoir.com/ icon library that can be installed via npm
-import React, { useState, useRef, useReducer, useEffect, useMemo, useEffect } from "react";
+import React, { useState, useRef, useReducer, useEffect, useMemo } from "react";
 import { MapContainer, TileLayer, WMSTileLayer, LayersControl, LayerGroup } from 'react-leaflet'
 import Drawer from '@/components/drawer';
 import 'leaflet/dist/leaflet.css'
@@ -26,7 +26,6 @@ import { useMediaQuery, Box, useTheme, Tooltip, Button } from "@mui/material";
 import TourWrapper from "@/components/Tour/UseTour";
 import { getTourSteps } from "@/components/Tour/tourSteps";
 import { useTour } from "@reactour/tour";
-import Tooltip from "@mui/material/Tooltip";
 import Cookies from "js-cookie";
 
 
