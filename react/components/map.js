@@ -1,10 +1,13 @@
 // https://iconoir.com/ icon library that can be installed via npm
-import React, { useState, useRef, useReducer, useMemo, useEffect } from "react";
+import React, { useState, useRef, useReducer, useEffect, useMemo, useEffect } from "react";
 import { MapContainer, TileLayer, WMSTileLayer, LayersControl, LayerGroup } from 'react-leaflet'
 import Drawer from '@/components/drawer';
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
+//import "leaflet.markercluster/dist/MarkerCluster.css";
+//import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import MarkerClusterGroup from "react-leaflet-markercluster";
 import LineOfTravel from "@/components/line_of_travel";
 import WindSpeedRadius from "@/components/wind_radii";
 import SeaHeightRadius from "@/components/sea_height_radii";
@@ -19,14 +22,15 @@ import { mapReducer, initialMapState } from "./mapReducer";
 import InfoScreen from "./message_screens/info_screen";
 import { IconButton } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
-import { useMediaQuery, Box, useTheme } from "@mui/material";
+import { useMediaQuery, Box, useTheme, Tooltip, Button } from "@mui/material";
 import TourWrapper from "@/components/Tour/UseTour";
 import { getTourSteps } from "@/components/Tour/tourSteps";
 import { useTour } from "@reactour/tour";
 import Tooltip from "@mui/material/Tooltip";
-import { useCookies } from "react-cookie";
 import Cookies from "js-cookie";
 
+
+import MeasureControl from 'react-leaflet-measure';
 
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
@@ -43,6 +47,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const { setIsOpen, setCurrentStep } = useTour();
   const [showModal, setShowModal] = useState(true);
   const [tourStarted, setTourStarted] = useState(false);
+  const [isRulerActive, setIsRulerActive] = useState(false);
 
   useEffect(() => {  
     const tourCompleted = Cookies.get("tourCompleted");
@@ -75,14 +80,6 @@ export default function Map({ children, station_data, source_type,  setStationPo
     });
   };
 
-  const finishTour = () => {
-    setIsOpen(false);
-    setTourStarted(false);
-
-    Cookies.set("tourCompleted", "true", {
-      expires: 5,
-    });
-  };
 
  useEffect(() => {
     if (!tourStarted) return;
@@ -95,8 +92,22 @@ export default function Map({ children, station_data, source_type,  setStationPo
 
    
   
+
+  
   
   console.debug("Storm Points in map.js: ", state.storm_points);
+  const measureOptions = {
+    position: 'topright',
+    primaryLengthUnit: 'meters',
+    secondaryLengthUnit: 'kilometers',
+    primaryAreaUnit: 'sqmeters',
+    secondaryAreaUnit: 'acres',
+    activeColor: '#db4a29',
+    completedColor: '#9b2d14',
+    captureZIndex: 10000,
+    onMeasureStart: (e) => console.log('Measurement started:', e),
+    onMeasureFinish: (e) => console.log('Measurement finished:', e),
+  };
   
 
   const mapContent = (<div className="map_container">
@@ -143,14 +154,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
       
       
         
-        { source_type === "historical" &&
-          <RenderFilter
-          clearShapesRef={clearShapesRef} // Pass the ref to 
-          state={state}
-          dispatch={dispatch}
-          setStationPoints={setStationPoints}
-          />
-        }
+       
         {
           <RenderDashboards
             source_type={source_type}
@@ -181,15 +185,103 @@ export default function Map({ children, station_data, source_type,  setStationPo
           
           
         > <CustomZoomControl /> 
+
+          
+          {source_type === "active" && (
+            <MeasureControl {...measureOptions} />
+          )}
+
+       
+          
+          
+          
+       
           
           
 
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-          />
+          
 
           <LayersControl position="bottomright">
+
+            {/* OpenStreetMap */}
+            <LayersControl.BaseLayer checked name="Open Street Map">
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>'
+              />
+            </LayersControl.BaseLayer>
+
+          
+
+            {/* OpenTopoMap */}
+            <LayersControl.BaseLayer name="Terrain">
+              <LayerGroup>
+                <TileLayer
+                  url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+                  attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a> | Map style: &copy; <a href="https://opentopomap.org" target="_blank" rel="noopener noreferrer">OpenTopoMap</a>'
+                />
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+
+              </LayerGroup>
+              
+            </LayersControl.BaseLayer>
+
+            
+
+            {/* ESRI Satellite*/}
+            <LayersControl.BaseLayer name="Satellite">
+              <LayerGroup>
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+              </LayerGroup>
+              
+            </LayersControl.BaseLayer>
+            
+            {/* ESRI Topographic Map */}
+              <LayersControl.BaseLayer name="Topographic">
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+              </LayersControl.BaseLayer>
+             
+                {/* ESRI World Physical Map */}
+              <LayersControl.BaseLayer name="Physical Map">
+                <LayerGroup>
+                    <TileLayer
+                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}"
+                    attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                    />
+                    <TileLayer
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                      attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                    />
+
+                </LayerGroup>
+                
+              </LayersControl.BaseLayer>
+
+              {/* ESRI NatGeo World Map */}
+              <LayersControl.BaseLayer name="NatGeo World Map">
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                />
+              </LayersControl.BaseLayer>
+            
+
+          
+
+
             <LayersControl.Overlay checked name="ECCC Hurricane Response Zone">
               <LayerGroup>
                 <WMSTileLayer
@@ -203,8 +295,10 @@ export default function Map({ children, station_data, source_type,  setStationPo
                 />
               </LayerGroup>
             </LayersControl.Overlay>
-            <LayersControl.Overlay checked name="Stations">
-              <LayerGroup>
+           
+            <LayersControl.Overlay  checked name="Stations">
+
+              <MarkerClusterGroup>
                 {
                   station_data ? (
                     Object.entries(station_data).map((station) => {
@@ -229,7 +323,8 @@ export default function Map({ children, station_data, source_type,  setStationPo
                     <></>
                   )
                 }
-              </LayerGroup>
+              </MarkerClusterGroup>
+             
             </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Error Cone">
               <LayerGroup>
@@ -314,10 +409,11 @@ export default function Map({ children, station_data, source_type,  setStationPo
             </LayersControl.Overlay>
           </LayersControl>
 
-          {<RenderSpatialFilter
-          ref={clearShapesRef} 
-          setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
-          />} {/* Calling the EditControl function here */}
+          { source_type == "historical" &&
+              (<RenderSpatialFilter
+                ref={clearShapesRef} 
+                setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
+                />)} {/* Calling the EditControl function here */}
         </MapContainer>
 
         { map && (<Drawer
@@ -328,6 +424,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
             state={state}
             dispatch={dispatch}
             map={map}
+            clearShapesRef= {clearShapesRef}
           />)}
       </div>
     </div>)
