@@ -24,6 +24,9 @@ import TourWrapper from "@/components/Tour/UseTour";
 import { getTourSteps } from "@/components/Tour/tourSteps";
 import { useTour } from "@reactour/tour";
 import Tooltip from "@mui/material/Tooltip";
+import { useCookies } from "react-cookie";
+import Cookies from "js-cookie";
+
 
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
@@ -40,25 +43,53 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const { setIsOpen, setCurrentStep } = useTour();
   const [showModal, setShowModal] = useState(true);
   const [tourStarted, setTourStarted] = useState(false);
- 
 
+  useEffect(() => {  
+    const tourCompleted = Cookies.get("tourCompleted");
+
+    if (!tourCompleted) {
+      Cookies.set("tourCompleted", "false", { expires: 5 });
+      
+    }
+    if (tourCompleted == 'true')
+      {setShowModal(false);}
+
+    if (tourCompleted == 'false') {
+      setShowModal(true);}
+  }, []);
+  
   
   const startTour = () => {
-  setShowModal(false);
-  setTourStarted(true);
+    setShowModal(false);
+    setTourStarted(true);
+     Cookies.set("tourCompleted", "true", {
+      expires: 5,
+    });
   };
 
   const skipTour = () => {
     setShowModal(false);
-    
+
+    Cookies.set("tourCompleted", "true", {
+      expires: 5,
+    });
   };
-  useEffect(() => {
-  if (tourStarted) {
+
+  const finishTour = () => {
+    setIsOpen(false);
+    setTourStarted(false);
+
+    Cookies.set("tourCompleted", "true", {
+      expires: 5,
+    });
+  };
+
+ useEffect(() => {
+    if (!tourStarted) return;
+
     setCurrentStep(0);
     setIsOpen(true);
-  }
   }, [tourStarted]);
-
 
 
 
