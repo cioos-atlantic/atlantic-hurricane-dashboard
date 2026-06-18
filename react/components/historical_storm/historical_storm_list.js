@@ -211,7 +211,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         dispatch({ type: "CLOSE_STORM_TRACKS" })
         setStationPoints(empty_station_obj)
     
-      router.push(`/?storms=historical`)
+      router.push(`/?page=historical`)
       }}
       className="cancel-search"
       >Clear Storm Tracks</Button>

@@ -108,7 +108,7 @@ function SearchForm({setIsSearchSubmitted, setIsDrawerOpen, isSearchSubmitted, s
   )
 }
 export function changeUrlToHistorical(router){
-  const url = `/?storms=historical`;
+  const url = `/?page=historical`;
   console.log(url)
   router.push(url);
 }

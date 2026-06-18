@@ -470,7 +470,7 @@ export async function handleSearch(storm_name, storm_year){
 }
 
 export function handleStormButtonClick(stormName, stormYear, stormID, router){
-  const url = `/?storms=historical&name=${stormName}&season=${stormYear}&sid=${stormID}`;
+  const url = `/?page=historical&name=${stormName}&season=${stormYear}&sid=${stormID}`;
   console.log(url)
   router.push(url);
   

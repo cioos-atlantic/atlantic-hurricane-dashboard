@@ -127,7 +127,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
     const stormResult = await processFilterRequest(updatedParams, setLoading);
     console.log(stormResult);
     dispatch({ type: "SET_FILTER_RESULT", payload: stormResult});
-    router.push(`/?storms=historical`);
+    router.push(`/?page=historical`);
 
     //setIsDrawerOpen(true);
     //setReturnFilterResult(true);

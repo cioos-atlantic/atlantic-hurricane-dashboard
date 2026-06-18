@@ -8,8 +8,8 @@ import { basePath } from '@/next.config';
 export default function HeaderNav({ children, navItems, isActivePage }) {
     const [headerDrawerOpen, setHeaderDrawerOpen] = useState(false);
     const searchParams = useSearchParams();
-    const page = searchParams.get("storms");
-    const currentUrl = `${basePath}?storms=${page}`;
+    const page = searchParams.get("page");
+    const currentUrl = `${basePath}?page=${page}`;
     
 
     const toggleDrawer = (open) => (event) => {
