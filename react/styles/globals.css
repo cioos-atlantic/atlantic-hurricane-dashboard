@@ -143,8 +143,15 @@ footer {
 }
 
 .leaflet-control-container .leaflet-top {
-  top: 135px; /* Adjust top to avoid overlapping header */
+  top: 40px; /* Adjust top to avoid overlapping header */
 }
+
+@media (max-width: 480px) {
+  .leaflet-control-container .leaflet-top {
+    top: 135px;
+  }
+}
+
 
 .leaflet-control-container .leaflet-bottom {
   bottom: 35px; /* Adjust bottom to avoid overlapping footer */
