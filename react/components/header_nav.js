@@ -80,7 +80,7 @@ export default function HeaderNav({ children, navItems, isActivePage }) {
                 onClose={toggleDrawer(false)}
                 sx={{
                     "& .MuiDrawer-paper": { width: 200, 
-                                            marginTop: '50px',
+                                            marginTop: '40px',
                                             backgroundColor:"#f5f5f5",
                                             padding: "2px"},
                     zIndex: '8000',

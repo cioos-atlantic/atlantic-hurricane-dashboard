@@ -69,6 +69,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
      Cookies.set("tourCompleted", "true", {
       expires: 5,
     });
+    setTourStarted(false);
   };
 
   const skipTour = () => {
