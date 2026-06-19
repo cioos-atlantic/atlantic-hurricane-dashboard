@@ -69,7 +69,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
      Cookies.set("tourCompleted", "true", {
       expires: 5,
     });
-    setTourStarted(false);
+    
   };
 
   const skipTour = () => {
@@ -196,7 +196,9 @@ export default function Map({ children, station_data, source_type,  setStationPo
                 left: state.isDrawerOpen == true ? "355px !important" : "9px !important" }}
               onClick={() => {
                 setIsOpen(false);// Reset any open tour popovers
-                setShowModal(true)}}
+                setShowModal(true)
+                setTourStarted(false);
+              }}
             >
               <InfoIcon />
             </IconButton>
