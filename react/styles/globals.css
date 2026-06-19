@@ -143,7 +143,7 @@ footer {
 }
 
 .leaflet-control-container .leaflet-top {
-  top: 95px; /* Adjust top to avoid overlapping header */
+  top: 135px; /* Adjust top to avoid overlapping header */
 }
 
 .leaflet-control-container .leaflet-bottom {
@@ -945,21 +945,23 @@ footer {
 .tour-reload{
   z-index: 3000;
   position: fixed !important;
-  top: 65px !important;
-  right: 9px !important;
+  display: flex !important;
+  top: 95px !important;
   text-align: center !important;
-  height: 38px !important;
-  width: 38px !important;
+  height: 40px !important;
+  width: 40px !important;
   padding: 0px !important;
   font-size: 0px !important;
   color:  #1E90FF !important;
-  border: white 3px solid !important;
-  background: rgba(0, 0, 0, 0.7) !important;
+  border: rgba(0, 0, 0, 0.7) 3px solid !important;
+  background: white !important;
+  transition: background-color 0.3s ease, color 0.3s ease !important;
 
 }
 
 .tour-reload :hover{
   background:transparent !important;
+  color:  #e55162 !important;
 
 }
 

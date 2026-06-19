@@ -20,7 +20,7 @@ import { RenderDashboards } from "./Dashboard/dashboard";
 import StormMarker from "./stormPoint";
 import { mapReducer, initialMapState } from "./mapReducer";
 import InfoScreen from "./message_screens/info_screen";
-import { IconButton } from "@mui/material";
+import { IconButton, Stack } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 import { useMediaQuery, Box, useTheme, Tooltip, Button } from "@mui/material";
 import TourWrapper from "@/components/Tour/UseTour";
@@ -137,19 +137,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
           </div>
         )}
 
-      
-        <Tooltip title="Take a tour of the tool features">
-          <IconButton
-            className="tour-reload"
-            sx={{ display: "flex" }}
-            onClick={() => {
-              setIsOpen(false);// Reset any open tour popovers
-              setShowModal(true)}}
-          >
-            <InfoIcon />
-          </IconButton>
-        </Tooltip>
-
+       
       
       
         
@@ -183,12 +171,39 @@ export default function Map({ children, station_data, source_type,  setStationPo
 
           
           
-        > <CustomZoomControl /> 
+        > 
+        
+          {// Map Controls
+          }
+
+            <CustomZoomControl /> 
+            {source_type === "active" && (
+              <MeasureControl {...measureOptions} />
+            )}
+           
+          { source_type == "historical" &&
+              (<RenderSpatialFilter
+                ref={clearShapesRef} 
+                setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
+                />)} {/* Calling the EditControl function here */}
+          
+          <Tooltip title="Take a tour of the tool features">
+            <IconButton
+              className="tour-reload"
+              sx={{   
+                 
+                left: state.isDrawerOpen == true ? "355px !important" : "9px !important" }}
+              onClick={() => {
+                setIsOpen(false);// Reset any open tour popovers
+                setShowModal(true)}}
+            >
+              <InfoIcon />
+            </IconButton>
+          </Tooltip>
 
           
-          {source_type === "active" && (
-            <MeasureControl {...measureOptions} />
-          )}
+          
+
 
        
           
@@ -408,11 +423,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
             </LayersControl.Overlay>
           </LayersControl>
 
-          { source_type == "historical" &&
-              (<RenderSpatialFilter
-                ref={clearShapesRef} 
-                setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
-                />)} {/* Calling the EditControl function here */}
+          
         </MapContainer>
 
         { map && (<Drawer
