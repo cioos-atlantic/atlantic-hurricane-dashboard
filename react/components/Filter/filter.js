@@ -237,6 +237,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
             */}
 
             <Button
+              id="filter-submit-button"
               className="filter-badge"
               onClick={handleFilterSubmit}
               startIcon={<PublishRoundedIcon />}>

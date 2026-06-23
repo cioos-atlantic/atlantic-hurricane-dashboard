@@ -26,11 +26,11 @@ export function getTourSteps({ isActive, isHistorical, }) {
       content:
         "This panel shows historical storms. Click on one to see the storm track and data."
     }, {
-      selector: ".filters", 
+      selector: ".view-filter-space", 
       content:
         "Filter storms or draw on the map to refine your view."
     }, {
-      selector: ".filter-submit-button", 
+      selector: "#filter-submit-button", 
       content:
         "Click here to apply filters and update the storm list."
     });

@@ -48,6 +48,8 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const [tourStarted, setTourStarted] = useState(false);
   const [isRulerActive, setIsRulerActive] = useState(false);
 
+
+
   useEffect(() => {  
     const tourCompleted = Cookies.get("tourCompleted");
 
@@ -66,18 +68,29 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const startTour = () => {
     setShowModal(false);
     setTourStarted(true);
-     Cookies.set("tourCompleted", "true", {
+    const tourCompleted = Cookies.get("tourCompleted");
+    
+    if ( tourCompleted && tourCompleted == 'false') {
+      Cookies.set("tourCompleted", "true", {
       expires: 5,
     });
+      }
+    
     
   };
 
   const skipTour = () => {
     setShowModal(false);
+    const tourCompleted = Cookies.get("tourCompleted");
 
-    Cookies.set("tourCompleted", "true", {
+
+    if ( tourCompleted && tourCompleted == 'false') {
+      Cookies.set("tourCompleted", "true", {
       expires: 5,
     });
+      }
+
+    
   };
 
 
