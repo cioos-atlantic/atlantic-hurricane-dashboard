@@ -13,6 +13,7 @@ import { loadSpace } from "@usersnap/browser";
 import { TourProvider } from "@reactour/tour";
 import { getTourSteps } from "./Tour/tourSteps";
 import UserGuide from "@/pages/user-guide";
+import CookieBanner from "./Tour/preferenceCookieBanner";
 
 
 import { basePath } from "@/next.config";
@@ -192,6 +193,7 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
         </Box>
         
       </footer>
+      <CookieBanner />
     </div>
   )
 }
