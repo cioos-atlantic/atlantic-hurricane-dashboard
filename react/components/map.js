@@ -217,9 +217,6 @@ export default function Map({ children, station_data, source_type,  setStationPo
                       if("TIMESTAMP" in state.hover_marker.properties){
                         storm_timestamp = new Date(["TIMESTAMP"]);
                       }
-                      console.log(JSON.stringify(state.hover_marker))
-                      console.log(storm_timestamp)
-                      console.log(station)
                       return (
                         <StationMarker
                           key={station[0]}
