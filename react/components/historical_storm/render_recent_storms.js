@@ -24,8 +24,6 @@ export function RenderRecentStorms({stormList, router, drawerButtonClicked, setD
               
               >
         {stormList.map((storm, index) => {
-          console.log(storm);
-          console.log(drawerButtonClicked);
             const isClicked = drawerButtonClicked === storm.storm_id;
               return (
                 <div key={storm.storm_id} className={(storm.name)}>
@@ -44,8 +42,6 @@ export function RenderRecentStorms({stormList, router, drawerButtonClicked, setD
                     handleStormButtonClick(storm.name, storm.year, storm.storm_id, router);
                     //setDrawerButtonClicked(storm.storm_id);
                     //handleClick(storm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation, setLoading, setIsDashOpen, setIsStormDashOpen,setIsStationDashOpen);
-
-                    //console.log(storm);
                     }}><Typography className='search-output' sx ={{fontWeight: isClicked ? '650': 'normal'}} >
                     {`${storm.display_name}`}
                   </Typography></Button>

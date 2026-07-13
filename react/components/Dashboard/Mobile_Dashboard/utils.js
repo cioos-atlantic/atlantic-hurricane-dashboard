@@ -22,6 +22,8 @@ function createWindDirVarPresence(stationValues, variablePresence){
 
 export function createVarPresenceDict(mergedData, stormCategory, stormType, stationValues){
 	const variablePresence={};
+
+	console.log(mergedData)
 	
   Object.keys(mergedData).forEach((key) => {
     variablePresence[key]= false;
@@ -89,7 +91,6 @@ export function mergeData(station_data, storm_data){
 	const merged_data = JSON.parse(JSON.stringify(storm_data)); // deepclone storm_data
 	station_data.forEach((varObj)=>{
 	const variable = Object.values(varObj)[0];
-	console.log(variable);
 
 
 		// sea height
@@ -129,7 +130,6 @@ export function mergeData(station_data, storm_data){
 
 export function parseStormData(storm_points){
 	const stormPoints = storm_points.pts.features;
-	console.log(stormPoints)
 	
 
 	const stormNameList = [];
@@ -154,8 +154,6 @@ export function parseStormData(storm_points){
 
 
 	stormPoints.forEach((storm_point)=> {
-	
-	//console.log(storm_point);
 	stormNameList.push(fetch_value(storm_point, ["STORMNAME", "NAME"]));
 	stormTime.push(fetch_value(storm_point, ["TIMESTAMP", "ISO_TIME"]));
 	storm_data_dict.Direction[0].stormDir.data.push(storm_point.properties.STORM_DIR);
@@ -187,8 +185,6 @@ export function parseStormData(storm_points){
 	})
 	const stormNameUniqueValues= [...new Set(stormNameList)];
 	const stormName = stormNameUniqueValues[0];
-	
-	console.log(stormName);
 
 	return [stormName, stormTime, stormType, storm_data_dict, stormCategory]
 }
@@ -220,8 +216,6 @@ export function parseStationData(stationValues){
 
 			}})
 
-	console.log(dataIndx);
-
 	dataIndx.forEach((indx)=>{
 		const column_name= stationData?.['column_names']?.[indx];
 		const long_name = stationData?.['column_long_names']?.[indx];
@@ -244,8 +238,6 @@ export function parseStationData(stationValues){
 			}
 		})
 	})
-
-	console.log(data_dict);
 	return data_dict;
 	
 }
@@ -254,7 +246,6 @@ export function getStationInfo(stationValues, station_descriptions, stationName,
 	// Determine if active or historic
 		const isHistorical = source_type == "historical" ? true : false
 		const dataText = getStationDataText(stationValues, time, isHistorical);
-		console.log(dataText);
 	
 		if (!dataText) return null;
 	
