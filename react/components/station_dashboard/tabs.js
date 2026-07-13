@@ -76,87 +76,90 @@ export default function BasicTabs({stationName, sourceDataLink, stationData, sta
    * "station_chart" and some inline styles for height, width, and padding. Inside the `div`, there is
    * a `RenderChart` component with props `sourceData`, `stationName`, and `varCategory`.
    */
-  
+
   //console.log(stationName, stationData, stationSummaryText, variablePresence, selectedTab, setSelectedTab)
-  
-  function generateGraph(selectedVar){
-    
+
+  function generateGraph(selectedVar) {
+
     return (
-     <div className="station_chart" >
-     <RenderChart  
-         sourceData={stationData}
-         stationName={stationName}
-         varCategory={selectedVar}
-         hoverPointTime={hoverPointTime}
-       />
-   </div>
+      <div className="station_chart" >
+        <RenderChart
+          sourceData={stationData}
+          stationName={stationName}
+          varCategory={selectedVar}
+          hoverPointTime={hoverPointTime}
+        />
+      </div>
     )
   }
-  if(stationData === undefined){
+
+  if (stationData === undefined) {
     return
   }
+
   let timeData, directionData, windSpeedData = []
 
-  try{
-  timeData = get_station_field_data(stationData, "time", "column_std_names").data;
-  directionData = get_station_field_data(stationData, 'wind_from_direction', "column_std_names").data;
-  windSpeedData = processWindSpeeds(stationData);
+  try {
+    timeData = get_station_field_data(stationData, "time", "column_std_names").data;
+    directionData = get_station_field_data(stationData, 'wind_from_direction', "column_std_names").data;
+    windSpeedData = processWindSpeeds(stationData);
   }
-  catch(error){
+  catch (error) {
     console.error(error)
   }
 
-  const [value, setValue] = React.useState(0);
+  // const [value, setValue] = React.useState(0);
   //const [hasData, setHasData] = React.useState(true); // State to track if data is available
   const handleChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
 
   return (
-    <Box sx={{ width: '100%'}}>
+    <Box sx={{ width: '100%' }}>
       <TabContext value={(selectedTab)}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <TabList 
-          value={selectedTab} 
-          onChange={handleChange} 
-          aria-label="station data tabs"
-          variant="scrollable"
-          scrollButtons="auto"
-          allowScrollButtonsMobile // Ensures scroll buttons appear on mobile devices
-          sx={{
-            '.MuiTabs-flexContainer': {
-              justifyContent: 'space-between',},
-            '.MuiTabScrollButton-root': {
-              display: 'block', // Ensure scroll buttons are visible
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <TabList
+            value={selectedTab}
+            onChange={handleChange}
+            aria-label="station data tabs"
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile // Ensures scroll buttons appear on mobile devices
+            sx={{
+              '.MuiTabs-flexContainer': {
+                justifyContent: 'space-between',
               },
-          }}>
-          <Tab label="Summary" sx={{
+              '.MuiTabScrollButton-root': {
+                display: 'block', // Ensure scroll buttons are visible
+              },
+            }}>
+            <Tab label="Summary" sx={{
               fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
             }} {...a11yProps(0)} />
-          <Tab label="Wind Speed"
-          sx={{
-            fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
-          }} {...a11yProps(1)} disabled={!variablePresence['wind_speed']}/>
-          {/*<Tab label="Wind Dir." 
+            <Tab label="Wind Speed"
+              sx={{
+                fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
+              }} {...a11yProps(1)} disabled={!variablePresence['wind_speed']} />
+            {/*<Tab label="Wind Dir." 
           sx={{
             fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
           }}
           {...a11yProps(2)} disabled={!variablePresence['wind_from_direction']} />*/}
-          <Tab label="Temperature"
-          sx={{
-            fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
-          }}
-          {...a11yProps(2)} disabled={!variablePresence['temperature']}/>
-          <Tab label="Waves"
-          sx={{
-            fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
-          }}
-          {...a11yProps(3)} disabled={!variablePresence['wave']}/>
-          <Tab label="Pressure"
-          sx={{
-            fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
-          }}
-          {...a11yProps(4)} disabled={!variablePresence['air_pressure']}/>
+            <Tab label="Temperature"
+              sx={{
+                fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
+              }}
+              {...a11yProps(2)} disabled={!variablePresence['temperature']} />
+            <Tab label="Waves"
+              sx={{
+                fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
+              }}
+              {...a11yProps(3)} disabled={!variablePresence['wave']} />
+            <Tab label="Pressure"
+              sx={{
+                fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
+              }}
+              {...a11yProps(4)} disabled={!variablePresence['air_pressure']} />
 
           {Object.keys(windSpeedData).map((key, index) => {
             const label = key.replace(/^wind speed(?=\s+\S)/i, '').trim();
@@ -186,26 +189,26 @@ export default function BasicTabs({stationName, sourceDataLink, stationData, sta
                 hasWindRoseData={variablePresence['wind_from_direction']}
                 /> 
       </CustomTabPanel>*/}
-      <CustomTabPanel value={selectedTab} index={2}>
-        {generateGraph("temperature")}
-      </CustomTabPanel>
-      <CustomTabPanel value={selectedTab} index={3}>
-        {generateGraph("wave")}
-      </CustomTabPanel>
-      <CustomTabPanel value={selectedTab} index={4}>
-        {generateGraph("air_pressure")}
-      </CustomTabPanel>
-      {
-            Object.keys(windSpeedData).map((key, index) => (
-              <CustomTabPanel  key={`windbin-tab-${key}`}  value={selectedTab} index={index + 5}>
-                  <RenderPlotlyRose 
-                    windData={windSpeedData[key]}
-                    directionData={directionData}
-                     timeData={timeData}/>
-                </CustomTabPanel>
-            )
-            )
-      }
+        <CustomTabPanel value={selectedTab} index={2}>
+          {generateGraph("temperature")}
+        </CustomTabPanel>
+        <CustomTabPanel value={selectedTab} index={3}>
+          {generateGraph("wave")}
+        </CustomTabPanel>
+        <CustomTabPanel value={selectedTab} index={4}>
+          {generateGraph("air_pressure")}
+        </CustomTabPanel>
+        {
+          Object.keys(windSpeedData).map((key, index) => (
+            <CustomTabPanel key={`windbin-tab-${key}`} value={selectedTab} index={index + 5}>
+              <RenderPlotlyRose
+                windData={windSpeedData[key]}
+                directionData={directionData}
+                timeData={timeData} />
+            </CustomTabPanel>
+          )
+          )
+        }
       </TabContext>
     </Box>
   );
