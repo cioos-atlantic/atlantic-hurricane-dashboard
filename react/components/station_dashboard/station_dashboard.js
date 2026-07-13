@@ -151,6 +151,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         >
             <StationDataLayout
               stationName={stationName}
+              sourceDataLink={dataLink}
               stationData={api_data[stationName]?.properties?.station_data}
               stationSummaryText={dataText}
               variablePresence={variablePresence}

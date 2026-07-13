@@ -6,7 +6,7 @@ import { RenderPlotlyRose } from "./plotly_rose";
 import { get_station_field_data } from "../utils/station_data_format_util";
 import { processWindSpeeds } from "./wind_rose_utils";
 
-export default function StationDataLayout({stationName, stationData, setSelectedStation, stationSummaryText, variablePresence, hoverPointTime}){
+export default function StationDataLayout({stationName, sourceDataLink, stationData, setSelectedStation, stationSummaryText, variablePresence, hoverPointTime}){
 
   if (stationData === undefined) {
     return
@@ -63,9 +63,7 @@ export default function StationDataLayout({stationName, stationData, setSelected
         >Summary</Box>
         <p>{stationSummaryText}</p>
         <div className="data-footer">
-          <a href={dataLink} target="_blank" rel="noopener noreferrer">
-            Full data
-          </a>
+                <a href={sourceDataLink} target="_blank">Full data</a>
         </div>
       </section>
 
