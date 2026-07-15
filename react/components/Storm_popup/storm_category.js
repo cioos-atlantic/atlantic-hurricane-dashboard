@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaInfoCircle } from "react-icons/fa";
 import Popup from "./storm_more_info_popoup";
-import { storm_categories } from "@/lib/storm_class";
+import { storm_cat } from "@/lib/storm_cat";
 
 /**
  * The StormCategory function displays information about a storm category, with an option to show more
@@ -12,27 +12,27 @@ import { storm_categories } from "@/lib/storm_class";
  * information about the storm category. The popup includes the storm category title, information, and
  * a link for more information on storm categories.
  */
-export default function StormCategory({ STORMFORCE }) {
+export default function StormCategory({ STORMCAT }) {
     const [showPopup, setShowPopup] = useState(false);
 
     const togglePopup = () => setShowPopup(!showPopup);
 
-    const stormCategory = String(STORMFORCE);
-    const hasStormForce = Boolean(STORMFORCE);
+    const stormCategory = String(STORMCAT);
+    const hasStormForce = Boolean(STORMCAT);
     const stormCategoryInfo = hasStormForce
-        ? storm_categories[stormCategory]?.info
+        ? storm_cat[stormCategory]?.info
         : "There is currently no information on the storm category.";
     const stormCategoryLink = hasStormForce
-        ? storm_categories[stormCategory]?.more_info_link
-        : "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html";
+        ? storm_cat[stormCategory]?.more_info_link
+        : "https://wmo.int/content/classification-of-tropical-cyclones";
     const stormCategoryTitle = hasStormForce
-        ? storm_categories[stormCategory]?.name?.en
+        ? storm_cat[stormCategory]?.name?.en
         : "Storm Category: No Current Information";
 
     return (
         <>
             <div>
-                <strong>Storm Category:</strong> {STORMFORCE || "NO DATA"}{" "}
+                <strong>Storm Category:</strong> {stormCategoryTitle || "NO DATA"}{" "}
                 <FaInfoCircle
                     style={{ cursor: "pointer", marginLeft: "5px" }}
                     onClick={togglePopup}

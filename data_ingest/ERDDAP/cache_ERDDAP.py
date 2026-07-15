@@ -77,29 +77,26 @@ def cache_erddap_data(storm_id, server, df, destination_table, pg_engine, table_
         else:
             #Clear old storm data
             sql = f"DELETE FROM public.{destination_table} WHERE station IN (SELECT station FROM public.{station_table} WHERE source='{server}');"
-        print(sql)
         pg_conn.execute(text(sql))
 
-    print(df[df.duplicated(subset=['station', 'min_time'], keep=False)])
     df.drop_duplicates(subset=['station', 'min_time'], inplace=True)
-    print(df[df.duplicated(subset=['station', 'min_time'], keep=False)])
-
+    log.info("Writing to table...")
     result = df.to_sql(destination_table, pg_engine, chunksize=1000, method='multi', 
                        if_exists='append', index=False, schema='public')
-    
+    log.info(f"{result} rows written" )
 
     with pg_engine.begin() as pg_conn: 
         
-       #log.info("Updating Geometry...")
-        sql = f'UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("min_lon", "min_lat"), 4326);'
+        log.info("Updating Geometry...")
+        sql = f"""UPDATE public.{destination_table} SET geom = ST_SetSRID(ST_MakePoint("min_lon", "min_lat"), 4326) WHERE storm = '{storm_id}';"""
         pg_conn.execute(text(sql))
-
+        
         # This may not work and permissions may need to be added manually depending on who owns the table
         sql = f"GRANT ALL ON public.{destination_table} TO docker;"
         sql = f"GRANT SELECT ON public.{destination_table} TO hurricane_dash_geoserver;"
         pg_conn.execute(text(sql))
 
-        #log.info("Committing Transaction.")
+        log.info("Committing Transaction.")
         pg_conn.execute(text("COMMIT;"))
         log.info("Cached " + storm_id)
     return
@@ -177,6 +174,7 @@ def match_standard_names(e, dataset_id, standard_names):
             "vars" :  [station_id_var, "time", "latitude", "longitude"] + dataset_vars,
             "meta" : metadata
         }
+        log.info(f"Caching {dataset_id}")
     else:
         log.info(f"{dataset_id} doesn't have any matching variables.")
     return dataset
