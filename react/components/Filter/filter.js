@@ -26,6 +26,7 @@ import InfoScreen from "../message_screens/info_screen";
 import { empty_station_obj } from "../point_defaults";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { formatFilterDate, formatStormCategory, formatStormName } from "./filter_utils";
+import { FiltersSelected, FiltersSubmitted } from "./viewFilters";
 
 
 const ITEM_HEIGHT = 35;
@@ -45,7 +46,7 @@ export const ShowOptions = KeyboardDoubleArrowDownIcon;
 export const CloseOptions = KeyboardDoubleArrowUpIcon;
 
 
-export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoints }) {
+export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, startDate, endDate, startCategory, endCategory, polyFilterCoords, isDrawerOpen, filterStormName, showDateSelection, showCatSelection,filterQuery, showFilterSelected }) {
   const [showFilterIcons, setShowFilterIcons] = useState(false);
   const [showFilterOptions, setShowFilterOptions] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -72,7 +73,7 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
 
   const router = useRouter(); // Next.js useRouter
   const drawerWidth = 258;
-  const drawerOpen = state.isDrawerOpen;
+  const drawerOpen = isDrawerOpen;
 
 
   function handleClearAllFilters() {
@@ -107,12 +108,12 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
     
     const updatedParams = {
       //...selectedOptions, // Spread selected options correctly
-      startDate: state.startDate, // Ensure start and end dates are included
-      endDate: state.endDate,
-      polyCoords: state.polyFilterCoords,
-      startCategory: state.startCategory,
-      endCategory:state.endCategory,
-      stormName:state.filterStormName
+      startDate: startDate, // Ensure start and end dates are included
+      endDate: endDate,
+      polyCoords: polyFilterCoords,
+      startCategory: startCategory,
+      endCategory: endCategory,
+      stormName: filterStormName
 
     };
 
@@ -137,8 +138,8 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
     dispatch({ type: "SET_START_DATE", payload: null});
     dispatch({ type: "SET_END_DATE", payload: null});
     dispatch({ type: "SET_POLY_FILTER_COORDS", payload: ''});
-    dispatch({ type: "SET_START_CATEGORY", payload: ''});
-    dispatch({ type: "SET_END_CATEGORY", payload: ''});
+    dispatch({ type: "SET_START_CATEGORY", payload: null});
+    dispatch({ type: "SET_END_CATEGORY", payload: null});
     dispatch({ type: "SET_FILTER_STORM_NAME", payload: []});
     
 
@@ -152,119 +153,25 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
         <LoadingScreen />
       ) : (
         <>
-          <SpeedDial
-            ariaLabel="Filter Options"
-            sx={{
-              position: 'absolute', bottom: 65, right: 7,
-              display: { xs: "block", md: "none" }, '& .MuiSpeedDial-fab': {
-                backgroundColor: '#e55162',  // Change SpeedDial button background color
-                '&:hover': {
-                  backgroundColor: '#b9acac', // Change SpeedDial button hover color
-                }
-              }
-            }}
-            icon={<FilterAltIcon />}
-            
 
-            //onClick={handleSpeedDialToggle}
-            open={openSpeedDial}
-            onOpen={handleOpen}
-            onClose={handleClose}
-          >
-
-            <SpeedDialAction
-            className="filters-speed-dial"
-              icon={<CloseRoundedIcon/>}
-              tooltipTitle="Clear Filters"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleClearAllFilters()
-              }}
-            />
-            <SpeedDialAction
-              className="filters-speed-dial"
-              icon={<PublishRoundedIcon />}
-              tooltipTitle="Submit"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleFilterSubmit()
-              }}
-            />
           
-             {openSpeedDial && (input_filters.map((input_filter, index) => {
-              return (
-                <div className="filter-group" key={index}>
-                  <InputFilter
-                    input_filter={input_filter}
-                    showFilterOptions={showFilterOptions}
-                    setShowFilterOptions={setShowFilterOptions}
-                    dispatch={dispatch}
-                    filterStormName={state.filterStormName}
-                    setFilterStormName= {setFilterStormName}
-                    startDate= {state.startDate} 
-                    endDate= {state.endDate}
-                    polyCoords= {state.polyFilterCoords}
-                    startCategory= {state.startCategory}
-                    endCategory={state.endCategory}
-                  />
-                </div>
-              )
-            }))
-
-            }
-            {openSpeedDial && (<div className="filter-group">
-              <RenderDateFilter
-                state={state}
-                dispatch={dispatch}
-                setShowFilterOptions={setShowFilterOptions}
-
-              />
-
-            </div>
-            )
-
-            }
-            {openSpeedDial && (<div className="filter-group">
-              <RenderCategoryFilter
-                  state={state}
-                  dispatch={dispatch}
-                  setShowFilterOptions={setShowFilterOptions}
-                />
-
-            </div>
-            )
-
-            }
-            {/*openSpeedDial && (filters.map((filter, index) => {
-              return (
-
-                <div className="filter-group" key={index}>
-
-
-                  <Badges
-                    filter={filter}
-                    showFilterOptions={showFilterOptions}
-                    setShowFilterOptions={setShowFilterOptions}
-                    setSelectedOptions={setSelectedOptions}
-                    selectedOptions={selectedOptions}
-                  />
-
-                </div>
-
-
-              )
-            }))
-
-            */}
-
-          </SpeedDial>
-
           <Stack
-            direction="row"
-            spacing={0.1}
-            sx={{ display: { xs: "none", md: "flex" },  left: drawerOpen ? `${drawerWidth}px` : 0,
-            width: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%',   }}
+            direction="column"
+            spacing={0.4}
+            sx={{ display: 'flex'
+              }}
             className='filter-icons-list'>
+            
+            
+            
+            <Box className='historical_page_drawer_subheader'
+              sx={{
+                fontSize: '14px',
+                
+              }}
+              >Filter Storms</Box>
+            
+            
             {
               input_filters.map((input_filter, index) => {
                 return (
@@ -275,13 +182,13 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
                     showFilterOptions={showFilterOptions}
                     setShowFilterOptions={setShowFilterOptions}
                     dispatch={dispatch}
-                    filterStormName={state.filterStormName}
+                    filterStormName={filterStormName}
                     setFilterStormName= {setFilterStormName}
-                    startDate= {state.startDate} 
-                    endDate= {state.endDate}
-                    polyCoords= {state.polyFilterCoords}
-                    startCategory= {state.startCategory}
-                    endCategory={state.endCategory}
+                    startDate= {startDate} 
+                    endDate= {endDate}
+                    polyCoords= {polyFilterCoords}
+                    startCategory= {startCategory}
+                    endCategory={endCategory}
                   />
 
                   </div>
@@ -292,18 +199,24 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
 
             <div className="filter-group">
               <RenderDateFilter
-                state={state}
                 dispatch={dispatch}
                 setShowFilterOptions={setShowFilterOptions}
+                startDate= {startDate} 
+                endDate= {endDate}
+                showDateSelection= {showDateSelection}
               />
             </div>
             <div className="filter-group">
               <RenderCategoryFilter
-                  state={state}
                   dispatch={dispatch}
                   setShowFilterOptions={setShowFilterOptions}
+                  startCategory={startCategory}
+                  endCategory={endCategory}
+                  showCatSelection={showCatSelection}
                 />
             </div>
+            
+
             
 
             {/*
@@ -324,17 +237,39 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
             */}
 
             <Button
-              className="filter-submit-button"
+              className="filter-badge"
               onClick={handleFilterSubmit}
               startIcon={<PublishRoundedIcon />}>
-              Submit
+              Submit FILTER QUERY
             </Button>
             <Button
-              id="cancel-filter-icon"
-              className="filter-icons"
+              
+              className="filter-badge"
               onClick={handleClearAllFilters}>
-              X
+              CLEAR FILTER QUERY
             </Button>
+
+            <div className="filter-group">
+              {(showFilterSelected)  ? (
+                <>
+                  <FiltersSelected
+                  startDate={startDate}
+                  endDate={endDate}
+                  startCategory={startCategory}
+                  endCategory={endCategory}
+                  polyFilterCoords={polyFilterCoords}
+                  filterStormName={filterStormName}/>
+                  
+                </>
+                ): (
+                  <>
+                  <FiltersSubmitted 
+                filterQuery={filterQuery}/>
+
+                
+                  </>
+                )}
+            </div>
           
           </Stack>
         
