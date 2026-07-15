@@ -64,42 +64,49 @@ export function alignMergedData(merged_data, stormTimes, stationTimes) {
   const alignedMergedData = {};
 
   for (const category in merged_data) {
-    alignedMergedData[category] = merged_data[category].map(varObj => {
-      const varKey = Object.keys(varObj)[0];
-      const variable = varObj[varKey];
-      
-      // figure out whether it is storm or station data
-      const times = varKey.startsWith('storm') ? stormTimes : stationTimes;
+	// Try/catch to avoid issues with merging categories that don't actually have data
+	try{
+		alignedMergedData[category] = merged_data[category].map(varObj => {
+		const varKey = Object.keys(varObj)[0];
+		const variable = varObj[varKey];
+		
+		// figure out whether it is storm or station data
+		const times = varKey.startsWith('storm') ? stormTimes : stationTimes;
+		const timeToValue = new Map(times.map((time, idx) => [time, variable.data[idx]]));
+		const alignedData = unifiedTimes.map(time => timeToValue.get(time) ?? null);
 
-      const timeToValue = new Map(times.map((time, idx) => [time, variable.data[idx]]));
-
-      const alignedData = unifiedTimes.map(time => timeToValue.get(time) ?? null);
-
-      return {
-        [varKey]: {
-          name: variable.name,
-          data: alignedData
-        }
-      };
-    });
+		return {
+			[varKey]: {
+			name: variable.name,
+			data: alignedData
+			}
+		};
+		});
+	}
+	catch(error){
+		console.log("Issue merging data with category: " + category)
+		console.error(error)
+	}
   }
 
   return { unifiedTimes, alignedMergedData };
 }
 
 export function mergeData(station_data, storm_data){
+	// TODO: Can turn into a function to avoid duplication
 	const merged_data = JSON.parse(JSON.stringify(storm_data)); // deepclone storm_data
 	station_data.forEach((varObj)=>{
 	const variable = Object.values(varObj)[0];
-
-
 		// sea height
-		if (variable.standardName.includes('wave') && variable.standardName.includes('height'))
-			{merged_data['Wave Height'].push(
+		if (variable.standardName.includes('wave') && variable.standardName.includes('height')){
+			//Check if wave height exists in the storm data before pushing. If not, create empty array
+			if(!('Wave Height' in merged_data)){
+				merged_data['Wave Height'] = []}
+			merged_data['Wave Height'].push(
 				{[`station${variable.name}`]:{
 					data: variable.data, 
 					name: variable.displayName }}
-			)}
+		)}
 			// wind speed and gust
 		if (variable.standardName.includes('wind') && variable.standardName.includes('speed'))
 			{merged_data['Wind Speed'].push(
