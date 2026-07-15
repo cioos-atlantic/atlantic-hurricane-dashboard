@@ -122,13 +122,13 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
       startIcon={input_filter.Icon ? <input_filter.Icon /> : null}
       endIcon={ !showFilterOptions[input_filter.name] ? (<ShowOptions/>):(<CloseOptions/>)}
       sx={{...buttonStyle,
-        display: { xs: "none", md: "inline-flex" }}
+        display: "inline-flex",}
       }
     >{input_filter.display_name}
 
     </Button>
 
-    {smallScreenIconButton(input_filter.display_name, handleIconClick, buttonStyle, input_filter.Icon)}
+    
 
     
     
@@ -137,17 +137,17 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
       <Paper elevation={3} 
         key={input_filter.name}
         className="input-filter"
-        sx={{top:{xs: '6px', md: '100%',},
-        right:{xs: '100%', md: '0px',},
-        width:'210px',
+        sx={{top:'1px',
+        right:'0px',
+        
         
         }}>
-          <Stack direction="row"  spacing={4} sx={{ mt: {xs: 0.2, md: 0.5 }, mb:{xs: 0.8, md: 1 }, justifyContent: 'center' }}>
+          <Stack direction="row"  spacing={4} sx={{ mt: 0.5, mb: 1, justifyContent: 'center' }}>
                       
         
            
-            <Button size="small" className="filter-submit-button" onClick={handleClearAll}>Clear</Button>
-            <Button size="small" className="filter-submit-button" onClick={() => setShowFilterOptions({ ...showFilterOptions, [input_filter.name]: false })}>
+            <Button size="small" className="shortcut-button" onClick={handleClearAll}>Clear</Button>
+            <Button size="small" className="shortcut-button" onClick={() => setShowFilterOptions({ ...showFilterOptions, [input_filter.name]: false })}>
               Close
             </Button>
     
@@ -200,7 +200,7 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
               sx={{ 
                   marginRight: 1.5,
                   color: '#e55162', 
-                  padding: {sm:'0px', md:'6px'}, 
+                  padding: '6px', 
                   alignSelf: 'center' }}
               checked={selected}
             />

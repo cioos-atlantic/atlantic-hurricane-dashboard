@@ -15,14 +15,14 @@ header {
   top: 0;
   background-color: #e55162; /* Light red background for header */
   z-index: 9000; /* High z-index to ensure header stays on top */
-  height: 60px;
+  height: 40px;
   
 }
 
 header img.logo {
   float: left; /* Align logo to the left */
   background-color: white; /* White background for logo */
-  height: 60px; /* Matches header height */
+  height: 40px; /* Matches header height */
   width: 80%; /* absolute width for logo */
   padding-left: 1.5rem; /* Spacing on left */
   padding-right: 1.5rem; /* Spacing on right */
@@ -61,15 +61,8 @@ header_nav{
   width:100%
 
 }
-header_nav{
-  float: left; /* Align navigation links to the left */
-  width: 100%;
-  display: block;
-  justify-content: space-between;
-  padding: 0.1rem;
-  align-items: center;
 
-}
+
 .header_nav .menu_icon_small_screen{
   color:#ffffff;
   fill:#ffffff;
@@ -150,11 +143,18 @@ footer {
 }
 
 .leaflet-control-container .leaflet-top {
-  top: 95px; /* Adjust top to avoid overlapping header */
+  top: 40px; /* Adjust top to avoid overlapping header */
 }
 
+@media (max-width: 480px) {
+  .leaflet-control-container .leaflet-top {
+    top: 135px;
+  }
+}
+
+
 .leaflet-control-container .leaflet-bottom {
-  bottom: 50px; /* Adjust bottom to avoid overlapping footer */
+  bottom: 35px; /* Adjust bottom to avoid overlapping footer */
   
 }
 
@@ -452,11 +452,11 @@ footer {
 
 .historical_storm_search_result{
   text-align: left;
-  padding: 12px;
+  padding: 8px;
   background-color: white;
-  height: 300px;
+  height: 260px;
   border-radius: 4px;
-  max-height: 480PX;
+  max-height: 480px;
   width: 100%;
   overflow-y: auto;
   position: relative;
@@ -475,8 +475,9 @@ footer {
   top: 0;
   z-index: 1;
   background-color: lightgrey;
-  padding: 8px;
+  padding: 2px;
   border-bottom: 2px solid #ccc;
+  width: 100%;
 }
 
 
@@ -582,23 +583,23 @@ footer {
   border-radius: 4px;
   border: 1px solid white;
   overflow: auto;
-  max-height: 500px;
+  max-height: 250px;
   width: 100%;
   position: relative;
 
 }
 
 .view-filter-space{
-  text-align: left;
-  padding: 12px;
+  text-align: center;
+  padding: 8px;
   background-color: #e55162;
   border-radius: 4px;
   border: 1px solid white;
   overflow: auto;
   width: 100%;
   position: relative;
-  max-height: 200px;
   font-size: 12px;
+  min-height: 200px;
 
 }
 
@@ -682,6 +683,8 @@ footer {
   background-color: #e55162 !important;
   color: white !important;
   font-weight: bold !important;
+  position: sticky;
+  bottom: 37px;
 
 }
 
@@ -712,10 +715,10 @@ footer {
 
 .filter-icons-list{
   z-index: 2999;
-  top: 65px;
-  position: absolute;
+  position: relative;
   justify-content: center;
   align-items: center;
+  width: 100%;
   
 
 }
@@ -735,9 +738,17 @@ footer {
 
 
 
-button.filter-badge{
-  
-  border: 1px solid #e55162 !important;
+.filter-badge{
+  text-align : center !important;
+  align-content : center !important;
+  width: 100%;
+  background-color: white !important;
+  color: #e55162 !important;
+  font-weight: bold !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  /*padding: 4px;
+  /*border: 1px solid #e55162 !important;
   
   margin: 0.8px;
   cursor: pointer;
@@ -745,11 +756,11 @@ button.filter-badge{
   justify-content: center !important;
   position: relative;
   max-width: 100%;
-  font-size: 12px !important;
-  /*height: 32px !important; */
-  border-radius: 16px !important;
+  
+  /*height: 32px !important; 
+
   transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  text-transform: none !important;
+  text-transform: none !important;*/
 }
 
 
@@ -759,6 +770,7 @@ button.filter-badge{
 .filter-group {
   position: relative;
   display: inline-block;  /* Keeps badges inline */
+  width: 100%;
 }
 
 .filter-dropdown-menu {
@@ -799,10 +811,12 @@ button.filter-badge{
   display: inline-flex;
   max-width: 100%;
   font-size: 0.8125rem !important;
-  height: 32px;
-  border-radius: 16px !important;
+  height: 30px;
+  min-width: 74px;
+  width:auto;
   transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   text-transform: none !important;
+  padding: 4px !important;
 }
 
 
@@ -844,19 +858,19 @@ button.filter-badge{
 
 
 .date-card-content{
-  padding: 9px !important;
+  padding: 1px !important;
   text-align: center !important;
-  overflow: hidden;
+  margin-bottom: 6px;
 }
 
 
 .input-filter{
-  position: absolute;
-  padding: 6px;
+  position: relative;
+  padding: 2px;
   height: auto;
-  border: 2px solid #e55162;
   background-color: #f4f4f4;
-  border-radius: 8px;
+  width: 100%;
+  top:1px;
   /*display: flex;
   flex-direction: column;*/
   
@@ -935,17 +949,26 @@ button.filter-badge{
 
 }
 
-.info-guide{
+.tour-reload{
   z-index: 3000;
   position: fixed !important;
-  top: 68px !important;
-  right: 9px !important;
+  display: flex !important;
+  top: 95px !important;
   text-align: center !important;
-  height: 35px !important;
-  width: 35px !important;
+  height: 40px !important;
+  width: 40px !important;
   padding: 0px !important;
   font-size: 0px !important;
   color:  #1E90FF !important;
+  border: rgba(0, 0, 0, 0.7) 3px solid !important;
+  background: white !important;
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+
+}
+
+.tour-reload :hover{
+  background:transparent !important;
+  color:  #e55162 !important;
 
 }
 
@@ -1108,3 +1131,101 @@ button.filter-badge{
 .marker-cluster span {
 	line-height: 30px;
 	}
+
+
+.drawer_close_button {
+  position: absolute !important;
+  z-index: 1000 !important;
+  top: 50px !important;
+  width: 40px !important;
+  height: 40px !important;
+  background-color: white !important;
+  border: 2px solid #e55162 !important;
+  border-radius: 50% !important;
+  color: #e55162 !important;
+  font-size: 25px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+  font-weight: bolder !important;
+  min-width: auto !important;
+}
+
+
+.drawer_close_button:hover {
+  background-color: #e55162; /* Change background color on hover */
+  color: #ffffff; /* Change text color on hover */
+}
+.drawer_close_button:focus {
+  outline: none; /* Remove outline when focused */
+  box-shadow: 0 0 0 3px rgba(229, 81, 98, 0.5); /* Add a glow around the button */
+}
+.map_ruler{
+  position: absolute;
+  top: 180px !important; /* Position above the footer */
+  right: 10px !important; /* Position from the right edge */
+  z-index: 1000 !important; /* Ensure it appears above the map */
+  width: 34px !important;
+  height: 34px !important;
+  min-width: auto;
+  border: 2px solid rgba(0,0,0,0.2);
+  box-shadow: none;
+  border-radius: 4px;
+}
+
+.map_ruler:hover{
+  background-color: #ddd !important;
+  border: 2px solid #e55162;
+}
+
+leaflet-control-attribution
+{bottom: 10px !important; /* Position above the footer */
+position: absolute !important;
+}
+
+
+.tour-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tour-modal {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.tour-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.primary {
+  background: #1976d2;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+}
+
+.secondary {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 6px;
+}

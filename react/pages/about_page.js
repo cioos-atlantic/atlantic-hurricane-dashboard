@@ -146,7 +146,7 @@ export default function About(){
  */
 
 export function handleStormNameClick(stormName, stormYear, router){
-  const url = `/?storms=historical&name=${stormName}&season=${stormYear}`;
+  const url = `/?page=historical&name=${stormName}&season=${stormYear}`;
   console.log(url)
   router.push(url);
   

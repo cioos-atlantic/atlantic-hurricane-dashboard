@@ -15,8 +15,8 @@ export const initialMapState = {
   drawerButtonClicked: '',
   startDate: null,
   endDate: null,
-  startCategory: '',
-  endCategory: '',
+  startCategory: null,
+  endCategory: null,
   showCatSelection: false,
   showDateSelection: false,
   isDrawerOpen: true,
@@ -88,8 +88,8 @@ export function mapReducer(state, action) {
         polyFilterCoords: '',
         startDate: null,
         endDate: null,
-        startCategory: "",
-        endCategory: "",
+        startCategory: null,
+        endCategory: null,
       };
       case 'RESET_FILTERS':
         return {
@@ -97,8 +97,8 @@ export function mapReducer(state, action) {
           polyFilterCoords: '',
           startDate: null,
           endDate: null,
-          startCategory: "",
-          endCategory: "",
+          startCategory: null,
+          endCategory: null,
           filterStormName:"",
           selectedStormNames:[]
         };

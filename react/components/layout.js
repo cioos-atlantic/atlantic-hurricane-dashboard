@@ -10,7 +10,10 @@ import Grid from '@mui/material/Grid2';
 import { Box } from "@mui/material";
 import HeaderNav from "./header_nav";
 import { loadSpace } from "@usersnap/browser";
-
+import { TourProvider } from "@reactour/tour";
+import { getTourSteps } from "./Tour/tourSteps";
+import UserGuide from "@/pages/user-guide";
+import CookieBanner from "./Tour/preferenceCookieBanner";
 
 
 import { basePath } from "@/next.config";
@@ -32,6 +35,7 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
   const [isMounted, setIsMounted] = useState(false);
 
   const router = useRouter();
+  const routerReady = router?.isReady;
 
   const spaceKey = 'dbba29d9-e060-4d56-8a09-923ef07e516d'
   // Will need to find some better way to store as secret
@@ -48,9 +52,19 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
   }, []);
 
 
-  const active_storms = querystring.query.storms == "active";
-  const historical_storms = querystring.query.storms == "historical";
-  const about_page = router?.query?.storms === "hurricanes";
+  
+
+  const mode = router?.query?.page;
+  
+
+
+  const isActive = mode === "active" || !mode; // Default to active if no mode is specified   
+  const isHistorical = mode === "historical";
+  const isAbout = mode === "about";
+  const isUserGuide = mode === "user-guide";
+
+  const isTourReady =
+    routerReady;
 
   // useMemo() tells React to "memorize" the map component.
   // Without this, the map will get redrawn by many interactions 
@@ -65,7 +79,7 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
 
   
   useEffect(() => {
-    if (active_storms) {
+    if (isActive) {
       setSourceType("active");
       fetch(`${basePath}/api/query_stations`)
         .then((res) => res.json())
@@ -73,11 +87,45 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
           setStationPoints(data);
         })
     };
-    if (historical_storms)
+    if (isHistorical)
       { setSourceType("historical")
         
       };
-  }, [active_storms, historical_storms]);
+  }, [isActive, isHistorical]);
+
+
+ 
+    
+  
+ 
+    
+  const steps = useMemo(() => {
+
+    return getTourSteps({
+      isActive,
+      isHistorical,
+    });
+  }, [ isActive, isHistorical]);
+
+
+  if (!isMounted) return null;
+
+  let pageContent;
+
+  if (isAbout) {
+    pageContent = <About />;
+  } else if (isUserGuide) {
+    pageContent = <UserGuide />;
+  } else {
+    pageContent = (
+      <MapWithNoSSR
+        station_data={station_points}
+        source_type={sourceType}
+        setStationPoints={setStationPoints}
+        isTourReady={isTourReady}
+      />
+    );
+  }
 
   
 
@@ -93,13 +141,13 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
       </Head>
       <header className={styles.header}>
         <Grid container alignItems="center" spacing={1}  
-        sx={{ justifyContent: 'space-between', flexWrap: 'nowrap',  maxHeight: { xs: '80px', sm: '100px', md: '120px', lg: '140px' }, // Responsive max height for the header 
+        sx={{ justifyContent: 'space-between', flexWrap: 'nowrap',  maxHeight: '40px', // Responsive max height for the header 
         //maxWidth: '50%'
         }}
         >
           {/* Logo Section */}
           <Grid size ='auto' 
-                sx={{maxWidth: '50%'}} >
+                sx={{maxWidth: '40%'}} >
           
               <a href={logo.href}>
                 <Image
@@ -114,21 +162,6 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
             
           </Grid>
           
-
-          {/* Content Section */}
-          <Grid size ='auto' >
-          
-            {home ? (
-              <>
-                {/* Home Page Header Content */}
-              </>
-            ) : (
-              <>
-                {/* Other Page Header Content */}
-              </>
-            )}
-
-          </Grid>
           
 
           {/* Navigation Section */}
@@ -147,31 +180,20 @@ export default function Layout({ children, home, topNav, logo, querystring }) {
           
         </Grid>
       </header>
-      {!isMounted ? null : about_page ?  (
-        <About
-            
-            />):(<>
       <main className="body">
-        
-
-
-        <MapWithNoSSR
-          station_data={station_points}
-          source_type={sourceType}
-          setStationPoints={setStationPoints}
-          
-
-        />
-      </main>
-      </>)}
+      
+        {pageContent}
+        </main>
+    
       <footer>
         <Box sx={{
-          height:{ xs: '20px', sm: '30px', md: '35px', lg: '50px', xl: '50px', xxl: '50px' }, // if changed, remember to change the station dashboard bottom in the station_dashboard.js
+          height:{ xs: '20px', sm: '30px', md: '35px',}, // if changed, remember to change the station dashboard bottom in the station_dashboard.js
         }}>
         <FooterNav></FooterNav>
         </Box>
         
       </footer>
+      <CookieBanner />
     </div>
   )
 }
