@@ -23,6 +23,9 @@ import InfoScreen from "./message_screens/info_screen";
 import { IconButton } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 import { useMediaQuery, Box, useTheme } from "@mui/material";
+import { LeafletHash } from "./leaflet_hash";
+import ZoomHomeControl from "./zoom_home";
+
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
@@ -39,6 +42,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
   
   
   console.debug("Storm Points in map.js: ", state.storm_points);
+  const hasHash = typeof window !== "undefined" && window.location.hash?.length > 0;
 
 
     
@@ -93,12 +97,15 @@ export default function Map({ children, station_data, source_type,  setStationPo
           
 
         <MapContainer
-          center={defaultPosition}
-          zoom={defaultZoom}
+          {...(!hasHash && {
+        center: defaultPosition,
+        zoom: defaultZoom
+      })}
           style={{ height: "100%", width: "100%" }}
           worldCopyJump={true}
           zoomControl={false}
           ref={setMap}
+          defaultExtentControl={true}
           whenReady={() => {
             console.log("Map is fully ready!");
             
@@ -106,7 +113,11 @@ export default function Map({ children, station_data, source_type,  setStationPo
 
           
           
-        > <CustomZoomControl /> 
+        > 
+        <LeafletHash />
+        <ZoomHomeControl />
+        {//<CustomZoomControl />
+         }
           
           
 
