@@ -16,18 +16,18 @@ import { RenderPlotlyRose } from "@/components/station_dashboard/plotly_rose";
 
 export function RenderSmallDashboard({selected_station, hover_point, source_type, time, storm_points, setIsDashOpen, setIsStormDashOpen, setIsStationDashOpen  }){
 	const stationData = selected_station;
-	console.log(stationData);
 	const stationName = stationData[0];
   const stationValues = stationData[1];
 
   const hoverPointTime = fetch_value(hover_point, ["TIMESTAMP", "ISO_TIME"]);
-  console.log(hoverPointTime);
 	const stationDataDict = parseStationData(stationValues)
-	console.log(stationDataDict);
 	const ibtracs_link = 'https://www.ncei.noaa.gov/products/international-best-track-archive';
 
-	const [stationSummary, stationDisplayName, institution, institutionLink] = getStationInfo(stationValues, stationName, source_type, time);
-  console.log(stationSummary, stationDisplayName, institution, institutionLink);
+	//const [stationSummary, stationDisplayName, institution, institutionLink] = getStationInfo(stationValues, stationName, source_type, time);
+  	const stationDisplayName = stationValues?.properties?.dataset_title || "Unknown Station";
+  	const institution = stationValues?.properties?.institution || "Unknown Institution";
+  	const institutionLink = stationValues?.properties?.institution_link || "#";  
+  	//console.log(stationSummary, stationDisplayName, institution, institutionLink);
 	const [stormName, stormTimes, stormType, stormDataDict, stormCategory] = parseStormData(storm_points);
 
 	const mergedData = mergeData(stationDataDict, stormDataDict);
