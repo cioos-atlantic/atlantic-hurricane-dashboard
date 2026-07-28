@@ -5,21 +5,21 @@ import { basePath } from '@/next.config.js';
 export const storm_cat = {
   "TD": {
     "min": 0,
-    "max": 62,
+    "max": 33,
     "name": { "en": "Tropical Depression", "fr": "Dépression tropicale" },
     "img":  `${basePath}/storm_types/test/TD.svg`,
-    "sub_info":"sustained winds of below 63 km/h (34–63 knots)",
+    "sub_info":"sustained winds of below 62 km/h (33 knots)",
     "img_height": 20,
     "img_width": 20,
     "info": "This is when tropical disturbance acquires a spin, the maximum sustained wind speed is less than 34 knots (63 km/h).",
     "source": "https://wmo.int/content/classification-of-tropical-cyclones",
     "more_info_link": "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html", 
-    "chart_color":'#33e0ff'
+    "chart_color":'#B2EBF2'
 
   },
   "TS": {
-    "min": 63,
-    "max": 117,
+    "min": 34,
+    "max": 63,
     "name": { "en": "Tropical Storm", "fr": "Tempête tropicale" },
     "img":  `${basePath}/storm_types/test/TS.svg`,
     "img_height": 38,
@@ -28,11 +28,11 @@ export const storm_cat = {
     "sub_info":"sustained winds of 63-117 km/h (34–63 knots)",
     "source": "https://wmo.int/content/classification-of-tropical-cyclones",
     "more_info_link": "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html",
-    "chart_color":'#7e7bb0'
+    "chart_color":'#2A9D8F'
   },
-  "CAT1": {
-    "min": 118,
-    "max": 153,
+  "C1": {
+    "min": 64,
+    "max": 82,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 1", "fr": "catégorie 1" },
@@ -41,12 +41,12 @@ export const storm_cat = {
     "sub_info":"sustained winds of 118-153 km/h (64–82 knots)",
     "more_info_link": "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html",
     "source": "https://wmo.int/content/classification-of-tropical-cyclones",
-    "chart_color":'#a25d5e'
+    "chart_color":'#277DA1'
   }
   ,
-  "CAT2": {
-    "min": 154,
-    "max": 177,
+  "C2": {
+    "min": 83,
+    "max": 95,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 2", "fr": "catégorie 2" },
@@ -55,12 +55,12 @@ export const storm_cat = {
     "sub_info":"sustained winds of 153-176 km/h (83–95 knots)",
     "more_info_link": "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html",
     "source": "https://wmo.int/content/classification-of-tropical-cyclones",
-    "chart_color":'#a25d5e'
+    "chart_color":'#FFD54F'
   }
   ,
-  "CAT3": {
-    "min": 178,
-    "max": 208,
+  "C3": {
+    "min": 96,
+    "max": 112,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 3", "fr": "catégorie 3" },
@@ -69,12 +69,12 @@ export const storm_cat = {
     "sub_info":"sustained winds of 177-207 km/h (96–112 knots)",
     "more_info_link": "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html",
     "source": "https://wmo.int/content/classification-of-tropical-cyclones",
-    "chart_color":'#a25d5e'
+    "chart_color":'#F3722C'
   }
   ,
-  "CAT4": {
-    "min": 209,
-    "max": 250,
+  "C4": {
+    "min": 113,
+    "max": 136,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 4", "fr": "catégorie 4" },
@@ -83,12 +83,12 @@ export const storm_cat = {
     "sub_info":"sustained winds of 210-252 km/h (113–136 knots)",
     "more_info_link": "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html",
     "source": "https://wmo.int/content/classification-of-tropical-cyclones",
-    "chart_color":'#a25d5e'
+    "chart_color":'#D62828'
   }
   ,
-  "CAT5": {
-    "min": 251,
-    "max": Infinity,
+  "C5": {
+    "min": 137,
+    "max": 9999,
     "img_height": 38,
     "img_width": 20,
     "name": { "en": "Category 5", "fr": "catégorie 5" },
@@ -97,7 +97,7 @@ export const storm_cat = {
     "sub_info":"sustained winds starting at 137 knots (254 km/h)",
     "more_info_link": "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html",
     "source": "https://wmo.int/content/classification-of-tropical-cyclones",
-    "chart_color":'#a25d5e'
+    "chart_color":'#7B1FA2'
   },
 
   
@@ -107,6 +107,6 @@ export const storm_cat = {
     "img_height": 20,
     "img_width": 20,
     "info": "Storm type not yet reported",
-    "chart_color":'#3371ff'
+    "chart_color":'grey'
   },
 }

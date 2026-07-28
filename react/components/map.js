@@ -22,7 +22,9 @@ import { mapReducer, initialMapState } from "./mapReducer";
 import InfoScreen from "./message_screens/info_screen";
 import { IconButton } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
-import { useMediaQuery, Box, useTheme } from "@mui/material";
+import { useMediaQuery, Box, useTheme, Tooltip, Button } from "@mui/material";
+import MeasureControl from 'react-leaflet-measure';
+
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
@@ -35,10 +37,23 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const [state, dispatch] = useReducer(mapReducer, initialMapState);
   const [map, setMap] = useState()
   const theme = useTheme();
+  const [isRulerActive, setIsRulerActive] = useState(false);
 
   
   
   console.debug("Storm Points in map.js: ", state.storm_points);
+  const measureOptions = {
+    position: 'topright',
+    primaryLengthUnit: 'meters',
+    secondaryLengthUnit: 'kilometers',
+    primaryAreaUnit: 'sqmeters',
+    secondaryAreaUnit: 'acres',
+    activeColor: '#db4a29',
+    completedColor: '#9b2d14',
+    captureZIndex: 10000,
+    onMeasureStart: (e) => console.log('Measurement started:', e),
+    onMeasureFinish: (e) => console.log('Measurement finished:', e),
+  };
 
 
     
@@ -69,14 +84,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
       
       }
         
-        { source_type === "historical" &&
-          <RenderFilter
-          clearShapesRef={clearShapesRef} // Pass the ref to 
-          state={state}
-          dispatch={dispatch}
-          setStationPoints={setStationPoints}
-          />
-        }
+       
         {
           <RenderDashboards
             source_type={source_type}
@@ -107,6 +115,17 @@ export default function Map({ children, station_data, source_type,  setStationPo
           
           
         > <CustomZoomControl /> 
+
+          
+          {source_type === "active" && (
+            <MeasureControl {...measureOptions} />
+          )}
+
+       
+          
+          
+          
+       
           
           
 
@@ -317,10 +336,11 @@ export default function Map({ children, station_data, source_type,  setStationPo
             </LayersControl.Overlay>
           </LayersControl>
 
-          {<RenderSpatialFilter
-          ref={clearShapesRef} 
-          setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
-          />} {/* Calling the EditControl function here */}
+          { source_type == "historical" &&
+              (<RenderSpatialFilter
+                ref={clearShapesRef} 
+                setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
+                />)} {/* Calling the EditControl function here */}
         </MapContainer>
 
         { map && (<Drawer
@@ -331,6 +351,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
             state={state}
             dispatch={dispatch}
             map={map}
+            clearShapesRef= {clearShapesRef}
           />)}
       </div>
     </div>

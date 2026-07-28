@@ -16,7 +16,7 @@ import { Tooltip, Box, Button } from '@mui/material';
  * `styles.drawer_interior`. Depending on the `source_type`, either the `ActiveStormList`,
  * `HistoricalStormList`, or a placeholder for the Home Page is rendered within the `Drawer` component.
  */
-export default function Drawer({ children, element_id, classes, source_type, setStationPoints, state, dispatch, map }) {
+export default function Drawer({ children, element_id, classes, source_type, setStationPoints, state, dispatch, map, clearShapesRef }) {
 
     let sideClass = null;
     
@@ -40,18 +40,14 @@ export default function Drawer({ children, element_id, classes, source_type, set
             <Box id={element_id} 
                     className={styles.drawer + " h-100 " + sideClass}
                     sx={{
-                        maxWidth:{xs:'258px', sm:'258px', md:'258px', lg:'258px',},
+                        maxWidth:'350px',
                         width:{xs:'100%', sm:'50%', md:'50%', lg:'50%',},
                         display: state.isDrawerOpen ? 'block' : 'none',
                     }}
                     onClick={(e) => e.stopPropagation()} // Prevent closing on internal clicks
             >
-                <button className={styles.closeButton}
-                onClick={() => {//setIsDrawerOpen(false); 
-                                dispatch({ type: "TOGGLE_DRAWER", payload: false});} }
-                >
-                    X
-                </button>
+                
+                
                 <Box className={styles.drawer_interior}
                     
                     >
@@ -82,6 +78,12 @@ export default function Drawer({ children, element_id, classes, source_type, set
                                 filterQuery={state.filterQuery}
                                 filterStormName={state.filterStormName}
                                 showFilterSelected={state.showFilterSelected}
+                                clearShapesRef={clearShapesRef}
+                                isDrawerOpen={state.isDrawerOpen}
+                                showDateSelection= {state.showDateSelection}
+                                showCatSelection={state.showCatSelection}
+
+
                                 
                         />
                         ) : 
@@ -96,21 +98,28 @@ export default function Drawer({ children, element_id, classes, source_type, set
             </Box>
 
 
-            <Tooltip title="Open storm menu" arrow
+            <Tooltip
+                title={state.isDrawerOpen ? "Close storm menu" : "Open storm menu"}
+                arrow
                 sx={{
                     "& .MuiTooltip-tooltip": {
-                    backgroundColor: "white", // Custom background color
-                    color: "#e55162", // Custom text color
-                    fontSize: "0.9rem", // Adjust font size
+                    backgroundColor: "white",
+                    color: "#e55162",
+                    fontSize: "0.9rem",
                     },
-                }}>
-                <Button
-                className={styles.openButton}
-                onClick={() => dispatch({ type: "TOGGLE_DRAWER", payload: true})} // Open the drawer
-                sx={{
-                    display: !state.isDrawerOpen ? 'grid' : 'none',
                 }}
-                >{'>'}
+                >
+                <Button
+                    className='drawer_close_button'
+                    sx={{left: state.isDrawerOpen ? "355px" : "10px",}}
+                    onClick={() =>
+                    dispatch({
+                        type: "TOGGLE_DRAWER",
+                        payload: !state.isDrawerOpen,
+                    })
+                    }
+                >
+                    {state.isDrawerOpen ? "X" : ">"}
                 </Button>
             </Tooltip>
         </>

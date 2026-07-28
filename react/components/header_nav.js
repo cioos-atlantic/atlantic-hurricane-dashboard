@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 import { Box, IconButton, Drawer, List, ListItem, ListItemText } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useSearchParams } from "next/navigation";
+import { basePath } from '@/next.config';
 
 
-export default function HeaderNav({ children, navItems }) {
+export default function HeaderNav({ children, navItems, isActivePage }) {
     const [headerDrawerOpen, setHeaderDrawerOpen] = useState(false);
+    const searchParams = useSearchParams();
+    const page = searchParams.get("storms");
+    const currentUrl = `${basePath}?storms=${page}`;
+    
 
     const toggleDrawer = (open) => (event) => {
         if (event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
@@ -41,17 +47,30 @@ export default function HeaderNav({ children, navItems }) {
                 sx={{
                     display: { xs: "none", md: "flex" },}}
             >
-                {navItems.map((link) => (
-                    <Box component="li" key={link.href}>
-                        <a
+                {
+                    navItems.map((link) => {
+                        const isActivePage = currentUrl === link.href;
+
+                        return (
+                        <Box
+                            component="li"
+                            key={link.href}
+                            sx={{
+                            fontWeight: isActivePage ? "bolder" : "normal",
+                            borderBottom: isActivePage ? "3px solid white" : "none",
+                            color: isActivePage ? "black !important" : "inherit",
+                            }}
+                        >
+                            <a
                             href={link.href}
                             className="header-drawer-big-screens"
-                            
-                        >
+                            >
                             {link.name}
-                        </a>
-                    </Box>
-                ))}
+                            </a>
+                        </Box>
+                        );
+                    })
+                    }
             </Box>
 
             {/* Drawer for Small Screens */}
