@@ -468,6 +468,7 @@ def main():
     server = config.get("ERDDAP", "server")
     e = ERDDAP(server=server)
 
+    focus_stations = config.get("ERDDAP", "focus_stations").splitlines()
     ignore_stations = config.get("ERDDAP", "ignore_stations").splitlines()
     standard_names = config.get("ERDDAP", "standard_names").splitlines()
     time_buffer = config.getint("ERDDAP", "time_buffer")
@@ -501,7 +502,13 @@ def main():
             max_time = storm['ISO_TIME']['max']
             if(post_storm_period>0):
                 max_time += timedelta(days=post_storm_period)
-            dataset_list = get_erddap_datasets(e, min_time, max_time, bbox)
+
+            dataset_list = []
+            # If certain datasets are specified, only grab those - otherwise search for applicable datasets
+            if(focus_stations):
+                dataset_list = focus_stations
+            else:
+                dataset_list = get_erddap_datasets(e, min_time, max_time, bbox)
             cached_data = []
             # Store in shared list to reduce calls and avoid overwriting for active cache
             for dataset_id in dataset_list:
@@ -531,7 +538,13 @@ def main():
         else:
             max_time = datetime.combine(max_time.date(), datetime.min.time()) + timedelta(hours=12)
         min_time = max_time - timedelta(days=active_data_period)
-        dataset_list = get_erddap_datasets(e, min_time, max_time, bbox)
+
+        dataset_list = []
+        # If certain datasets are specified, only grab those - otherwise search for applicable datasets
+        if(focus_stations):
+            dataset_list = focus_stations
+        else:
+            dataset_list = get_erddap_datasets(e, min_time, max_time, bbox)
         create_table_from_schema(pg_engine=engine, table_name=pg_erddap_cache_active_table, schema_file=erddap_cache_active_schema)
         # Store in shared list to reduce calls and avoid overwriting for active cache
         cached_data = []
