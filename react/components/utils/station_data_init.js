@@ -5,15 +5,15 @@ export default function station_data_init(features, filter_station, skip_data=tr
     try {
         let station_data = {}
         for (let feature in features){
-            const station_name = features[feature]['properties']['station']
+            const station_id = features[feature]['properties']['station_id']
             // Can change the WFS query to only get one station, but for now easier to filter out here
-            if(!filter_station || filter_station==station_name){
-                if(station_data[station_name]) {
+            if(!filter_station || filter_station==station_id){
+                if(station_data[station_id]) {
                     //Theory that data is already sorted, but perhaps not so - it's not - all alphabetical
-                    station_data[station_name]['properties']['max_time'] = features[feature]['properties']['max_time']
+                    station_data[station_id]['properties']['max_time'] = features[feature]['properties']['max_time']
                 }
                 else {
-                    station_data[station_name] = features[feature];
+                    station_data[station_id] = features[feature];
                 }
             }
         }

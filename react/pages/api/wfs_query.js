@@ -177,6 +177,7 @@ export async function wfs_query(storm_name, season, source, source_type, storm_i
         // cioos-atlantic:erddap_cache
         wfs_sources.push("erddap_active_cache_lite");
 
+        // Use the view 'erddap_active_cache_lite' which cuts out the data and only displays identification and position
         let erddap_source = "erddap_active_cache_lite&sortby=station_id,max_time"
         const erddap_features_url = build_wfs_query(workspace + erddap_source, [], source_type)
 
@@ -216,7 +217,7 @@ export async function wfs_data_query(station_id, storm){
     let source_type = 'ACTIVE'
     data_filters.push('station_id=%27' + station_id + '%27')
     if(storm == "ACTIVE"){
-        station_data_source = "erddap_active_cache&sortby=station_id,max_time"
+        station_data_source = "erddap_active_cache_lite&sortby=station_id,max_time"
     }
     else{
         station_data_source = "erddap_historical_cache&sortby=station_id,max_time"
