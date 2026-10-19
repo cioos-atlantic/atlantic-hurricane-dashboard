@@ -9,7 +9,6 @@ export default async function handler(req, res) {
     const storm_id = "";
     const filters = {};
 
-    console.log("handler", storm_name, season, source, source_type);
     
     try {
         const result = await wfs_query(storm_name, season, source, source_type, storm_id, filters);

@@ -22,7 +22,6 @@ export const show_all_storms = "SHOW_ALL_ACTIVE_STORMS";
 //     return data;
 //   }
 //   catch(err){
-//     console.log("Cannot Fetch Data!", err);
 //     return({});
 //   }
 // }
@@ -70,7 +69,6 @@ export default function ActiveStormList({ setStormPoints, map, Leaflet, setSelec
 
   let active_storms = false;
 
-  console.log("Selected Storm: " + selected_storm);
 
   if (!is_loading_storm) {
     console.debug("IBTRACS Storm List: " + active_storm_data.ib_data?.features.length + " points");

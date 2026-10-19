@@ -20,7 +20,7 @@ function sleep(duration) {
 
 
 export function InputFilter({input_filter, showFilterOptions, setShowFilterOptions, dispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
-  //console.log(startDate, endDate, polyCoords, startCategory, endCategory)
+
   const [inputValue, setInputValue] = useState(""); // Controlled input field
   const [stormNameList, setStormNameList] = useState([]);
   const [open, setOpen] = useState(false);
@@ -79,7 +79,6 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
 
 
  function handleIconClick(){
-    console.log(showFilterOptions);
     dispatch({ type: "SHOW_FILTER_SELECTED", payload: true })
     dispatch({ type: "SET_CAT_SELECTION", payload: false});
     dispatch({ type: "SET_DATE_SELECTION", payload: false});
@@ -92,9 +91,8 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
     setOpen(true);
     (async () => {
       setLoading(true);
-      //console.log(startDate, endDate, polyCoords, startCategory, endCategory)
+  
       const stormNames = await input_filter.query(startDate, endDate, polyCoords, startCategory, endCategory); 
-      console.log(stormNames);
       if (!stormNames || !Array.isArray(stormNames))
         { alert("No storm name data available...")
           setLoading(false);
@@ -113,7 +111,6 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
     //setStormNameList([]);
   };
 
-  console.log(stormNameList);
   return(
     <>
     <Button

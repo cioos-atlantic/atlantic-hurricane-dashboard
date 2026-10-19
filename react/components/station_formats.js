@@ -149,18 +149,14 @@ export function formatCioosDateTime(date_str){
  * Parses and converts raw station data into a structured format.//+
  */
 export function parseData(fullStationData) {
-  console.log(fullStationData);
-  console.log("HI AM I BEING HIT BY SOMETHING? OR CAN I BE DELETED?")
-  //console.log(JSON.parse(chartData));
+
   let stationDataTable = {}; 
 
   Object.entries(fullStationData).forEach(([station_name, station_details]) => {
-    //console.log(`Station_name: ${station_name}`);
-    //console.log(`station_details: ${station_details.properties.station_data}`);
     const stationBbox = station_details.bbox;
-    //console.log(stationBbox)
+
     const stationEntries= station_details.properties.station_data;
-    //console.log(stationEntries);
+
     if (!stationDataTable[station_name]) {
       stationDataTable[station_name] = { 
         bbox: stationBbox,
@@ -187,11 +183,9 @@ export function parseData(fullStationData) {
       });
     })
 
-    console.log(stationDataTable);
 
 
   });
-  console.log(stationDataTable);
   const convertedStationData= dataConversion(stationDataTable);
 
 
@@ -204,7 +198,6 @@ export function parseData(fullStationData) {
 function dataConversion(stationDataTable){
   let rawStationData = { ...stationDataTable }; // make deep copy
 
-  //console.log(stationDataTable);
   Object.entries(rawStationData).forEach(([stationName, stationData]) => {
     const station = stationData.data
     Object.entries(station).forEach(([key, variable]) => {
@@ -215,14 +208,14 @@ function dataConversion(stationDataTable){
         variable.units = 'kPa';
         variable.value = variable.value.map(v => {
           const resultKPa = toKPa(v);
-          //console.log(`Value: ${v}, Converted: ${resultKPa.value}`);
+
           return resultKPa.value}); 
       }
       if (key === 'wind_speed'){
         variable.units = 'Kmh';
         variable.value = variable.value.map(v => {
           const resultKmh = toKmh(v);
-          //console.log(`Value: ${v}, Converted: ${resultKmh.value}`);
+
           return resultKmh.value}); 
       }
 
@@ -230,16 +223,13 @@ function dataConversion(stationDataTable){
         variable.units = 'Kmh';
         variable.value = variable.value.map(v => {
           const resultKmh = toKmh(v);
-          //console.log(`Value: ${v}, Converted: ${resultKmh.value}`);
+
           return resultKmh.value}); 
       }
 
-
-      //console.log(station)
     })
 
   })
-  console.log(rawStationData);
   return rawStationData
 
 }
@@ -249,6 +239,5 @@ function dataConversion(stationDataTable){
  */
 export function getStormBbox (storm_data){
   const bbox = storm_data["pts"]["features"]['0'].bbox;
-  console.log(bbox);
   return bbox;
 }

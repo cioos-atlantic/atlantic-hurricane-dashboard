@@ -194,8 +194,6 @@ const getRandomColor = () => {
 
 function getColour(var_name){
   let colour = '';
-  console.log(var_name)
-  console.log(storm_graph_color)
   colour = storm_graph_color[var_name] || getRandomColor();
   return colour;
 }
@@ -205,8 +203,8 @@ function getColour(var_name){
 function makeDataset(dataList, formattedTimeData, hoverPointTime) {
   const datasets=[];
   const hoverTimeStamp = new Date(hoverPointTime).getTime();
-  dataList.forEach((dataDict) => {console.log(dataDict);
-    Object.entries(dataDict).forEach(([key, value]) => {console.log(key)
+  dataList.forEach((dataDict) => {
+    Object.entries(dataDict).forEach(([key, value]) => {
       datasets.push({
         label: value.name,
         data: value.data,

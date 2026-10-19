@@ -32,7 +32,6 @@ export default function StationDashboard({state, dispatch, station_descriptions,
   //const institution = stationDescription.institution || "Unknown Institution";
    //const institutionLink = stationDescription.institution_link || "#";\
 
-   //console.log(stationValues.properties)
 
   const displayName = stationValues?.properties?.dataset_title || "Unknown Station";
   const stationName = stationValues?.properties?.station

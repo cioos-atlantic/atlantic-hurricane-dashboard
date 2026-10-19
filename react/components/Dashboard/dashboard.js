@@ -14,7 +14,6 @@ export function RenderDashboards({ source_type, time, state, dispatch
 
         const showStorm = state.isStormDashOpen;
         const showStation = state.isStationDashOpen;
-        console.log(showStation, showStorm)
             // Determine width dynamically
         const flexValue = showStorm && showStation ? 1 : 2; // 50% if both, 100% if one
         const theme = useTheme();

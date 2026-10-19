@@ -77,16 +77,13 @@ export default function BasicTabs({stormName, stormData, stormSummaryText, varia
    * a `RenderChart` component with props `sourceData`, `stationName`, and `varCategory`.
    */
   
-  //console.log(stationName, stationData, stationSummaryText, variablePresence, selectedTab, setSelectedTab)
   const stormWindSpeed=stormData['Wind Speed']?.find(obj => "stormWindSpeed" in obj)?.stormWindSpeed;//[stormWindSpeed]?.data
 
   const windData = stormWindSpeed?.data;
   const stormDir=stormData?.direction?.find(obj => "stormDir" in obj)?.stormDir;
   const directionData = stormDir?.data;
-  console.log(stormData, windData, directionData );
 
   function generateGraph(selectedVar){
-    console.log('plotting charts');
     return (
      <div className="station_chart" key='chart01' >
      <RenderStormChart   
@@ -104,7 +101,6 @@ export default function BasicTabs({stormName, stormData, stormSummaryText, varia
 
   
   const handleChange = (event, newValue) => {
-    console.log(newValue)
     setSelectedStormTab(newValue);
   };
 
