@@ -40,7 +40,8 @@ export function RenderDashboards({ source_type, time, state, dispatch
         className="dashboards"
         direction="row"
         sx={{
-            bottom: { xs: "20px", sm: "30px", md: "35px", lg: "50px", xl: "50px" },
+            // Must match the footer height in layout.js (35px from md up)
+            bottom: { xs: "20px", sm: "30px", md: "35px", lg: "35px", xl: "35px" },
             width: {
             xs: "100%",
             md: "100%",

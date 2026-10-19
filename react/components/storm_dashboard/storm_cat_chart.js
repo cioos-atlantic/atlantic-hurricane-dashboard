@@ -40,6 +40,7 @@ function StormCategoryChart({ chartData }) {
       data: data,
       options: {
         responsive: true,
+        maintainAspectRatio: false, 
         plugins: {
           legend: { position: 'top' },
           title: { display: true, text: 'Storm Category Distribution (Data Points)' },
@@ -63,8 +64,8 @@ function StormCategoryChart({ chartData }) {
   }, [chartData]);
 
   return (
-    <div className='chart-render'> {/* Set container size */}
-      <canvas ref={chartRef} id="stormCategoryChart"></canvas> {/* Set explicit canvas size */}
+    <div className='chart-box chart-box--square'>
+      <canvas ref={chartRef} id="stormCategoryChart"></canvas>
     </div>
   );
 }

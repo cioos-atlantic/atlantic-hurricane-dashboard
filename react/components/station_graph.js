@@ -16,11 +16,10 @@ Chart.register(LineController, LineElement, LinearScale, PointElement, CategoryS
  */
 function RenderChart({ sourceData, position, stationName, varCategory, hoverPointTime }) {
 
-
   const chartRef = useRef(null); // Reference to the canvas element
 
   const startAtZero = varCategory === 'air_pressure' ? false : true
-  
+
   useEffect(() => {
     // Check if chartData is available
     if (sourceData && sourceData.rows.length > 0) {
@@ -52,7 +51,7 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
           datasets: datasets, // Set the datasets
         },
         options: {
-          animation:ProgressiveAnimation(datasets),
+          animation:false,
           interaction: {
             intersect: false,
             mode: 'index',
@@ -84,7 +83,7 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
           },
           responsive: true,
           spanGaps:true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false, 
           
           plugins: {
             annotation: {
@@ -168,15 +167,8 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
 
   return (
 
-    <div  className='chart-render'>
-      <canvas
-        ref={chartRef}
-        style={{
-          top: 0,
-          left: 0,
-          
-        }}
-      />
+    <div className='chart-box'>
+      <canvas ref={chartRef} />
     </div>
 
       

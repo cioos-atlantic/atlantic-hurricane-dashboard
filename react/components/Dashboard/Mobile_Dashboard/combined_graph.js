@@ -89,9 +89,8 @@ function RenderCombinedChart({ sourceData, varCategory, timeData, hoverPointTime
           },
         },
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false, 
         spanGaps: true,
-        //maintainAspectRatio: false,
         plugins: {
           annotation: {
             annotations: {
@@ -165,14 +164,8 @@ function RenderCombinedChart({ sourceData, varCategory, timeData, hoverPointTime
 
 
   return (
-    <div className='chart-render'>
-      <canvas
-        ref={chartRef}
-        style={{
-          top: 0,
-          left: 0,
-        }}
-      />
+    <div className='chart-box'>
+      <canvas ref={chartRef} />
     </div>
   );
 }
