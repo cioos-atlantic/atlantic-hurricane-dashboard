@@ -217,20 +217,6 @@ export default function Map({ children, station_data, source_type,  setStationPo
             </IconButton>
           </Tooltip>
 
-          
-          
-
-
-       
-          
-          
-          
-       
-          
-          
-
-          
-
           <LayersControl position="bottomright">
 
             {/* OpenStreetMap */}

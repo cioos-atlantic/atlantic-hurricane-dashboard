@@ -150,7 +150,6 @@ export function formatCioosDateTime(date_str){
  */
 export function parseData(fullStationData) {
   console.log(fullStationData);
-  console.log("HI AM I BEING HIT BY SOMETHING? OR CAN I BE DELETED?")
   //console.log(JSON.parse(chartData));
   let stationDataTable = {}; 
 
