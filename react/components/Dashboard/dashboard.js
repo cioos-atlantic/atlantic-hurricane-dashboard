@@ -45,12 +45,12 @@ export function RenderDashboards({ source_type, time, state, dispatch
             width: {
             xs: "100%",
             md: "100%",
-            lg: state.isDrawerOpen ? "calc(100vw - 258px)" : "100%",
+            lg: state.isDrawerOpen ? "calc(100vw - 350px)" : "100%",
             },
             marginLeft: {
             xs: 0,
             md: 0,
-            lg: state.isDrawerOpen ? "258px" : 0,
+            lg: state.isDrawerOpen ? "350px" : 0,
             },
             gap: 0,
             display: "flex",
