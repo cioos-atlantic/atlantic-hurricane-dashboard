@@ -282,21 +282,16 @@ export default function Map({ children, station_data, source_type,  setStationPo
             <LayersControl.Overlay checked name="Stations">
               <MarkerClusterGroup>
                 {station_data ? (
-                  Object.entries(station_data).map((station) => {
-                    let storm_timestamp = new Date();
-                    if ("TIMESTAMP" in state.hover_marker.properties) {
-                      storm_timestamp = new Date(["TIMESTAMP"]);
-                    }
-                    return (
-                      <StationMarker
-                        key={station[0]}
-                        station_data={station}
-                        time={storm_timestamp}
-                        selected_station={state.selected_station}
-                        dispatch={dispatch}
-                      />
-                    );
-                  })
+                  // Only primitive / stable props, so React.memo can skip markers on storm hover
+                  Object.entries(station_data).map(([stationName, stationValues]) => (
+                    <StationMarker
+                      key={stationName}
+                      station_name={stationName}
+                      station_values={stationValues}
+                      isSelected={stationName === state.selected_station?.[0]}
+                      dispatch={dispatch}
+                    />
+                  ))
                 ) : (
                   <></>
                 )}
