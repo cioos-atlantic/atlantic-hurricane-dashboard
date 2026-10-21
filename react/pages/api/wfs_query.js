@@ -20,7 +20,6 @@ export default async function handler(req, res) {
     const source = req.query["source"].split(",")
     const source_type = req.query["source_type"]
 
-    console.log("handler", storm_name, season, source, source_type);
 
     try {
         const result = await wfs_query(storm_name, season, source, source_type, storm_id, filters, selected_features = "", storm_line_filter= false)
@@ -45,7 +44,6 @@ export async function wfs_query(storm_name, season, source, source_type, storm_i
     &cql_filter=(SEASON=2024);(TIMESTAMP BETWEEN 2024-01-01 AND 2024-12-31)
     */
 
-    console.log("wfs_query", storm_name, season, source, source_type);
 
     let get_ibtracs = false;
     let get_eccc = false;
@@ -230,10 +228,8 @@ export async function wfs_data_query(station_id, storm){
 function build_wfs_query(source, filters, source_type, selected_features = "", storm_bbox = "", output_format = "application/json", base_url = process.env.NEXT_PUBLIC_GEOSERVER_BASE_URL,) {
     output_format = "&outputFormat=" + encodeURI(output_format);
     //Filter causes issues for ERDDAP cache
-    console.log(filters.join(" AND "));
 
     const final_filter = (source.includes("erddap") && source_type === "ACTIVE") ? ("") : ("&cql_filter=" + filters.join(" AND "))
-    console.log("final filter", final_filter)
 
     let url = '';
 

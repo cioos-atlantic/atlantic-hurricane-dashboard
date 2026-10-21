@@ -14,7 +14,6 @@ export function RenderDashboards({ source_type, time, state, dispatch
 
         const showStorm = state.isStormDashOpen;
         const showStation = state.isStationDashOpen;
-        console.log(showStation, showStorm)
             // Determine width dynamically
         const flexValue = showStorm && showStation ? 1 : 2; // 50% if both, 100% if one
         const theme = useTheme();
@@ -41,7 +40,8 @@ export function RenderDashboards({ source_type, time, state, dispatch
         className="dashboards"
         direction="row"
         sx={{
-            bottom: { xs: "20px", sm: "30px", md: "35px"},
+            // Must match the footer height in layout.js (35px from md up)
+            bottom: { xs: "20px", sm: "30px", md: "35px", lg: "35px", xl: "35px" },
             width: {
             xs: "100%",
             md: "100%",

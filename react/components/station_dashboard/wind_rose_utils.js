@@ -53,7 +53,6 @@ export function categorizeWindDirection(direction) {
  * speed falls into. If the input speed does not match any bin, it returns "Unknown".
  */
 export function categorizeWindSpeed(speed) {
-  //console.log(speed);
   for (const bin of windSpeedBins) {
     if (speed >= bin.min && (bin.max === undefined || speed < bin.max)) {
       return bin.label; // Return the label instead of the index
@@ -76,7 +75,6 @@ export function makeEmptyfreqObj(windSpeedBins, cardinalPoints){
   cardinalPoints.forEach((point)=>{
     freqObj[point] = new Array(windSpeedBins.length).fill(0);});
   
-  console.log(freqObj);
 
   return freqObj
   
@@ -90,11 +88,9 @@ export function makeEmptyfreqObj(windSpeedBins, cardinalPoints){
  * account for.
  */
 export function makeFreqFraction(freqObj, totalDataPoints){
-  console.log(totalDataPoints)
   const freqFrac= structuredClone(freqObj);
 
   Object.values(freqFrac).forEach((point) =>{
-    //console.log(point)
 
 
     point.forEach((value, index) => {
@@ -104,7 +100,6 @@ export function makeFreqFraction(freqObj, totalDataPoints){
     });
   });
 
-  //console.log(freqFrac);
   return freqFrac
 };
 
@@ -131,7 +126,6 @@ export function makeGroupedList(directions, speeds){
     directions.forEach((direction, index) => {
     
         const cardinal = categorizeWindDirection(direction);
-        //console.log(cardinal)
         const speedBin = categorizeWindSpeed(speeds[index]);
     
         groupedList.push({
@@ -158,7 +152,6 @@ export function processWindSpeeds(sourceData){
   
     const column_std_names = sourceData.column_std_names;
     const uniqueColStdNames= getUniqueStdNamesList(column_std_names);
-    console.log(uniqueColStdNames);
   
     uniqueColStdNames.filter((variable) => include_var.includes(variable))
     .forEach((variable, index) => {
@@ -169,16 +162,13 @@ export function processWindSpeeds(sourceData){
         const station_data_obj = get_station_field_data(sourceData, col_name);
         const data_unit = get_station_field_units(sourceData, col_name);
         let values = station_data_obj.data;
-        console.log(values, data_unit)
         if (data_unit !== 'km/h'){
           values= values.map((value)=> {
             
             const converted_value = convert_unit_data(value, data_unit, 'km/h');
-            //console.log(value, converted_value.value)
             return converted_value.value
           })
         }
-        console.log(values)
 
 
         const long_name= station_data_obj.long_name;
@@ -216,7 +206,6 @@ export function parseWindData(freqFrac, windSpdLabel){
             )
         })
     });
-    //console.log(data)
     return data;
 
 }

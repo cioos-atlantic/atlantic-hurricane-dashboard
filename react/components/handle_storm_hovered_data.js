@@ -5,7 +5,6 @@ import { basePath } from "@/next.config";
  * and logs the storm's time.
  */
 export function handleStormHoveredData(point){
-  //console.log(point);
   const stormId= point.id;
   const [stormSource, code, stormTime] = stormId.split('.');
 
@@ -20,7 +19,6 @@ export function handleStormHoveredData(point){
 
   
 
-  console.log(stormTime)
 }
   //passStormData(point)}
   // Construct query parameters
@@ -43,12 +41,10 @@ export async function passStormData(stormTime, stormLat, stormLon ){
 
   // process.env reading empty
 
-  //console.log(process)
   const resource = await fetch(`${basePath}/api/query_stations_historical?${query}`);
   
   const historical_station_data = await resource.json();
 
-  console.log(historical_station_data);
 
    // Trigger the callback to send data back to the parent
 

@@ -23,7 +23,6 @@ export default function StationDataLayout({stationName, sourceDataLink, stationD
     console.error(error)
   }
 
-  console.log(stationData)
   
   function generateGraph(selectedVar){
       return (
@@ -45,8 +44,6 @@ export default function StationDataLayout({stationName, sourceDataLink, stationD
   }
 
   const dataLink = "https://cioosatlantic.ca/erddap/tabledap/" + stationName + ".html"
-  console.log("here comes data")
-  console.log(stationData)
 
   return (
     <Box sx={{ width: "100%",

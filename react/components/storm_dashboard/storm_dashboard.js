@@ -23,11 +23,8 @@ import { getStormCategory } from "./utils";
 const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_marker, storm_points, isStormDashOpen }) {
 
   const [selectedStormTab, setSelectedStormTab] = useState(0);
-  //console.log(storm_data, storm_points, source_type, hover_point);
-  console.log(storm_points.pts.features)
 
   const stormPoints = storm_points.pts.features;
-  console.log(stormPoints)
   const ibtracs_link = 'https://www.ncei.noaa.gov/products/international-best-track-archive';
 
   const stormNameList = [];
@@ -53,7 +50,6 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
 
   stormPoints.forEach((storm_point)=> {
     
-    //console.log(storm_point);
     stormNameList.push(fetch_value(storm_point, ["STORMNAME", "NAME"]));
     stormTime.push(fetch_value(storm_point, ["TIMESTAMP", "ISO_TIME"]));
     storm_data_dict.direction[0].stormDir.data.push(storm_point.properties.STORM_DIR);
@@ -89,7 +85,6 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
   const stormName = stormNameUniqueValues[0];
   // Add on to check if more than one storm name exists in data
   const theme = useTheme();
-  console.log(stormName);
   const isExtraSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   const isSmall = useMediaQuery(theme.breakpoints.down('md')); // `md` in MUI = 960px
@@ -98,8 +93,6 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
   const hoverPointTime = fetch_value(hover_marker, ["TIMESTAMP", "ISO_TIME"]);
 
 
-  console.log(storm_data_dict);
-  console.log(stormCategory);
 
   const variablePresence={};
   Object.keys(storm_data_dict).forEach((key) => {
@@ -129,7 +122,6 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
       });
   });
 
-  console.log(hover_marker);
 
 
 
@@ -157,7 +149,6 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
         <button
           className="close"
           onClick={() => {
-            console.log("closed")
             setSelectedStormTab(0);
             dispatch({ type: "SET_HOVER_MARKER", payload: empty_point_obj});
             dispatch({ type: "TOGGLE_STORM_DASH", payload: false});
@@ -217,7 +208,6 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
         <button
           className="close"
           onClick={() => {
-            console.log("closed")
             setSelectedStormTab(0);
             dispatch({ type: "SET_HOVER_MARKER", payload: empty_point_obj});
             dispatch({ type: "TOGGLE_STORM_DASH", payload: false});

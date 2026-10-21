@@ -61,7 +61,7 @@ function RenderStormChart({ sourceData,  varCategory, timeData, hoverPointTime }
       },
       
       options: {
-        animation:ProgressiveAnimation(datasets),
+        animation:false,
         interaction: {
           intersect: false,
           mode: 'index',
@@ -92,9 +92,8 @@ function RenderStormChart({ sourceData,  varCategory, timeData, hoverPointTime }
           },
         },
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         spanGaps:true,
-        //maintainAspectRatio: false,
         plugins: {
           annotation: {
             annotations: {
@@ -167,16 +166,9 @@ function RenderStormChart({ sourceData,  varCategory, timeData, hoverPointTime }
 
 
   return (
-    <div className='chart-render'>
-    <canvas
-      ref={chartRef}
-      style={{
-        top: 0,
-        left: 0,
-        
-      }}
-    />
-  </div>
+    <div className='chart-box'>
+      <canvas ref={chartRef} />
+    </div>
   );
 }
 
@@ -194,8 +186,6 @@ const getRandomColor = () => {
 
 function getColour(var_name){
   let colour = '';
-  console.log(var_name)
-  console.log(storm_graph_color)
   colour = storm_graph_color[var_name] || getRandomColor();
   return colour;
 }
@@ -205,8 +195,8 @@ function getColour(var_name){
 function makeDataset(dataList, formattedTimeData, hoverPointTime) {
   const datasets=[];
   const hoverTimeStamp = new Date(hoverPointTime).getTime();
-  dataList.forEach((dataDict) => {console.log(dataDict);
-    Object.entries(dataDict).forEach(([key, value]) => {console.log(key)
+  dataList.forEach((dataDict) => {
+    Object.entries(dataDict).forEach(([key, value]) => {
       datasets.push({
         label: value.name,
         data: value.data,

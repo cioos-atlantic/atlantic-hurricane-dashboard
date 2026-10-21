@@ -118,8 +118,6 @@ export default function Map({ children, station_data, source_type,  setStationPo
     activeColor: '#db4a29',
     completedColor: '#9b2d14',
     captureZIndex: 10000,
-    onMeasureStart: (e) => console.log('Measurement started:', e),
-    onMeasureFinish: (e) => console.log('Measurement finished:', e),
   };
   
 
@@ -179,7 +177,6 @@ export default function Map({ children, station_data, source_type,  setStationPo
           zoomControl={false}
           ref={setMap}
           whenReady={() => {
-            console.log("Map is fully ready!");
             
           }}
 

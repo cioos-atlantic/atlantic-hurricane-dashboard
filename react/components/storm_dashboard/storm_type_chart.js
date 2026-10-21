@@ -40,7 +40,7 @@ function StormTypeChart({ chartData }) {
       data: data,
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false, 
         plugins: {
           
           legend: { position: 'top' },
@@ -65,8 +65,8 @@ function StormTypeChart({ chartData }) {
   }, [chartData]);
 
   return (
-    <div className='chart-render'> {/* Set container size */}
-      <canvas ref={chartRef} id="stormTypeChart" ></canvas> {/* Set explicit canvas size */}
+    <div className='chart-box chart-box--square'>
+      <canvas ref={chartRef} id="stormTypeChart"></canvas>
     </div>
   );
 }

@@ -5,8 +5,6 @@ import { handleStormButtonClick } from "../historical_storm/historical_storm_uti
 
 export function RenderFilterResult({filterResult, router, drawerButtonClicked,  cancelFilters, setDrawerButtonClicked}){
  
-  
-  console.log (filterResult);
   return( 
     
     <>
@@ -35,12 +33,10 @@ export function RenderFilterResult({filterResult, router, drawerButtonClicked,  
                 <Paper
                   key={storm.storm_id}
                   onClick=
-                    {(e) => { console.log(`${storm.name} clicked`)
+                    {(e) => { 
                     handleStormButtonClick(storm.name, storm.year, storm.storm_id, router);
                     //setDrawerButtonClicked(storm.storm_id);
                                     //triggerReload(); // Reload page when a storm is clicked
-                  
-                                    //console.log(storm);
                             }}
                     sx={{color: isClicked ? 'white' : 'black', 
                                       backgroundColor: isClicked ? 'black' : 'white',
