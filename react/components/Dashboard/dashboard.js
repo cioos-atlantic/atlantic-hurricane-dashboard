@@ -4,6 +4,7 @@ import StationDashboard from '../station_dashboard/station_dashboard';
 import { Stack } from '@mui/material';
 import { useMediaQuery, Box, useTheme } from "@mui/material";
 import { RenderSmallDashboard } from './Mobile_Dashboard/dashboard_small';
+import { mapActions } from "@/components/mapReducer";
 
 
 
@@ -31,9 +32,9 @@ export function RenderDashboards({ source_type, time, state, dispatch
         source_type={source_type}
         time={time}
         storm_points={state.storm_points}
-        setIsDashOpen= {(state) => dispatch({ type: "TOGGLE_DASH", payload: state })}
-        setIsStormDashOpen={(state) => dispatch({ type: "TOGGLE_STORM_DASH", payload: state })}
-        setIsStationDashOpen={(state) => dispatch({ type: "TOGGLE_STATION_DASH", payload: state })}
+        setIsDashOpen= {(state) => dispatch(mapActions.setDashOpen(state))}
+        setIsStormDashOpen={(state) => dispatch(mapActions.setStormDashOpen(state))}
+        setIsStationDashOpen={(state) => dispatch(mapActions.setStationDashOpen(state))}
         />
     ) : (
         <Stack

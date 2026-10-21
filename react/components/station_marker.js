@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { flip_coords } from "@/lib/storm_utils";
 import { Marker, Tooltip, Popup, Icon } from "react-leaflet";
 import { getDisplayName } from "./utils/station_data_format_util";
+import { mapActions } from "@/components/mapReducer";
 
 /**
  * 
@@ -48,10 +49,7 @@ export default function StationMarker({station_data, time = new Date(), selected
       icon={getMarkerIcon(selected_station, station_name)}
       eventHandlers={{
         click: (e) => {
-          dispatch({
-            type: 'SET_SELECTED_STATION_AND_OPEN_DASHBOARD',
-            payload: station_data,
-          });
+          dispatch(mapActions.selectStationAndOpenDashboard(station_data));
           
         }
       }}

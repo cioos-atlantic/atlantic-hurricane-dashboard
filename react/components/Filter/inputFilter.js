@@ -6,6 +6,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import React, { forwardRef } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
+import { mapActions } from "@/components/mapReducer";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -80,9 +81,9 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
 
  function handleIconClick(){
     console.log(showFilterOptions);
-    dispatch({ type: "SHOW_FILTER_SELECTED", payload: true })
-    dispatch({ type: "SET_CAT_SELECTION", payload: false});
-    dispatch({ type: "SET_DATE_SELECTION", payload: false});
+    dispatch(mapActions.setShowFilterSelected(true))
+    dispatch(mapActions.setCatSelection(false));
+    dispatch(mapActions.setDateSelection(false));
     setShowFilterOptions((prev) => ({
       ...prev,
       [input_filter.name]: !prev[input_filter.name],

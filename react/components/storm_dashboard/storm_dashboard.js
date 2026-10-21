@@ -7,6 +7,7 @@ import { StormSummaryText } from "./storm_details";
 import StormDataLayout from "./storm_layout_small_screen";
 import { convert_unit_data } from "../utils/unit_conversion";
 import { empty_point_obj } from "../point_defaults";
+import { mapActions } from "@/components/mapReducer";
 
 
 
@@ -155,8 +156,8 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
           onClick={() => {
             console.log("closed")
             setSelectedStormTab(0);
-            dispatch({ type: "SET_HOVER_MARKER", payload: empty_point_obj});
-            dispatch({ type: "TOGGLE_STORM_DASH", payload: false});
+            dispatch(mapActions.setHoverMarker(empty_point_obj));
+            dispatch(mapActions.setStormDashOpen(false));
           }}
           title="Close"
           aria-label="Close"
@@ -215,8 +216,8 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
           onClick={() => {
             console.log("closed")
             setSelectedStormTab(0);
-            dispatch({ type: "SET_HOVER_MARKER", payload: empty_point_obj});
-            dispatch({ type: "TOGGLE_STORM_DASH", payload: false});
+            dispatch(mapActions.setHoverMarker(empty_point_obj));
+            dispatch(mapActions.setStormDashOpen(false));
           }}
           title="Close"
           aria-label="Close"

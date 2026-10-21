@@ -18,7 +18,7 @@ import { RenderSpatialFilter } from "./Filter/Edit_spatial_filter";
 import CustomZoomControl from "./custom_zoom_control";
 import { RenderDashboards } from "./Dashboard/dashboard";
 import StormMarker from "./stormPoint";
-import { mapReducer, initialMapState } from "./mapReducer";
+import { mapReducer, initialMapState, mapActions } from "./mapReducer";
 import InfoScreen from "./message_screens/info_screen";
 import { IconButton, Stack } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
@@ -198,7 +198,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
           { source_type == "historical" &&
               (<RenderSpatialFilter
                 ref={clearShapesRef} 
-                setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
+                setPolyFilterCoords={(coords) => dispatch(mapActions.setPolyFilterCoords(coords))}
                 />)} {/* Calling the EditControl function here */}
           
           <Tooltip title="Take a tour of the tool features">

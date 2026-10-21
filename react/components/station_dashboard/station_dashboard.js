@@ -6,6 +6,7 @@ import BasicTabs from "./tabs";
 import {  getMatchedStation, getStationDataText, } from "../utils/station_data_format_util";
 import { fetch_value } from "@/lib/storm_utils";
 import { basePath } from "@/next.config";
+import { mapActions } from "@/components/mapReducer";
 
 /**
  * The `StationDashboard` function renders a dashboard for a selected station with relevant data and
@@ -124,8 +125,8 @@ export default function StationDashboard({state, dispatch, station_descriptions,
           <button
             className="close"
             onClick={() => {
-              dispatch({ type: "CLOSE_STATION_DASHBOARD"});
-              dispatch({ type: "TOGGLE_STATION_DASH", payload: false});
+              dispatch(mapActions.closeStationDashboard());
+              dispatch(mapActions.setStationDashOpen(false));
             }}
             title="Close"
             aria-label="Close"
@@ -179,8 +180,8 @@ export default function StationDashboard({state, dispatch, station_descriptions,
           <button
             className="close"
             onClick={() => {
-              dispatch({ type: "CLOSE_STATION_DASHBOARD"});
-              dispatch({ type: "TOGGLE_STATION_DASH", payload: false});
+              dispatch(mapActions.closeStationDashboard());
+              dispatch(mapActions.setStationDashOpen(false));
               //setIsStationDashOpen(false);
             }}
             title="Close"
@@ -212,7 +213,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
               stationSummaryText={dataText}
               variablePresence={variablePresence}
               selectedTab={state.selectedTab}
-              setSelectedTab={(tab) => dispatch({ type: "SET_SELECTED_TAB", payload: tab })}
+              setSelectedTab={(tab) => dispatch(mapActions.setSelectedTab(tab))}
               hoverPointTime={hoverPointTime}
             />
           

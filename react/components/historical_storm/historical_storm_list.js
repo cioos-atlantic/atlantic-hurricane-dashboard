@@ -9,6 +9,7 @@ import LoadingScreen from '../loading_screen.js';
 import { empty_station_obj } from '../point_defaults.js';
 import {  FiltersSelected, FiltersSubmitted } from '../Filter/viewFilters.js';
 import { RenderFilter } from '../Filter/filter.js';
+import { mapActions } from "@/components/mapReducer";
 
 
 
@@ -29,16 +30,16 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
   const [previousQuery, setPreviousQuery] = useState(null);
 
   console.log("Historical Storms Loading...");
-  const setStormPoints = (point) => dispatch({ type: "SET_STORM_POINT", payload: point });
-  const setSelectedStation= (station) => dispatch({ type: "SET_SELECTED_STATION", payload: station });
+  const setStormPoints = (point) => dispatch(mapActions.setStormPoints(point));
+  const setSelectedStation= (station) => dispatch(mapActions.setSelectedStation(station));
   //const setReturnFilterResult = (state) => dispatch({ type: "TOGGLE_FILTER_RESULT", payload: state });
   //const setDrawerButtonClicked = (clicked) => dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: clicked });
-  const setIsDashOpen= (state) => dispatch({ type: "TOGGLE_DASH", payload: state });
-  const setIsStormDashOpen= (state) => dispatch({ type: "TOGGLE_STORM_DASH", payload: state });
-  const setIsStationDashOpen= (state) => dispatch({ type: "TOGGLE_STATION_DASH", payload: state });
+  const setIsDashOpen= (state) => dispatch(mapActions.setDashOpen(state));
+  const setIsStormDashOpen= (state) => dispatch(mapActions.setStormDashOpen(state));
+  const setIsStationDashOpen= (state) => dispatch(mapActions.setStationDashOpen(state));
 
-  const cancelFilters = () => dispatch({ type: 'CANCEL_FILTERS' });
-  const setDrawerButtonClicked = (buttonClicked) => dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: buttonClicked });
+  const cancelFilters = () => dispatch(mapActions.cancelFilters());
+  const setDrawerButtonClicked = (buttonClicked) => dispatch(mapActions.setDrawerButtonClicked(buttonClicked));
 
 
    // Check query parameters on mount and trigger `handleClick`
@@ -76,7 +77,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
           if (selectedStorm) {
             //setDrawerButtonClicked(selectedStorm.storm_id);
             console.log(selectedStorm.storm_id)
-            dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: selectedStorm.storm_id })
+            dispatch(mapActions.setDrawerButtonClicked(selectedStorm.storm_id))
             
 
             await handleClick(selectedStorm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation,setLoading, setIsDashOpen, setIsStormDashOpen,setIsStationDashOpen);
@@ -111,7 +112,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
 
   useEffect(() => {
     if (filterResult.length <= 0 && returnFilterResult) {
-      dispatch({ type: "TOGGLE_FILTER_RESULT", payload: false });
+      dispatch(mapActions.setReturnFilterResult(false));
     }
   }, [filterResult.length, returnFilterResult, dispatch]);
 
@@ -208,7 +209,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
       <hr style={{ height: '4px', backgroundColor: 'black', border: 'none', margin: '5px' }}/> 
       <Button
       onClick={()=> {
-        dispatch({ type: "CLOSE_STORM_TRACKS" })
+        dispatch(mapActions.closeStormTracks())
         setStationPoints(empty_station_obj)
     
       router.push(`/?page=historical`)

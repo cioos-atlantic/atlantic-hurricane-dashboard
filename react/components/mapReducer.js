@@ -26,6 +26,50 @@ export const initialMapState = {
   showFilterSelected:true
 };
 
+// Action helpers: build the action objects for mapReducer so call sites don't
+// repeat type strings. Usage: dispatch(mapActions.setHoverMarker(point))
+export const mapActions = {
+  // Storm / station selection
+  setHoverMarker: (point) => ({ type: 'SET_HOVER_MARKER', payload: point }),
+  setStormPoints: (stormPoints) => ({ type: 'SET_STORM_POINT', payload: stormPoints }),
+  setSelectedStation: (station) => ({ type: 'SET_SELECTED_STATION', payload: station }),
+  selectStationAndOpenDashboard: (station) => ({ type: 'SET_SELECTED_STATION_AND_OPEN_DASHBOARD', payload: station }),
+  setDrawerButtonClicked: (stormId) => ({ type: 'SET_DRAWER_BUTTON_CLICKED', payload: stormId }),
+  closeStormTracks: () => ({ type: 'CLOSE_STORM_TRACKS' }),
+
+  // Dashboards
+  setDashOpen: (isOpen) => ({ type: 'TOGGLE_DASH', payload: isOpen }),
+  setStormDashOpen: (isOpen) => ({ type: 'TOGGLE_STORM_DASH', payload: isOpen }),
+  setStationDashOpen: (isOpen) => ({ type: 'TOGGLE_STATION_DASH', payload: isOpen }),
+  setSelectedTab: (tab) => ({ type: 'SET_SELECTED_TAB', payload: tab }),
+  closeStationDashboard: () => ({ type: 'CLOSE_STATION_DASHBOARD' }),
+
+  // Drawer
+  setDrawerOpen: (isOpen) => ({ type: 'TOGGLE_DRAWER', payload: isOpen }),
+
+  // Filter values
+  setStartDate: (date) => ({ type: 'SET_START_DATE', payload: date }),
+  setEndDate: (date) => ({ type: 'SET_END_DATE', payload: date }),
+  setStartCategory: (category) => ({ type: 'SET_START_CATEGORY', payload: category }),
+  setEndCategory: (category) => ({ type: 'SET_END_CATEGORY', payload: category }),
+  setPolyFilterCoords: (coords) => ({ type: 'SET_POLY_FILTER_COORDS', payload: coords }),
+  setFilterStormName: (names) => ({ type: 'SET_FILTER_STORM_NAME', payload: names }),
+  resetFilters: () => ({ type: 'RESET_FILTERS' }),
+  cancelFilters: () => ({ type: 'CANCEL_FILTERS' }),
+
+  // Filter UI
+  setCatSelection: (isOpen) => ({ type: 'SET_CAT_SELECTION', payload: isOpen }),
+  toggleCatSelection: () => ({ type: 'TOGGLE_CAT_SELECTION' }),
+  setDateSelection: (isOpen) => ({ type: 'SET_DATE_SELECTION', payload: isOpen }),
+  toggleDateSelection: () => ({ type: 'TOGGLE_DATE_SELECTION' }),
+  setShowFilterSelected: (show) => ({ type: 'SHOW_FILTER_SELECTED', payload: show }),
+
+  // Filter results
+  setFilterQuery: (query) => ({ type: 'SET_FILTER_QUERY', payload: query }),
+  setFilterResult: (result) => ({ type: 'SET_FILTER_RESULT', payload: result }),
+  setReturnFilterResult: (show) => ({ type: 'TOGGLE_FILTER_RESULT', payload: show }),
+};
+
 export function mapReducer(state, action) {
   switch (action.type) {
     case 'SET_HOVER_MARKER':
