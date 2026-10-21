@@ -143,8 +143,15 @@ footer {
 }
 
 .leaflet-control-container .leaflet-top {
-  top: 95px; /* Adjust top to avoid overlapping header */
+  top: 40px; /* Adjust top to avoid overlapping header */
 }
+
+@media (max-width: 480px) {
+  .leaflet-control-container .leaflet-top {
+    top: 135px;
+  }
+}
+
 
 .leaflet-control-container .leaflet-bottom {
   bottom: 35px; /* Adjust bottom to avoid overlapping footer */
@@ -942,17 +949,26 @@ footer {
 
 }
 
-.info-guide{
+.tour-reload{
   z-index: 3000;
   position: fixed !important;
-  top: 68px !important;
-  right: 9px !important;
+  display: flex !important;
+  top: 95px !important;
   text-align: center !important;
-  height: 35px !important;
-  width: 35px !important;
+  height: 40px !important;
+  width: 40px !important;
   padding: 0px !important;
   font-size: 0px !important;
   color:  #1E90FF !important;
+  border: rgba(0, 0, 0, 0.7) 3px solid !important;
+  background: white !important;
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+
+}
+
+.tour-reload :hover{
+  background:transparent !important;
+  color:  #e55162 !important;
 
 }
 
@@ -1117,34 +1133,34 @@ footer {
 	}
 
 
-  .drawer_close_button {
-    position: absolute;
-    z-index: 1000;
-    top: 50px;
-    width: 40px !important;
-    height: 40px !important;
-    background-color: white;
-    border: 2px solid #e55162;
-    border-radius: 50%;
-    color: #e55162;
-    font-size: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    font-weight: bolder;
-    min-width: auto;
+.drawer_close_button {
+  position: absolute !important;
+  z-index: 1000 !important;
+  top: 50px !important;
+  width: 40px !important;
+  height: 40px !important;
+  background-color: white !important;
+  border: 2px solid #e55162 !important;
+  border-radius: 50% !important;
+  color: #e55162 !important;
+  font-size: 25px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+  font-weight: bolder !important;
+  min-width: auto !important;
 }
 
 
 .drawer_close_button:hover {
-    background-color: #e55162; /* Change background color on hover */
-    color: #ffffff; /* Change text color on hover */
+  background-color: #e55162; /* Change background color on hover */
+  color: #ffffff; /* Change text color on hover */
 }
 .drawer_close_button:focus {
-    outline: none; /* Remove outline when focused */
-    box-shadow: 0 0 0 3px rgba(229, 81, 98, 0.5); /* Add a glow around the button */
+  outline: none; /* Remove outline when focused */
+  box-shadow: 0 0 0 3px rgba(229, 81, 98, 0.5); /* Add a glow around the button */
 }
 .map_ruler{
   position: absolute;
@@ -1169,3 +1185,47 @@ leaflet-control-attribution
 position: absolute !important;
 }
 
+
+.tour-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tour-modal {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.tour-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.primary {
+  background: #1976d2;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+}
+
+.secondary {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 6px;
+}

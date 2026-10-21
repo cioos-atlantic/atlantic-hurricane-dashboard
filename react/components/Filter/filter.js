@@ -127,7 +127,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
     const stormResult = await processFilterRequest(updatedParams, setLoading);
     console.log(stormResult);
     dispatch({ type: "SET_FILTER_RESULT", payload: stormResult});
-    router.push(`/?storms=historical`);
+    router.push(`/?page=historical`);
 
     //setIsDrawerOpen(true);
     //setReturnFilterResult(true);
@@ -191,10 +191,10 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
                     endCategory={endCategory}
                   />
 
-                  </div>
-                )
-              })
-            }
+                    </div>
+                  )
+                })
+              }
 
 
             <div className="filter-group">
@@ -237,6 +237,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
             */}
 
             <Button
+              id="filter-submit-button"
               className="filter-badge"
               onClick={handleFilterSubmit}
               startIcon={<PublishRoundedIcon />}>
@@ -453,8 +454,8 @@ export async function processFilterRequest(filterParameters, setLoading) {
   const endDate = formatFilterDate(filterParameters['endDate']);
   
   const stormPoly = filterParameters['polyCoords'];                       
-  const startCategory= filterParameters['startCategory'];
-  const endCategory = filterParameters['endCategory'];
+  const startCategory= (filterParameters['startCategory']) ? filterParameters['startCategory'] : '';
+  const endCategory = (filterParameters['endCategory']) ? filterParameters['endCategory'] : '';
 
 
   console.log(stormCategory, stormNames, startDate, endDate)

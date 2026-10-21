@@ -8,8 +8,8 @@ import { basePath } from '@/next.config';
 export default function HeaderNav({ children, navItems, isActivePage }) {
     const [headerDrawerOpen, setHeaderDrawerOpen] = useState(false);
     const searchParams = useSearchParams();
-    const page = searchParams.get("storms");
-    const currentUrl = `${basePath}?storms=${page}`;
+    const page = searchParams.get("page");
+    const currentUrl = `${basePath}?page=${page}`;
     
 
     const toggleDrawer = (open) => (event) => {
@@ -80,7 +80,7 @@ export default function HeaderNav({ children, navItems, isActivePage }) {
                 onClose={toggleDrawer(false)}
                 sx={{
                     "& .MuiDrawer-paper": { width: 200, 
-                                            marginTop: '50px',
+                                            marginTop: '40px',
                                             backgroundColor:"#f5f5f5",
                                             padding: "2px"},
                     zIndex: '8000',

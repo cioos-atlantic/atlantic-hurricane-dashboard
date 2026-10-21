@@ -68,7 +68,7 @@ function a11yProps(index) {
  * selected category. The Summary tab includes station summary text and a link to view full data. The
  * Wind Speed, Temperature, Waves, and
  */
-export default function BasicTabs({ stationName, stationData, stationSummaryText, variablePresence, selectedTab, setSelectedTab, hoverPointTime }) {
+export default function BasicTabs({stationName, sourceDataLink, stationData, stationSummaryText, variablePresence, selectedTab, setSelectedTab, hoverPointTime}) {
   /**
    * The function `generateGraph` returns a JSX element containing a chart component with specified
    * data and styling.
@@ -110,10 +110,7 @@ export default function BasicTabs({ stationName, stationData, stationSummaryText
 
   // const [value, setValue] = React.useState(0);
   //const [hasData, setHasData] = React.useState(true); // State to track if data is available
-
-  const data_link = "https://cioosatlantic.ca/erddap/tabledap/" + stationName + ".html"
   const handleChange = (event, newValue) => {
-    //console.log(newValue)
     setSelectedTab(newValue);
   };
 
@@ -164,30 +161,29 @@ export default function BasicTabs({ stationName, stationData, stationSummaryText
               }}
               {...a11yProps(4)} disabled={!variablePresence['air_pressure']} />
 
-            {Object.keys(windSpeedData).map((key, index) => {
-              const label = key.replace(/^wind speed(?=\s+\S)/i, '').trim();
-              return (
-                <Tab label={`WINDROSE-${label}`} key={`windbin-tab-${key}`}
-                  sx={{
-                    fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
-                  }}
-                  {...a11yProps(5 + index)} disabled={!variablePresence['wind_from_direction']} />
-              )
-            }
-
-            )}
-          </TabList>
-        </Box>
-        <CustomTabPanel value={selectedTab} index={0}>
-          {stationSummaryText}
-          <div className="data-footer">
-            <a href={data_link} target="_blank">Full data</a>
-          </div>
-        </CustomTabPanel>
-        <CustomTabPanel value={selectedTab} index={1}>
-          {generateGraph("wind_speed")}
-        </CustomTabPanel>
-        {/*<CustomTabPanel value={selectedTab} index={2}>
+          {Object.keys(windSpeedData).map((key, index) => {
+            const label = key.replace(/^wind speed(?=\s+\S)/i, '').trim();
+            return(
+            <Tab label={`WINDROSE-${label}`}  key={`windbin-tab-${key}`} 
+            sx={{
+              fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
+            }}
+            {...a11yProps(5 + index )} disabled={!variablePresence['wind_from_direction']}/>
+          )}
+            
+           )}
+        </TabList>
+      </Box>
+      <CustomTabPanel value={selectedTab} index={0}>
+        {stationSummaryText}
+        <div className="data-footer">
+                <a href={sourceDataLink} target="_blank">Full data</a>
+        </div>
+      </CustomTabPanel>
+      <CustomTabPanel value={selectedTab} index={1}>
+        {generateGraph("wind_speed")}
+      </CustomTabPanel>
+      {/*<CustomTabPanel value={selectedTab} index={2}>
       <RenderWindRose  
                 sourceData={stationData}
                 hasWindRoseData={variablePresence['wind_from_direction']}

@@ -118,7 +118,7 @@ export function RenderSearchResult({searchResult, router}){
 
 
 export function changeUrlToHistorical(router){
-  const url = `/?storms=historical`;
+  const url = `/?page=historical`;
   console.log(url)
   router.push(url);
 }

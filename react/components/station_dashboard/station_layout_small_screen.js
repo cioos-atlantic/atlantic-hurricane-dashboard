@@ -6,11 +6,24 @@ import { RenderPlotlyRose } from "./plotly_rose";
 import { get_station_field_data } from "../utils/station_data_format_util";
 import { processWindSpeeds } from "./wind_rose_utils";
 
-export default function StationDataLayout({stationName, stationData, stationSummaryText, variablePresence, hoverPointTime}){
-  const timeData = get_station_field_data(stationData, "time", "column_std_names").data;
-  const directionData = get_station_field_data(stationData, 'wind_from_direction', "column_std_names").data;
-  const  windSpeedData = processWindSpeeds(stationData);
-    console.log(timeData, directionData, windSpeedData);
+export default function StationDataLayout({stationName, sourceDataLink, stationData, setSelectedStation, stationSummaryText, variablePresence, hoverPointTime}){
+
+  if (stationData === undefined) {
+    return
+  }
+
+  let timeData, directionData, windSpeedData = []
+
+  try {
+    timeData = get_station_field_data(stationData, "time", "column_std_names").data;
+    directionData = get_station_field_data(stationData, 'wind_from_direction', "column_std_names").data;
+    windSpeedData = processWindSpeeds(stationData);
+  }
+  catch (error) {
+    console.error(error)
+  }
+
+  console.log(stationData)
   
   function generateGraph(selectedVar){
       return (
@@ -32,6 +45,8 @@ export default function StationDataLayout({stationName, stationData, stationSumm
   }
 
   const dataLink = "https://cioosatlantic.ca/erddap/tabledap/" + stationName + ".html"
+  console.log("here comes data")
+  console.log(stationData)
 
   return (
     <Box sx={{ width: "100%",
@@ -48,9 +63,7 @@ export default function StationDataLayout({stationName, stationData, stationSumm
         >Summary</Box>
         <p>{stationSummaryText}</p>
         <div className="data-footer">
-          <a href={dataLink} target="_blank" rel="noopener noreferrer">
-            Full data
-          </a>
+                <a href={sourceDataLink} target="_blank">Full data</a>
         </div>
       </section>
 

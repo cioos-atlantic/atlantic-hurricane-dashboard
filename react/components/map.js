@@ -1,5 +1,5 @@
 // https://iconoir.com/ icon library that can be installed via npm
-import React, { useState, useRef, useReducer, useEffect } from "react";
+import React, { useState, useRef, useReducer, useEffect, useMemo } from "react";
 import { MapContainer, TileLayer, WMSTileLayer, LayersControl, LayerGroup } from 'react-leaflet'
 import Drawer from '@/components/drawer';
 import 'leaflet/dist/leaflet.css'
@@ -20,9 +20,15 @@ import { RenderDashboards } from "./Dashboard/dashboard";
 import StormMarker from "./stormPoint";
 import { mapReducer, initialMapState } from "./mapReducer";
 import InfoScreen from "./message_screens/info_screen";
-import { IconButton } from "@mui/material";
+import { IconButton, Stack } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 import { useMediaQuery, Box, useTheme, Tooltip, Button } from "@mui/material";
+import TourWrapper from "@/components/Tour/UseTour";
+import { getTourSteps } from "@/components/Tour/tourSteps";
+import { useTour } from "@reactour/tour";
+import Cookies from "js-cookie";
+
+
 import MeasureControl from 'react-leaflet-measure';
 
 
@@ -30,14 +36,75 @@ const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
 const defaultZoom = 4
 
 
-export default function Map({ children, station_data, source_type,  setStationPoints}) {
+export default function Map({ children, station_data, source_type,  setStationPoints, isTourReady}) {
 
   const clearShapesRef = useRef(null);
 
   const [state, dispatch] = useReducer(mapReducer, initialMapState);
   const [map, setMap] = useState()
   const theme = useTheme();
+  const { setIsOpen, setCurrentStep } = useTour();
+  const [showModal, setShowModal] = useState(true);
+  const [tourStarted, setTourStarted] = useState(false);
   const [isRulerActive, setIsRulerActive] = useState(false);
+
+
+
+  useEffect(() => {  
+    const tourCompleted = Cookies.get("tourCompleted");
+
+    if (!tourCompleted) {
+      Cookies.set("tourCompleted", "false", { expires: 5 });
+      
+    }
+    if (tourCompleted == 'true')
+      {setShowModal(false);}
+
+    if (tourCompleted == 'false') {
+      setShowModal(true);}
+  }, []);
+  
+  
+  const startTour = () => {
+    setShowModal(false);
+    setTourStarted(true);
+    const tourCompleted = Cookies.get("tourCompleted");
+    
+    if ( tourCompleted && tourCompleted == 'false') {
+      Cookies.set("tourCompleted", "true", {
+      expires: 5,
+    });
+      }
+    
+    
+  };
+
+  const skipTour = () => {
+    setShowModal(false);
+    const tourCompleted = Cookies.get("tourCompleted");
+
+
+    if ( tourCompleted && tourCompleted == 'false') {
+      Cookies.set("tourCompleted", "true", {
+      expires: 5,
+    });
+      }
+
+    
+  };
+
+
+ useEffect(() => {
+    if (!tourStarted) return;
+
+    setCurrentStep(0);
+    setIsOpen(true);
+  }, [tourStarted]);
+
+
+
+   
+  
 
   
   
@@ -54,35 +121,39 @@ export default function Map({ children, station_data, source_type,  setStationPo
     onMeasureStart: (e) => console.log('Measurement started:', e),
     onMeasureFinish: (e) => console.log('Measurement finished:', e),
   };
+  
 
-
-    
-
-
-
-  return (
-    <div className="map_container">
+  const mapContent = (<div className="map_container">
       <div className='inner_container'>
-      {<InfoScreen
-          setInfo = {(state) =>dispatch({ type: "SET_INFO_GUIDE", payload: state})}
-          open={state.info}
-          onClose = {state.info}
-        />}
-        
+         
+       {showModal && (
+          <div className="tour-modal-overlay">
+            <div className="tour-modal">
+              <h2>Welcome</h2>
+              <p>
+                Want a quick tour of how to explore storms and use the map?
+              </p>
 
-      { 
-        <IconButton
-          className="info-guide"
-          sx={{ display: 'flex'
-            }}
-          onClick={() => {
-            dispatch({ type: "SET_INFO_GUIDE", payload: true});
-          }}
-          ><InfoIcon />
-        </IconButton>
+              <div className="tour-actions">
+                <button
+                  onClick={startTour}
+                  className="primary"
+                  
+                >
+                  Take a Tour
+                </button>
 
+                <button onClick={skipTour} className="secondary">
+                  No, thanks
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+       
       
-      }
+      
         
        
         {
@@ -114,12 +185,41 @@ export default function Map({ children, station_data, source_type,  setStationPo
 
           
           
-        > <CustomZoomControl /> 
+        > 
+        
+          {// Map Controls
+          }
+
+            <CustomZoomControl /> 
+            {source_type === "active" && (
+              <MeasureControl {...measureOptions} />
+            )}
+           
+          { source_type == "historical" &&
+              (<RenderSpatialFilter
+                ref={clearShapesRef} 
+                setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
+                />)} {/* Calling the EditControl function here */}
+          
+          <Tooltip title="Take a tour of the tool features">
+            <IconButton
+              className="tour-reload"
+              sx={{   
+                 
+                left: state.isDrawerOpen == true ? "355px !important" : "9px !important" }}
+              onClick={() => {
+                setIsOpen(false);// Reset any open tour popovers
+                setShowModal(true)
+                setTourStarted(false);
+              }}
+            >
+              <InfoIcon />
+            </IconButton>
+          </Tooltip>
 
           
-          {source_type === "active" && (
-            <MeasureControl {...measureOptions} />
-          )}
+          
+
 
        
           
@@ -236,9 +336,6 @@ export default function Map({ children, station_data, source_type,  setStationPo
                       if("TIMESTAMP" in state.hover_marker.properties){
                         storm_timestamp = new Date(["TIMESTAMP"]);
                       }
-                      console.log(JSON.stringify(state.hover_marker))
-                      console.log(storm_timestamp)
-                      console.log(station)
                       return (
                         <StationMarker
                           key={station[0]}
@@ -339,11 +436,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
             </LayersControl.Overlay>
           </LayersControl>
 
-          { source_type == "historical" &&
-              (<RenderSpatialFilter
-                ref={clearShapesRef} 
-                setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
-                />)} {/* Calling the EditControl function here */}
+          
         </MapContainer>
 
         { map && (<Drawer
@@ -357,6 +450,19 @@ export default function Map({ children, station_data, source_type,  setStationPo
             clearShapesRef= {clearShapesRef}
           />)}
       </div>
-    </div>
-  )
+    </div>)
+
+  return  tourStarted ? (
+  <TourWrapper
+    steps={getTourSteps({
+      isActive: source_type === "active",
+      isHistorical: source_type === "historical",
+    })}
+      >
+        {mapContent}
+      </TourWrapper>
+    ) : (
+      mapContent
+    );
+  
 }
