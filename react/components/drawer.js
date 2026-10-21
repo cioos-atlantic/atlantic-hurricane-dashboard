@@ -32,7 +32,6 @@ export default function Drawer({ children, element_id, classes, source_type, set
     }
 
     //const map = useMap();
-    console.debug("Map Object: ", map);
     
 
     return ( 

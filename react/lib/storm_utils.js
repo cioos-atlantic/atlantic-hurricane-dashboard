@@ -215,7 +215,6 @@ export function generate_radii_coords(final_polygon, storm_center, ne_rad, se_ra
     const sw_rad_m = sw_rad * nmi_to_m;
     const nw_rad_m = nw_rad * nmi_to_m;
 
-    // console.debug(`NE: ${ne_rad_m}m SE: ${se_rad_m}m SW: ${sw_rad_m}m NW: ${nw_rad_m}m`);
 
     let radius = NaN;
     let rad_coords = [];
@@ -329,7 +328,6 @@ export function build_line_of_travel(storm_data) {
         line_of_travel.geometry.coordinates.push([storm_pt.geometry.coordinates[0], storm_pt.geometry.coordinates[1]]);
     });
 
-    console.debug("Generated Line of Travel: ", line_of_travel);
 
     return line_of_travel;
 }
@@ -461,7 +459,6 @@ export function build_storm_features(storm_data) {
     // however, cloning its properties into a new variable will work as expected
     let storm_features = structuredClone(empty_storm_obj);
 
-    console.debug("build_storm_features -> storm_data: ", storm_data);
 
     // Build wind radii polygons
     let sea_height_rad_polys = build_sea_height_radii_polygons(storm_data);
@@ -474,22 +471,18 @@ export function build_storm_features(storm_data) {
     // })[0];
 
     if (storm_points) {
-        console.debug("Adding points to storm features");
         storm_features.pts.features = storm_points;
     }
 
     if (wind_rad_polys) {
-        console.debug("Adding polygons to storm features");
         storm_features.rad.features = wind_rad_polys;
     }
 
     if (line_of_travel) {
-        console.debug("Adding line of travel to storm features");
         storm_features.lin.features = [line_of_travel];
     }
 
     if (sea_height_rad_polys) {
-        console.debug("Adding sea height to storm features");
         storm_features.sea.features = sea_height_rad_polys;
     }
 
@@ -500,7 +493,6 @@ export function build_ib_active_storm_features(active_storm_data){
     let final_storm_features = structuredClone(empty_storm_obj);
 
     // Build features from IBTRACS data
-    console.debug("Build Features from IBTRACS data...")
     for (let ib_storm in active_storm_data) {
         const storm_features = build_storm_features(active_storm_data[ib_storm]);
 
@@ -532,12 +524,9 @@ export function populateStormDetails(event, storm_data, setSelectedStorm, setSto
 }
 
 export function populateAllStormDetails(event, all_storm_data, setSelectedStorm, setStormPoints) {
-    console.debug("ALL STORM DATA: ", all_storm_data);
 
-    console.debug("Setting selected storm to ALL STORMS");
     setSelectedStorm(show_all_storms);
 
-    console.debug("Clearing ALL storm data from map!");
     setStormPoints(empty_storm_obj);
 
     let final_storm_features = structuredClone(empty_storm_obj);
@@ -552,7 +541,6 @@ export function populateAllStormDetails(event, all_storm_data, setSelectedStorm,
         final_storm_features.sea.features = final_storm_features.sea.features.concat(storm_features.sea.features);
     }
 
-    console.debug("Setting final storm features")
     setStormPoints(final_storm_features);
 }
 

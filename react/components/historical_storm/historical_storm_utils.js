@@ -33,7 +33,6 @@ export async function getHistoricalStormList(){
 
     //const historical_storm_data = parseStormData(storm_data, storm.name);
 
-    console.debug(`historical Storm Data for ${start_date} - ${end_date} : `, storm_data);
     const uniqueList= makeStormList(storm_data)
     // Create a set to track unique IDs and add objects to the result list
     
@@ -345,8 +344,6 @@ export async function handleClick( storm, setStationPoints, setStormPoints, map,
 
     const historical_storm_data = parseStormData(storm_data, storm.name, map, Leaflet);
 
-    console.debug("Historical Storm Data: ", historical_storm_data);
-    console.debug("Historical Station Data: ", historical_station_data);
 
     setStormPoints(historical_storm_data);  // Set the storm data
     setStationPoints(historical_station_data);  // Set the station data

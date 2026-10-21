@@ -467,7 +467,6 @@ export async function processFilterRequest(filterParameters, setLoading) {
 
     //const historical_storm_data = parseStormData(storm_data, storm.name);
 
-    console.debug(`historical Storm Data for ${stormCategory} Between  ${startDate} and ${endDate}: `, storm_data);
     // Create a set to track unique IDs and add objects to the result list
     uniqueList = makeStormList(storm_data)
     // Create a set to track unique IDs and add objects to the result list

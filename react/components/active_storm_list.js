@@ -71,8 +71,6 @@ export default function ActiveStormList({ setStormPoints, map, Leaflet, setSelec
 
 
   if (!is_loading_storm) {
-    console.debug("IBTRACS Storm List: " + active_storm_data.ib_data?.features.length + " points");
-    console.debug("ECCC Storm List: " + active_storm_data.eccc_data?.features.length + " points");
 
     if (active_storm_data.ib_data?.features.length > 0 || active_storm_data.eccc_data?.features.length > 0) {
       active_storms = true;
@@ -90,13 +88,6 @@ export default function ActiveStormList({ setStormPoints, map, Leaflet, setSelec
         storm_details[storm_point.properties.NAME].data.push(storm_point)
       })
     }
-  }
-
-  if (!is_loading_station) {
-    console.debug("Active Station Data: ", active_station_data);
-  }
-  else {
-    console.debug("Waiting for station data to load...");
   }
 
   return (
