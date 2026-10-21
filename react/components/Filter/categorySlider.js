@@ -214,7 +214,7 @@ export function RenderCategoryFilter({ filterDispatch, setShowFilterOptions, sta
         startCategory={startCategory}
         endCategory={endCategory}/>)}
 
-    {console.log(startCategory, endCategory)}
+
     </>
 
 

@@ -80,7 +80,7 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
 
 
  function handleIconClick(){
-    console.log(showFilterOptions);
+
     filterDispatch(filterActions.setShowFilterSelected(true))
     filterDispatch(filterActions.setCatSelection(false));
     filterDispatch(filterActions.setDateSelection(false));
@@ -93,9 +93,8 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
     setOpen(true);
     (async () => {
       setLoading(true);
-      //console.log(startDate, endDate, polyCoords, startCategory, endCategory)
+  
       const stormNames = await input_filter.query(startDate, endDate, polyCoords, startCategory, endCategory); 
-      console.log(stormNames);
       if (!stormNames || !Array.isArray(stormNames))
         { alert("No storm name data available...")
           setLoading(false);
@@ -114,7 +113,6 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
     //setStormNameList([]);
   };
 
-  console.log(stormNameList);
   return(
     <>
     <Button

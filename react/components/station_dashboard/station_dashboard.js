@@ -29,7 +29,6 @@ export default function StationDashboard({ station, hoverPointTime, onClose, tim
   //const institution = stationDescription.institution || "Unknown Institution";
    //const institutionLink = stationDescription.institution_link || "#";\
 
-   //console.log(stationValues.properties)
 
   const displayName = stationValues?.properties?.dataset_title || "Unknown Station";
   const stationName = stationValues?.properties?.station

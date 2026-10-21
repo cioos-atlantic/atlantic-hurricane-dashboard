@@ -22,7 +22,7 @@ export function RenderStormSearch({isSearchSubmitted, setIsSearchSubmitted, sear
       <IconButton  aria-label='search' className="search-icon-small-screen"
         onClick={() => 
       handleClick()
-      //console.log('here')
+
       }>
       <Search
       sx={{
@@ -63,7 +63,6 @@ function SearchForm({setIsSearchSubmitted, setIsDrawerOpen, isSearchSubmitted, s
 
 
 
-  console.log(searchResult)
 
   
 
@@ -109,7 +108,6 @@ function SearchForm({setIsSearchSubmitted, setIsDrawerOpen, isSearchSubmitted, s
 }
 export function changeUrlToHistorical(router){
   const url = `/?page=historical`;
-  console.log(url)
   router.push(url);
 }
 

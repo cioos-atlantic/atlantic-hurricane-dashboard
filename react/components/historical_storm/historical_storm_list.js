@@ -33,7 +33,6 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
   const router = useRouter();
   const [previousQuery, setPreviousQuery] = useState(null);
 
-  console.log("Historical Storms Loading...");
   const setStormPoints = (point) => dispatch(mapActions.setStormPoints(point));
   const setSelectedStation= (station) => dispatch(mapActions.setSelectedStation(station));
   //const setReturnFilterResult = (state) => dispatch({ type: "TOGGLE_FILTER_RESULT", payload: state });
@@ -50,7 +49,6 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
    useEffect(() => { 
     if (!router.isReady) return; // Ensure router is ready
     const { name, season, sid } = router.query;
-    console.log( name, season, sid )
     if (previousQuery?.name !== name || previousQuery?.season !== season || previousQuery?.sid !== sid ) {
     
       async function searchQuery(){
@@ -59,10 +57,8 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         parameters received from the router. If both parameters exist, it calls the `handleSearch`
         function with the `name` and `season` values to fetch storm data based on the search
         criteria. */
-        console.log('here')
         if (name && season) {
           const stormObjectList = await handleSearch(name, season);
-          console.log(stormObjectList);
 
           let selectedStorm;
           if (stormObjectList.length > 1){ // this accounts for unnamed storms that has the same name and season
@@ -75,10 +71,8 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
           }
           else{selectedStorm = stormObjectList[0];}
           
-          console.log(selectedStorm);
           if (selectedStorm) {
             //setDrawerButtonClicked(selectedStorm.storm_id);
-            console.log(selectedStorm.storm_id)
             dispatch(mapActions.setDrawerButtonClicked(selectedStorm.storm_id))
             
 
@@ -98,8 +92,6 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         const fetchedStormList = await getHistoricalStormList();
         setStormList(fetchedStormList);
 
-
-        console.log(fetchedStormList);  // Log the returned storm list
       } catch (error) {
         console.error('Error fetching storm list:', error);
       }

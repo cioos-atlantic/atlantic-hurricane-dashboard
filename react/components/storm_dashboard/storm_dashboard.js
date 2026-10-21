@@ -6,6 +6,7 @@ import BasicTabs from "./tabs";
 import { StormSummaryText } from "./storm_details";
 import StormDataLayout from "./storm_layout_small_screen";
 import { convert_unit_data } from "../utils/unit_conversion";
+import { getStormCategory } from "./utils";
 
 
 
@@ -21,11 +22,8 @@ import { convert_unit_data } from "../utils/unit_conversion";
 const StormDashboard = React.memo(function StormDashboard({ hover_marker, storm_points, onClose }) {
 
   const [selectedStormTab, setSelectedStormTab] = useState(0);
-  //console.log(storm_data, storm_points, source_type, hover_point);
-  console.log(storm_points.pts.features)
 
   const stormPoints = storm_points.pts.features;
-  console.log(stormPoints)
   const ibtracs_link = 'https://www.ncei.noaa.gov/products/international-best-track-archive';
 
   const stormNameList = [];
@@ -51,12 +49,11 @@ const StormDashboard = React.memo(function StormDashboard({ hover_marker, storm_
 
   stormPoints.forEach((storm_point)=> {
     
-    //console.log(storm_point);
     stormNameList.push(fetch_value(storm_point, ["STORMNAME", "NAME"]));
     stormTime.push(fetch_value(storm_point, ["TIMESTAMP", "ISO_TIME"]));
     storm_data_dict.direction[0].stormDir.data.push(storm_point.properties.STORM_DIR);
     
-    stormCategory.data.push(fetch_value(storm_point, ["STORMFORCE", "USA_SSHS"]));
+    
 
 
     // convert gust, storm speed and wind speed from knots to Kmh to synchronize with station chart
@@ -64,6 +61,8 @@ const StormDashboard = React.memo(function StormDashboard({ hover_marker, storm_
     const stormWindSpeed_in_knots = fetch_value(storm_point, ["MAXWIND", "WMO_WIND", "USA_WIND"])
     const stormWindSpeed_in_Kmh = convert_unit_data(stormWindSpeed_in_knots, 'knots', 'km/h')
     const stormSpeed_in_Kmh = convert_unit_data(storm_point.properties.STORM_SPEED, 'knots', 'km/h')
+
+    stormCategory.data.push(getStormCategory(storm_point));
     
 
     storm_data_dict.speed[0].stormSpeed.data.push(stormSpeed_in_Kmh.value);
@@ -85,7 +84,6 @@ const StormDashboard = React.memo(function StormDashboard({ hover_marker, storm_
   const stormName = stormNameUniqueValues[0];
   // Add on to check if more than one storm name exists in data
   const theme = useTheme();
-  console.log(stormName);
   const isExtraSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   const isSmall = useMediaQuery(theme.breakpoints.down('md')); // `md` in MUI = 960px
@@ -94,7 +92,6 @@ const StormDashboard = React.memo(function StormDashboard({ hover_marker, storm_
   const hoverPointTime = fetch_value(hover_marker, ["TIMESTAMP", "ISO_TIME"]);
 
 
-  console.log(storm_data_dict);
 
   const variablePresence={};
   Object.keys(storm_data_dict).forEach((key) => {
@@ -124,7 +121,6 @@ const StormDashboard = React.memo(function StormDashboard({ hover_marker, storm_
       });
   });
 
-  console.log(hover_marker);
 
 
 
@@ -152,7 +148,6 @@ const StormDashboard = React.memo(function StormDashboard({ hover_marker, storm_
         <button
           className="close"
           onClick={() => {
-            console.log("closed")
             setSelectedStormTab(0);
             onClose();
           }}
@@ -211,7 +206,6 @@ const StormDashboard = React.memo(function StormDashboard({ hover_marker, storm_
         <button
           className="close"
           onClick={() => {
-            console.log("closed")
             setSelectedStormTab(0);
             onClose();
           }}

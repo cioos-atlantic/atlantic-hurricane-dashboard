@@ -27,26 +27,23 @@ export function RenderSmallDashboard({selected_station, hover_point, storm_point
   	const stationDisplayName = stationValues?.properties?.dataset_title || "Unknown Station";
   	const institution = stationValues?.properties?.institution || "Unknown Institution";
   	const institutionLink = stationValues?.properties?.institution_link || "#";  
-  	//console.log(stationSummary, stationDisplayName, institution, institutionLink);
+
 	const [stormName, stormTimes, stormType, stormDataDict, stormCategory] = parseStormData(storm_points);
 
 	const mergedData = mergeData(stationDataDict, stormDataDict);
 
-	console.log(mergedData);
 	const stationTimes = get_station_field_data(stationValues?.properties?.station_data,"time", "column_std_names")?.data
 
 	const convertedStormTimes = stormTimes.map(time =>  Date.parse(time));
 
 	const { unifiedTimes, alignedMergedData } = alignMergedData(mergedData, convertedStormTimes, stationTimes);
 
-	console.log(unifiedTimes, alignedMergedData);
 
 	const variablePresence = createVarPresenceDict(alignedMergedData, stormCategory, stormType, stationValues );
 	const allStationData =stationValues?.properties?.station_data;
 	const timeData = get_station_field_data(allStationData, "time", "column_std_names").data;
 	const directionData = get_station_field_data(allStationData, 'wind_from_direction', "column_std_names").data;
 	const  windSpeedData = processWindSpeeds(allStationData);
-	console.log(timeData, directionData, windSpeedData);
 	
 
 	function generateGraph(selectedVar){

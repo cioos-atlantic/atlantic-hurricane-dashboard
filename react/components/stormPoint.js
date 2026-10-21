@@ -44,18 +44,15 @@ export default function StormMarker({ storm_point_data, storm_point_hover, dispa
     }, []);
 
     const isSelected = storm_point_data.id === storm_point_hover?.id;
-    //console.log(`Marker for storm point with category ${storm_cat[getStormCategory(storm_point_data)].name.en || "Unknown"}`)
     
 
 
 
     useEffect(() => {
         (async () => {
-            console.log(storm_point_data.properties);
             const storm_category = getStormCategory(storm_point_data) || "";
             const categoryInfo = storm_cat[storm_category] || {};
             const baseIcon = categoryInfo.img;
-            console.log(baseIcon);
              const icon = L.divIcon({ 
                 className: `storm-marker ${isSelected ? "selected" : ""}`,
                 html: `

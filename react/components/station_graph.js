@@ -16,17 +16,15 @@ Chart.register(LineController, LineElement, LinearScale, PointElement, CategoryS
  */
 function RenderChart({ sourceData, position, stationName, varCategory, hoverPointTime }) {
 
-
   const chartRef = useRef(null); // Reference to the canvas element
 
   const startAtZero = varCategory === 'air_pressure' ? false : true
-  
+
   useEffect(() => {
     // Check if chartData is available
     if (sourceData && sourceData.rows.length > 0) {
       const ctx = chartRef.current.getContext('2d'); // Get context for the canvas
       
-      console.log(hoverPointTime);
       const highlightTime = new Date(hoverPointTime).toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',   // full month name
@@ -37,10 +35,8 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
     
       });
 
-      console.log(hoverPointTime);
       
       const chartData = parseChartData(sourceData, varCategory, hoverPointTime);
-      console.log(chartData);
       const datasets = chartData.datasets;
       const timeData = chartData.timeData;
 
@@ -55,7 +51,7 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
           datasets: datasets, // Set the datasets
         },
         options: {
-          animation:ProgressiveAnimation(datasets),
+          animation:false,
           interaction: {
             intersect: false,
             mode: 'index',
@@ -87,7 +83,7 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
           },
           responsive: true,
           spanGaps:true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false, 
           
           plugins: {
             annotation: {
@@ -117,7 +113,6 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
       };
 
       // Destroy the previous chart if it exists
-      //console.log(chartRef.current.chart);
       if (chartRef.current.chart) {
         chartRef.current.chart.destroy();
       }
@@ -141,14 +136,14 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
           xMax: new Date(hoverPointTime),
           //yMin: yMin,
           //yMax: yMax,
-          borderColor: 'rgb(255, 99, 132)',
+          borderColor: '#1F1617',
           borderWidth: 2,
           borderDash: [5,2],
           label: {
             display: true,
             content: `Hovered Date: ${highlightTime}`,
             position: 'end', // options: 'start', 'center', 'end'
-            backgroundColor: 'rgba(255,99,132,0.8)',
+            backgroundColor: '#1F1617',
             color: '#fff',
             font: {
               weight: 'bold',
@@ -172,15 +167,8 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
 
   return (
 
-    <div  className='chart-render'>
-      <canvas
-        ref={chartRef}
-        style={{
-          top: 0,
-          left: 0,
-          
-        }}
-      />
+    <div className='chart-box'>
+      <canvas ref={chartRef} />
     </div>
 
       
@@ -202,8 +190,6 @@ const getRandomColor = () => {
 
 function getColour(graph_colour_list, var_name, indx) {
   let colour = '';
-  console.log(var_name);
-  console.log(graph_colour_list);
 
   colour = var_name in graph_colour_list ? graph_colour[var_name][indx] : getRandomColor()
   return colour;
@@ -215,16 +201,13 @@ function getColour(graph_colour_list, var_name, indx) {
 export default React.memo(RenderChart);
 
 function parseChartData(sourceData, varCategory, hoverPointTime){
-  console.log(sourceData);
   const  column_names = sourceData.column_names;
   const hoverTimestamp = new Date(hoverPointTime).getTime();
   
   const column_std_names = sourceData.column_std_names;
   const uniqueColStdNames= getUniqueStdNamesList(column_std_names);
-  console.log(uniqueColStdNames);
 
   const timeData = get_station_field_data(sourceData,"time", "column_std_names")?.data
-  console.log(timeData);
   // Move this to config later
   const exclude_var = ['time', 'latitude', 'longitude', 'wind_from_direction', 'relative_humidity',
       'sea_surface_wave_from_direction', 'sea_surface_wave_maximum_period', 'sea_surface_wave_mean_period'
@@ -232,14 +215,11 @@ function parseChartData(sourceData, varCategory, hoverPointTime){
   // Prepare datasets for each variable, excluding 'time'
   const datasets = [];
   uniqueColStdNames.filter((variable) => !exclude_var.includes(variable) && variable.includes(varCategory)).map((variable, index) =>{
-    console.log(variable)
 
     const column_names_list = getColumnNameList(column_std_names, column_names, variable)
-    console.log(column_names_list);
     var graph_colour_list = {}
     Object.assign(graph_colour_list, graph_colour);
    
-    console.log(graph_colour_list)
     column_names_list.forEach((col_name, indx) => {
       const unit = get_station_field_units(sourceData, col_name)
       
@@ -260,7 +240,6 @@ function parseChartData(sourceData, varCategory, hoverPointTime){
         },
         pointBackgroundColor: (context) => {
           const pointTime = timeData[context.dataIndex];
-          //console.log(hoverTimestamp);
           return pointTime === hoverTimestamp ? 'red' : '';
         },
       })}
@@ -268,7 +247,6 @@ function parseChartData(sourceData, varCategory, hoverPointTime){
     });
     
   });
-      console.log(datasets)
       return {datasets: datasets,
               timeData: timeData}
 };

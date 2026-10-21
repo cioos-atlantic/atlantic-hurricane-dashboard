@@ -51,7 +51,6 @@ export default function station_data_format(features, filter_station) {
         }
         return station_data
     } catch (err) {
-        console.log("Error reformatting data")
         return err
     }
 }

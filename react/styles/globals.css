@@ -930,6 +930,34 @@ footer {
   justify-content: center;
 }
 
+/* Wrapper for every Chart.js chart */
+.chart-box{
+  --chart-width: 50%;
+  --chart-max-height: 220px;
+  position: relative;
+  width: var(--chart-width);
+  min-width: 0;
+  margin-inline: auto;
+  aspect-ratio: 5 / 2;
+  max-height: var(--chart-max-height);
+}
+
+/* For polar/pie style charts */
+.chart-box--square{
+  aspect-ratio: 1 / 1;
+}
+
+.chart-box canvas{
+  display: block;
+}
+
+/* Half width is too small on phones, change behaviour of displayed chart */
+@media (max-width: 600px){
+  .chart-box{
+    --chart-width: 100%;
+  }
+}
+
 .leaflet-popup-content {
   margin: 5px !important;
   padding: 0 !important;

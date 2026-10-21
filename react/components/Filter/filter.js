@@ -94,7 +94,6 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints, isDra
       clearShapesRef.current.clearShapes();
     }
 
-    console.log("All filters and shapes cleared!");
   }
 
 
@@ -122,16 +121,11 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints, isDra
       stormName: filterStormName
 
     };
-
-    console.log(updatedParams); // 
+ 
     filterDispatch(filterActions.setFilterQuery(updatedParams));
 
-   
-
-
-
     const stormResult = await processFilterRequest(updatedParams, setLoading);
-    console.log(stormResult);
+
     filterDispatch(filterActions.setFilterResult(stormResult));
     router.push(`/?page=historical`);
 
@@ -302,7 +296,6 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints, isDra
       clearShapesRef.current.clearShapes();
     }
 
-    console.log("All filters and shapes cleared!");
   }
 
 export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSelectedOptions, selectedOptions }) {
@@ -337,7 +330,7 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
       ...prev,
       [name]: [] // Clear the options for the specific filter name
     }));
-    console.log({ [name]: [] }); // Log the cleared options
+ 
   };
 
   function handleIconClick() {
@@ -367,8 +360,6 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
         }>
 
         {filter.display_name}
-
-        {console.log(showFilterOptions)}
 
       </Button>
 
@@ -434,11 +425,6 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
 
           </Stack>
 
-
-
-          {console.log(selectedOptions)}
-          {console.log(filter.options)}
-
         </Paper>
       )}
 
@@ -452,7 +438,6 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
 
 export async function processFilterRequest(filterParameters, setLoading) {
 
-  console.log(filterParameters);
   let uniqueList = [];
   const stormCategory = formatStormCategory(filterParameters['stormCategory']);
   const stormNames = formatStormName(filterParameters['stormName']);
@@ -464,7 +449,6 @@ export async function processFilterRequest(filterParameters, setLoading) {
   const endCategory = (filterParameters['endCategory']) ? filterParameters['endCategory'] : '';
 
 
-  console.log(stormCategory, stormNames, startDate, endDate)
 
 
 
@@ -479,15 +463,12 @@ export async function processFilterRequest(filterParameters, setLoading) {
 
   }).toString();
 
-  console.log(query)
   setLoading(true);
   try {
     const resource = await fetch(`${basePath}/api/filter_storms?${query}`);
     const storm_data = await resource.json();
-    //console.log(storm_data);
 
     //const historical_storm_data = parseStormData(storm_data, storm.name);
-    // console.log(historical_station_data);
 
     console.debug(`historical Storm Data for ${stormCategory} Between  ${startDate} and ${endDate}: `, storm_data);
     // Create a set to track unique IDs and add objects to the result list
@@ -495,7 +476,6 @@ export async function processFilterRequest(filterParameters, setLoading) {
     // Create a set to track unique IDs and add objects to the result list
     setLoading(false);
 
-    console.log(uniqueList);
     if (uniqueList.length === 0) {
       alert("No result found for this search, please try again...")
     }
