@@ -5,6 +5,7 @@ import HistoricalStormList from "@/components/historical_storm/historical_storm_
 import Leaflet from 'leaflet';
 import React from "react";
 import { Tooltip, Box, Button } from '@mui/material';
+import { mapActions } from "@/components/mapReducer";
 
 
 
@@ -54,10 +55,10 @@ export default function Drawer({ children, element_id, classes, source_type, set
                     {
                         source_type == "active" ? (
                             <ActiveStormList
-                                setStormPoints = {(point) => dispatch({ type: "SET_STORM_POINT", payload: point })}
+                                setStormPoints = {(point) => dispatch(mapActions.setStormPoints(point))}
                                 map={map}
                                 Leaflet={Leaflet}
-                                setSelectedStation = {(station) => dispatch({ type: "SET_SELECTED_STATION", payload: station })}
+                                setSelectedStation = {(station) => dispatch(mapActions.setSelectedStation(station))}
                                 
                             />
                         ) : 
@@ -67,21 +68,9 @@ export default function Drawer({ children, element_id, classes, source_type, set
                                 map={map}
                                 Leaflet={Leaflet}
                                 dispatch={dispatch}
-                                returnFilterResult={state.returnFilterResult}
-                                filterResult={state.filterResult}
                                 drawerButtonClicked={state.drawerButtonClicked}
-                                startDate={state.startDate}
-                                endDate={state.endDate}
-                                startCategory={state.startCategory}
-                                endCategory={state.endCategory}
-                                polyFilterCoords={state.polyFilterCoords}
-                                filterQuery={state.filterQuery}
-                                filterStormName={state.filterStormName}
-                                showFilterSelected={state.showFilterSelected}
                                 clearShapesRef={clearShapesRef}
                                 isDrawerOpen={state.isDrawerOpen}
-                                showDateSelection= {state.showDateSelection}
-                                showCatSelection={state.showCatSelection}
 
 
                                 
@@ -113,10 +102,7 @@ export default function Drawer({ children, element_id, classes, source_type, set
                     className='drawer_close_button'
                     sx={{left: state.isDrawerOpen ? "355px" : "10px",}}
                     onClick={() =>
-                    dispatch({
-                        type: "TOGGLE_DRAWER",
-                        payload: !state.isDrawerOpen,
-                    })
+                    dispatch(mapActions.setDrawerOpen(!state.isDrawerOpen))
                     }
                 >
                     {state.isDrawerOpen ? "X" : ">"}

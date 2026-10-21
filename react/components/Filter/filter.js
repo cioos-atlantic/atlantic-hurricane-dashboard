@@ -27,6 +27,9 @@ import { empty_station_obj } from "../point_defaults";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { formatFilterDate, formatStormCategory, formatStormName } from "./filter_utils";
 import { FiltersSelected, FiltersSubmitted } from "./viewFilters";
+import { mapActions } from "@/components/mapReducer";
+import { filterActions } from "@/components/Filter/filterReducer";
+import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
 
 
 const ITEM_HEIGHT = 35;
@@ -46,7 +49,10 @@ export const ShowOptions = KeyboardDoubleArrowDownIcon;
 export const CloseOptions = KeyboardDoubleArrowUpIcon;
 
 
-export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, startDate, endDate, startCategory, endCategory, polyFilterCoords, isDrawerOpen, filterStormName, showDateSelection, showCatSelection,filterQuery, showFilterSelected }) {
+export function RenderFilter({ clearShapesRef, dispatch, setStationPoints, isDrawerOpen }) {
+  const { startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName,
+    showDateSelection, showCatSelection, showFilterSelected, filterQuery } = useFilters();
+  const filterDispatch = useFilterDispatch();
   const [showFilterIcons, setShowFilterIcons] = useState(false);
   const [showFilterOptions, setShowFilterOptions] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -57,7 +63,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
   
 
   const [openSpeedDial, setOpenSpeedDial] = useState(false);
-  const setFilterStormName = (state) => dispatch({ type: "SET_FILTER_STORM_NAME", payload: state });
+  const setFilterStormName = (state) => filterDispatch(filterActions.setFilterStormName(state));
 
   
   const handleOpen = () => setOpenSpeedDial(true);
@@ -78,7 +84,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
 
   function handleClearAllFilters() {
     setSelectedOptions([]);
-    dispatch({ type: "RESET_FILTERS" })
+    filterDispatch(filterActions.resetFilters())
 
     const hasClearShapesRef = clearShapesRef && clearShapesRef.current;
     
@@ -93,10 +99,10 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
 
   async function handleFilterSubmit() {
     //setDrawerButtonClicked('');
-    dispatch({ type: "SHOW_FILTER_SELECTED", payload: false });
-    dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: '' });
-    dispatch({ type: "SET_CAT_SELECTION", payload: false});
-    dispatch({ type: "SET_DATE_SELECTION", payload: false});
+    filterDispatch(filterActions.setShowFilterSelected(false));
+    dispatch(mapActions.setDrawerButtonClicked(''));
+    filterDispatch(filterActions.setCatSelection(false));
+    filterDispatch(filterActions.setDateSelection(false));
     setShowFilterOptions(prev => ({
       ...prev,
       stormName: false, // stormName must be defined here
@@ -115,29 +121,26 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
       stormName: filterStormName
 
     };
-
-    dispatch({ type: "SET_FILTER_QUERY", payload: updatedParams});
-
-   
-
-
+ 
+    filterDispatch(filterActions.setFilterQuery(updatedParams));
 
     const stormResult = await processFilterRequest(updatedParams, setLoading);
-    dispatch({ type: "SET_FILTER_RESULT", payload: stormResult});
+
+    filterDispatch(filterActions.setFilterResult(stormResult));
     router.push(`/?page=historical`);
 
     //setIsDrawerOpen(true);
     //setReturnFilterResult(true);
-    dispatch({ type: "TOGGLE_DRAWER", payload: true});
-    dispatch({ type: "TOGGLE_FILTER_RESULT", payload: true});
-    dispatch({ type: "CLOSE_STORM_TRACKS" })
+    dispatch(mapActions.setDrawerOpen(true));
+    filterDispatch(filterActions.setReturnFilterResult(true));
+    dispatch(mapActions.closeStormTracks())
     setStationPoints(empty_station_obj)
-    dispatch({ type: "SET_START_DATE", payload: null});
-    dispatch({ type: "SET_END_DATE", payload: null});
-    dispatch({ type: "SET_POLY_FILTER_COORDS", payload: ''});
-    dispatch({ type: "SET_START_CATEGORY", payload: null});
-    dispatch({ type: "SET_END_CATEGORY", payload: null});
-    dispatch({ type: "SET_FILTER_STORM_NAME", payload: []});
+    filterDispatch(filterActions.setStartDate(null));
+    filterDispatch(filterActions.setEndDate(null));
+    filterDispatch(filterActions.setPolyFilterCoords(''));
+    filterDispatch(filterActions.setStartCategory(null));
+    filterDispatch(filterActions.setEndCategory(null));
+    filterDispatch(filterActions.setFilterStormName([]));
     
 
   }
@@ -178,7 +181,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
                     input_filter={input_filter}
                     showFilterOptions={showFilterOptions}
                     setShowFilterOptions={setShowFilterOptions}
-                    dispatch={dispatch}
+                    filterDispatch={filterDispatch}
                     filterStormName={filterStormName}
                     setFilterStormName= {setFilterStormName}
                     startDate= {startDate} 
@@ -196,7 +199,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
 
             <div className="filter-group">
               <RenderDateFilter
-                dispatch={dispatch}
+                filterDispatch={filterDispatch}
                 setShowFilterOptions={setShowFilterOptions}
                 startDate= {startDate} 
                 endDate= {endDate}
@@ -205,7 +208,7 @@ export function RenderFilter({  clearShapesRef, dispatch, setStationPoints, star
             </div>
             <div className="filter-group">
               <RenderCategoryFilter
-                  dispatch={dispatch}
+                  filterDispatch={filterDispatch}
                   setShowFilterOptions={setShowFilterOptions}
                   startCategory={startCategory}
                   endCategory={endCategory}
@@ -435,7 +438,7 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
 
 export async function processFilterRequest(filterParameters, setLoading) {
 
-  let uniqueList;
+  let uniqueList = [];
   const stormCategory = formatStormCategory(filterParameters['stormCategory']);
   const stormNames = formatStormName(filterParameters['stormName']);
   const startDate = formatFilterDate(filterParameters['startDate']);
