@@ -137,17 +137,17 @@ function RenderStormChart({ sourceData,  varCategory, timeData, hoverPointTime }
         xMax: new Date(hoverPointTime),
         //yMin: yMin,
         //yMax: yMax,
-        borderColor: 'rgb(255, 99, 132)',
+        borderColor: 'black',
         borderWidth: 2,
         borderDash: [5,2],
         label: {
           display: true,
           content: `Hovered Date: ${highlightTime}`,
           position: 'end', // options: 'start', 'center', 'end'
-          backgroundColor: 'rgba(255,99,132,0.8)',
+          backgroundColor: '#1F1617',
           color: '#fff',
           font: {
-            weight: 'bold',
+            weight: '#1F1617',
             size: 10
           },
           padding: 4
@@ -219,7 +219,7 @@ function makeDataset(dataList, formattedTimeData, hoverPointTime) {
         },
         pointBackgroundColor: (context) => {
           const pointTime = new Date(formattedTimeData[context.dataIndex]).getTime();
-          return pointTime === hoverTimeStamp ? 'red' : 'blue';
+          return pointTime === hoverTimeStamp ? '#1F1617' : 'blue';
         },
       })
     })

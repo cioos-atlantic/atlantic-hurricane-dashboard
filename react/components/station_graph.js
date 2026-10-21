@@ -141,14 +141,14 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
           xMax: new Date(hoverPointTime),
           //yMin: yMin,
           //yMax: yMax,
-          borderColor: 'rgb(255, 99, 132)',
+          borderColor: '#1F1617',
           borderWidth: 2,
           borderDash: [5,2],
           label: {
             display: true,
             content: `Hovered Date: ${highlightTime}`,
             position: 'end', // options: 'start', 'center', 'end'
-            backgroundColor: 'rgba(255,99,132,0.8)',
+            backgroundColor: '#1F1617',
             color: '#fff',
             font: {
               weight: 'bold',
@@ -261,7 +261,7 @@ function parseChartData(sourceData, varCategory, hoverPointTime){
         pointBackgroundColor: (context) => {
           const pointTime = timeData[context.dataIndex];
           //console.log(hoverTimestamp);
-          return pointTime === hoverTimestamp ? 'red' : '';
+          return pointTime === hoverTimestamp ? '#1F1617' : 'blue';
         },
       })}
       

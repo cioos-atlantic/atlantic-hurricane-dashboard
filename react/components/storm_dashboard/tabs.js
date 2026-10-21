@@ -129,10 +129,7 @@ export default function BasicTabs({stormName, stormData, stormSummaryText, varia
             <Tab label="Summary" sx={{
               fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
             }} {...a11yProps(0)} />
-            <Tab label={stormType['name']}
-             sx={{
-              fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
-            }} {...a11yProps(1)} />
+           
             <Tab label={stormCategory['name']}
              sx={{
               fontSize: { xs: '12px', sm: '14px', md: '14px', lg: '14px' }
@@ -166,13 +163,10 @@ export default function BasicTabs({stormName, stormData, stormSummaryText, varia
       <CustomTabPanel value={selectedStormTab} index={0}>
         {stormSummaryText}
       </CustomTabPanel>
-      <CustomTabPanel value={selectedStormTab} index={1} >
-        {<StormTypeChart chartData={stormType}/>}
-      </CustomTabPanel>
-      <CustomTabPanel value={selectedStormTab} index={2}>
+      <CustomTabPanel value={selectedStormTab} index={1}>
         {<StormCategoryChart chartData={stormCategory}/>}
       </CustomTabPanel>
-      <CustomTabPanel value={selectedStormTab} index={3}>
+      <CustomTabPanel value={selectedStormTab} index={2}>
       {<RenderPlotlyRose 
           windData={windData}
           directionData={directionData}
@@ -185,7 +179,7 @@ export default function BasicTabs({stormName, stormData, stormSummaryText, varia
             .map(([key, value], index) => {
               
               return(
-                <CustomTabPanel key={key} value={selectedStormTab} index={index + 4}>
+                <CustomTabPanel key={key} value={selectedStormTab} index={index + 3}>
                   {generateGraph(key)}
                 </CustomTabPanel>
               )

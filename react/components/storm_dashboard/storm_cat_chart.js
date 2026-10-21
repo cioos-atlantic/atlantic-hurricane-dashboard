@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart, PolarAreaController, RadialLinearScale, ArcElement, Legend, Title } from 'chart.js';
-import { storm_categories } from '@/lib/storm_class';
+import { storm_cat } from '@/lib/storm_cat';
 
 // Register necessary components
 Chart.register(PolarAreaController, RadialLinearScale, ArcElement, Legend, Title);
@@ -18,9 +18,9 @@ function StormCategoryChart({ chartData }) {
     
     
     // Extract background colors based on storm types
-    const labels = uniqueStormCats.map(category => storm_categories[category]?.name.en || 'No Data');
+    const labels = uniqueStormCats.map(category => storm_cat[category]?.name.en || 'No Data');
     const backgroundColors = uniqueStormCats.map(category => 
-      storm_categories[category]?.arcColor || "#CCCCCC" // Default color if type is missing
+      storm_cat[category]?.chart_color || "#CCCCCC" // Default color if type is missing
     );
 
     const data = {
@@ -73,7 +73,3 @@ export default StormCategoryChart;
 
 
 
-function getLabelName(name_code){
-  const labelName = storm_type_info[name_code]['name']['en']
-  return labelName
-}
