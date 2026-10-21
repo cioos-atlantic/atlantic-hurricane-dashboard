@@ -9,9 +9,8 @@ export const initialMapState = {
   filterResult: [],
   returnFilterResult: false,
   polyFilterCoords: '',
-  isDashOpen: false,
-  isStormDashOpen: false,
-  isStationDashOpen: false,
+  // Which dashboard panels are visible. "Any dashboard open" is derived: storm || station
+  dashboards: { storm: false, station: false },
   drawerButtonClicked: '',
   startDate: null,
   endDate: null,
@@ -38,9 +37,9 @@ export const mapActions = {
   closeStormTracks: () => ({ type: 'CLOSE_STORM_TRACKS' }),
 
   // Dashboards
-  setDashOpen: (isOpen) => ({ type: 'TOGGLE_DASH', payload: isOpen }),
-  setStormDashOpen: (isOpen) => ({ type: 'TOGGLE_STORM_DASH', payload: isOpen }),
-  setStationDashOpen: (isOpen) => ({ type: 'TOGGLE_STATION_DASH', payload: isOpen }),
+  openDashboard: (panel) => ({ type: 'OPEN_DASHBOARD', payload: panel }),    // panel: 'storm' | 'station'
+  closeDashboard: (panel) => ({ type: 'CLOSE_DASHBOARD', payload: panel }),  // panel: 'storm' | 'station'
+  closeAllDashboards: () => ({ type: 'CLOSE_ALL_DASHBOARDS' }),
   setSelectedTab: (tab) => ({ type: 'SET_SELECTED_TAB', payload: tab }),
   closeStationDashboard: () => ({ type: 'CLOSE_STATION_DASHBOARD' }),
 
@@ -86,12 +85,12 @@ export function mapReducer(state, action) {
       return { ...state, returnFilterResult: action.payload };
     case 'SET_POLY_FILTER_COORDS':
       return { ...state, polyFilterCoords: action.payload };
-      case 'TOGGLE_DASH':
-      return { ...state, isDashOpen: action.payload };
-    case 'TOGGLE_STORM_DASH':
-      return { ...state, isStormDashOpen: action.payload };
-    case 'TOGGLE_STATION_DASH':
-      return { ...state, isStationDashOpen: action.payload };
+    case 'OPEN_DASHBOARD':
+      return { ...state, dashboards: { ...state.dashboards, [action.payload]: true } };
+    case 'CLOSE_DASHBOARD':
+      return { ...state, dashboards: { ...state.dashboards, [action.payload]: false } };
+    case 'CLOSE_ALL_DASHBOARDS':
+      return { ...state, dashboards: { storm: false, station: false } };
     case 'SET_DRAWER_BUTTON_CLICKED':
       return { ...state, drawerButtonClicked: action.payload };
     case 'SET_START_DATE':
@@ -144,8 +143,7 @@ export function mapReducer(state, action) {
           ...state,
           selected_station: action.payload,
           selectedTab: 0,
-          isDashOpen: true,
-          isStationDashOpen: true,
+          dashboards: { ...state.dashboards, station: true },
         };
       case 'CLOSE_STATION_DASHBOARD':
         return {
@@ -159,9 +157,7 @@ export function mapReducer(state, action) {
           ...state,
           storm_points: empty_storm_obj,
           hover_marker: empty_point_obj,
-          isStormDashOpen: false,
-          isStationDashOpen: false,
-          isDashOpen: false,
+          dashboards: { storm: false, station: false },
           drawerButtonClicked: ''
           
 

@@ -157,7 +157,7 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
             console.log("closed")
             setSelectedStormTab(0);
             dispatch(mapActions.setHoverMarker(empty_point_obj));
-            dispatch(mapActions.setStormDashOpen(false));
+            dispatch(mapActions.closeDashboard('storm'));
           }}
           title="Close"
           aria-label="Close"
@@ -217,7 +217,7 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
             console.log("closed")
             setSelectedStormTab(0);
             dispatch(mapActions.setHoverMarker(empty_point_obj));
-            dispatch(mapActions.setStormDashOpen(false));
+            dispatch(mapActions.closeDashboard('storm'));
           }}
           title="Close"
           aria-label="Close"

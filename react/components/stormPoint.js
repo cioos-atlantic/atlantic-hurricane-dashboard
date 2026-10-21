@@ -98,8 +98,7 @@ export default function StormMarker({ storm_point_data, storm_point_hover, dispa
                 },
                 click: () => {
                     dispatch(mapActions.setHoverMarker(storm_point_data));
-                    dispatch(mapActions.setDashOpen(true));
-                    dispatch(mapActions.setStormDashOpen(true));
+                    dispatch(mapActions.openDashboard('storm'));
                     clickedRef.current = true;
                 },
                 mouseout: () => {

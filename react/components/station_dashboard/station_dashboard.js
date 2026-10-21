@@ -126,7 +126,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
             className="close"
             onClick={() => {
               dispatch(mapActions.closeStationDashboard());
-              dispatch(mapActions.setStationDashOpen(false));
+              dispatch(mapActions.closeDashboard('station'));
             }}
             title="Close"
             aria-label="Close"
@@ -181,7 +181,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
             className="close"
             onClick={() => {
               dispatch(mapActions.closeStationDashboard());
-              dispatch(mapActions.setStationDashOpen(false));
+              dispatch(mapActions.closeDashboard('station'));
               //setIsStationDashOpen(false);
             }}
             title="Close"

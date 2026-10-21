@@ -13,8 +13,8 @@ export function RenderDashboards({ source_type, time, state, dispatch
     }){
         
 
-        const showStorm = state.isStormDashOpen;
-        const showStation = state.isStationDashOpen;
+        const showStorm = state.dashboards.storm;
+        const showStation = state.dashboards.station;
         console.log(showStation, showStorm)
             // Determine width dynamically
         const flexValue = showStorm && showStation ? 1 : 2; // 50% if both, 100% if one
@@ -22,7 +22,7 @@ export function RenderDashboards({ source_type, time, state, dispatch
         const isSmall = useMediaQuery(theme.breakpoints.down('md')); // `md` in MUI = 960px
         const isExtraSmall = useMediaQuery(theme.breakpoints.down('sm'));
     
-        if (!state.isDashOpen) return null;
+        if (!showStorm && !showStation) return null;
 
     return (
     isExtraSmall && showStorm && showStation ? (
@@ -32,9 +32,7 @@ export function RenderDashboards({ source_type, time, state, dispatch
         source_type={source_type}
         time={time}
         storm_points={state.storm_points}
-        setIsDashOpen= {(state) => dispatch(mapActions.setDashOpen(state))}
-        setIsStormDashOpen={(state) => dispatch(mapActions.setStormDashOpen(state))}
-        setIsStationDashOpen={(state) => dispatch(mapActions.setStationDashOpen(state))}
+        onClose={() => dispatch(mapActions.closeAllDashboards())}
         />
     ) : (
         <Stack
@@ -65,7 +63,7 @@ export function RenderDashboards({ source_type, time, state, dispatch
                 dispatch={dispatch}
                 hover_marker={state.hover_marker}
                 storm_points={state.storm_points}
-                isStormDashOpen={state.isStormDashOpen}
+                isStormDashOpen={state.dashboards.storm}
                 
             />
             </Box>

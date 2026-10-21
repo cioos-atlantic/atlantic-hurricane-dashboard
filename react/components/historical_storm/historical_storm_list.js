@@ -34,9 +34,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
   const setSelectedStation= (station) => dispatch(mapActions.setSelectedStation(station));
   //const setReturnFilterResult = (state) => dispatch({ type: "TOGGLE_FILTER_RESULT", payload: state });
   //const setDrawerButtonClicked = (clicked) => dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: clicked });
-  const setIsDashOpen= (state) => dispatch(mapActions.setDashOpen(state));
-  const setIsStormDashOpen= (state) => dispatch(mapActions.setStormDashOpen(state));
-  const setIsStationDashOpen= (state) => dispatch(mapActions.setStationDashOpen(state));
+  const closeAllDashboards = () => dispatch(mapActions.closeAllDashboards());
 
   const cancelFilters = () => dispatch(mapActions.cancelFilters());
   const setDrawerButtonClicked = (buttonClicked) => dispatch(mapActions.setDrawerButtonClicked(buttonClicked));
@@ -80,7 +78,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
             dispatch(mapActions.setDrawerButtonClicked(selectedStorm.storm_id))
             
 
-            await handleClick(selectedStorm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation,setLoading, setIsDashOpen, setIsStormDashOpen,setIsStationDashOpen);
+            await handleClick(selectedStorm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation,setLoading, closeAllDashboards);
           }
         }
     }
