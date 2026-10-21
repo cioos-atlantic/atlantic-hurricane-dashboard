@@ -30,6 +30,7 @@ import Cookies from "js-cookie";
 
 
 import MeasureControl from 'react-leaflet-measure';
+import { filterReducer, initialFilterState, filterActions } from "@/components/Filter/filterReducer";
 
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
@@ -41,6 +42,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
   const clearShapesRef = useRef(null);
 
   const [state, dispatch] = useReducer(mapReducer, initialMapState);
+  const [filters, filterDispatch] = useReducer(filterReducer, initialFilterState);
   const [map, setMap] = useState()
   const theme = useTheme();
   const { setIsOpen, setCurrentStep } = useTour();
@@ -199,7 +201,7 @@ export default function Map({ children, station_data, source_type,  setStationPo
           { source_type == "historical" &&
               (<RenderSpatialFilter
                 ref={clearShapesRef} 
-                setPolyFilterCoords={(coords) => dispatch(mapActions.setPolyFilterCoords(coords))}
+                setPolyFilterCoords={(coords) => filterDispatch(filterActions.setPolyFilterCoords(coords))}
                 />)} {/* Calling the EditControl function here */}
           
           <Tooltip title="Take a tour of the tool features">
@@ -447,6 +449,8 @@ export default function Map({ children, station_data, source_type,  setStationPo
             setStationPoints={setStationPoints}
             state={state}
             dispatch={dispatch}
+            filters={filters}
+            filterDispatch={filterDispatch}
             map={map}
             clearShapesRef= {clearShapesRef}
           />)}

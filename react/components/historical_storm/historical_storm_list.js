@@ -10,6 +10,7 @@ import { empty_station_obj } from '../point_defaults.js';
 import {  FiltersSelected, FiltersSubmitted } from '../Filter/viewFilters.js';
 import { RenderFilter } from '../Filter/filter.js';
 import { mapActions } from "@/components/mapReducer";
+import { filterActions } from "@/components/Filter/filterReducer";
 
 
 
@@ -19,7 +20,7 @@ import { mapActions } from "@/components/mapReducer";
  * clickable links, and allows users to search for specific storms by name or year.
  
  */
-export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, returnFilterResult, filterResult, drawerButtonClicked, startDate, endDate, startCategory, endCategory, polyFilterCoords, filterQuery, filterStormName, showFilterSelected, clearShapesRef, isDrawerOpen, showDateSelection, showCatSelection }) {
+export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, filterDispatch, returnFilterResult, filterResult, drawerButtonClicked, startDate, endDate, startCategory, endCategory, polyFilterCoords, filterQuery, filterStormName, showFilterSelected, clearShapesRef, isDrawerOpen, showDateSelection, showCatSelection }) {
 
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +37,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
   //const setDrawerButtonClicked = (clicked) => dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: clicked });
   const closeAllDashboards = () => dispatch(mapActions.closeAllDashboards());
 
-  const cancelFilters = () => dispatch(mapActions.cancelFilters());
+  const cancelFilters = () => filterDispatch(filterActions.cancelFilters());
   const setDrawerButtonClicked = (buttonClicked) => dispatch(mapActions.setDrawerButtonClicked(buttonClicked));
 
 
@@ -110,9 +111,9 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
 
   useEffect(() => {
     if (filterResult.length <= 0 && returnFilterResult) {
-      dispatch(mapActions.setReturnFilterResult(false));
+      filterDispatch(filterActions.setReturnFilterResult(false));
     }
-  }, [filterResult.length, returnFilterResult, dispatch]);
+  }, [filterResult.length, returnFilterResult, filterDispatch]);
 
   // const [selected_storm, setSelectedStorm] = useState("");
   return (
@@ -134,6 +135,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
           <RenderFilter
             clearShapesRef={clearShapesRef} // Pass the ref to 
             dispatch={dispatch}
+            filterDispatch={filterDispatch}
             setStationPoints={setStationPoints}
             startDate={startDate}
             endDate={endDate}

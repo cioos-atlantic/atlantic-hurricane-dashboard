@@ -6,7 +6,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import React, { forwardRef } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
-import { mapActions } from "@/components/mapReducer";
+import { filterActions } from "@/components/Filter/filterReducer";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -20,7 +20,7 @@ function sleep(duration) {
 }
 
 
-export function InputFilter({input_filter, showFilterOptions, setShowFilterOptions, dispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
+export function InputFilter({input_filter, showFilterOptions, setShowFilterOptions, filterDispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
   //console.log(startDate, endDate, polyCoords, startCategory, endCategory)
   const [inputValue, setInputValue] = useState(""); // Controlled input field
   const [stormNameList, setStormNameList] = useState([]);
@@ -81,9 +81,9 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
 
  function handleIconClick(){
     console.log(showFilterOptions);
-    dispatch(mapActions.setShowFilterSelected(true))
-    dispatch(mapActions.setCatSelection(false));
-    dispatch(mapActions.setDateSelection(false));
+    filterDispatch(filterActions.setShowFilterSelected(true))
+    filterDispatch(filterActions.setCatSelection(false));
+    filterDispatch(filterActions.setDateSelection(false));
     setShowFilterOptions((prev) => ({
       ...prev,
       [input_filter.name]: !prev[input_filter.name],

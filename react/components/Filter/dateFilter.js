@@ -10,7 +10,7 @@ import {Slider} from '@mui/material';
 import { smallScreenIconButton } from './filter_utils';
 import { ShowOptions, CloseOptions } from './filter';
 import Typography from "@mui/material/Typography";
-import { mapActions } from "@/components/mapReducer";
+import { filterActions } from "@/components/Filter/filterReducer";
 
 
 
@@ -68,7 +68,7 @@ const reset= { label: 'Reset', getValue: () => [null, null] };
 
 
 
-export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, endDate, showDateSelection }) {
+export function RenderDateFilter({ filterDispatch, setShowFilterOptions, startDate, endDate, showDateSelection }) {
   //const [showDateSelection, setShowDateSelection] = useState(false); 
   const hasValidDates = startDate?.isValid?.() && endDate?.isValid?.();
   const buttonStyle = {
@@ -81,9 +81,9 @@ export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, en
   };
 
   function handleIconClick(){
-    dispatch(mapActions.setShowFilterSelected(true))
-    dispatch(mapActions.toggleDateSelection());
-    dispatch(mapActions.setCatSelection(false));
+    filterDispatch(filterActions.setShowFilterSelected(true))
+    filterDispatch(filterActions.toggleDateSelection());
+    filterDispatch(filterActions.setCatSelection(false));
     setShowFilterOptions(prev => ({
       ...prev,
       stormName: false, // stormName must be defined here
@@ -117,9 +117,9 @@ export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, en
       (<DateDisplay 
         startDate={startDate}
         endDate={endDate}
-        setStartDate = {(date) => dispatch(mapActions.setStartDate(date))}
-        setEndDate = {(date) => dispatch(mapActions.setEndDate(date))}
-        setShowDateSelection = {(date) => dispatch(mapActions.setDateSelection(date))}
+        setStartDate = {(date) => filterDispatch(filterActions.setStartDate(date))}
+        setEndDate = {(date) => filterDispatch(filterActions.setEndDate(date))}
+        setShowDateSelection = {(date) => filterDispatch(filterActions.setDateSelection(date))}
          />)}
 
     

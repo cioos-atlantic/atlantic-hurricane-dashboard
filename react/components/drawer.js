@@ -17,7 +17,7 @@ import { mapActions } from "@/components/mapReducer";
  * `styles.drawer_interior`. Depending on the `source_type`, either the `ActiveStormList`,
  * `HistoricalStormList`, or a placeholder for the Home Page is rendered within the `Drawer` component.
  */
-export default function Drawer({ children, element_id, classes, source_type, setStationPoints, state, dispatch, map, clearShapesRef }) {
+export default function Drawer({ children, element_id, classes, source_type, setStationPoints, state, dispatch, filters, filterDispatch, map, clearShapesRef }) {
 
     let sideClass = null;
     
@@ -68,21 +68,22 @@ export default function Drawer({ children, element_id, classes, source_type, set
                                 map={map}
                                 Leaflet={Leaflet}
                                 dispatch={dispatch}
-                                returnFilterResult={state.returnFilterResult}
-                                filterResult={state.filterResult}
+                                filterDispatch={filterDispatch}
+                                returnFilterResult={filters.returnFilterResult}
+                                filterResult={filters.filterResult}
                                 drawerButtonClicked={state.drawerButtonClicked}
-                                startDate={state.startDate}
-                                endDate={state.endDate}
-                                startCategory={state.startCategory}
-                                endCategory={state.endCategory}
-                                polyFilterCoords={state.polyFilterCoords}
-                                filterQuery={state.filterQuery}
-                                filterStormName={state.filterStormName}
-                                showFilterSelected={state.showFilterSelected}
+                                startDate={filters.startDate}
+                                endDate={filters.endDate}
+                                startCategory={filters.startCategory}
+                                endCategory={filters.endCategory}
+                                polyFilterCoords={filters.polyFilterCoords}
+                                filterQuery={filters.filterQuery}
+                                filterStormName={filters.filterStormName}
+                                showFilterSelected={filters.showFilterSelected}
                                 clearShapesRef={clearShapesRef}
                                 isDrawerOpen={state.isDrawerOpen}
-                                showDateSelection= {state.showDateSelection}
-                                showCatSelection={state.showCatSelection}
+                                showDateSelection= {filters.showDateSelection}
+                                showCatSelection={filters.showCatSelection}
 
 
                                 
