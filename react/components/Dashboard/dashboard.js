@@ -58,12 +58,12 @@ export function RenderDashboards({ dashboards, selected_station, hover_marker, s
             width: {
             xs: "100%",
             md: "100%",
-            lg: isDrawerOpen ? "calc(100vw - 258px)" : "100%",
+            lg: isDrawerOpen ? "calc(100vw - 350px)" : "100%",
             },
             marginLeft: {
             xs: 0,
             md: 0,
-            lg: isDrawerOpen ? "258px" : 0,
+            lg: isDrawerOpen ? "350px" : 0,
             },
             gap: 0,
             display: "flex",
