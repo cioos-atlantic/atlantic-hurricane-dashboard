@@ -24,7 +24,6 @@ export default function StationDataLayout({stationName, sourceDataLink, stationD
     console.error(error)
   }
 
-  console.log(stationData)
   
   function generateGraph(selectedVar){
       return (

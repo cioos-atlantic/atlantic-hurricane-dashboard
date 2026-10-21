@@ -25,7 +25,6 @@ export default async function handler(req, res) {
     res.status(200).json({ "storm_name": storm_name, "season": season, "source": source, "source_type": source_type, ...result })
     */
     const result = await wfs_query("", "", source, source_type, "", filters)
-    console.log('getting features...')
     const features = result['erddap_data']['features']
     const station_data = station_data_init(features, station)
 
@@ -39,19 +38,16 @@ export default async function handler(req, res) {
 
 // Unused
 function parseStationData(result, station) {
-  console.log(result);
   if (Object.keys(result).length === 0) {
     return {}
   };
   let station_data = {};
   const features = result['erddap_data']['features'];
-  console.log(features);
   
 
   const re_match = /(?<var_name>.*)\s\((?<standard_name>.*)\|(?<units>.*)\|(?<long_name>.*)\)/g;
   for (let feature in features) {
     const station_name = features[feature]['properties']['station'];
-    //console.log(station_name)
 
     // Can change the WFS query to only get one station, but for now easier to filter out here
     const parsed_data = (!station || station === station_name) && JSON.parse(features[feature]['properties']['station_data']);
@@ -62,8 +58,6 @@ function parseStationData(result, station) {
       //const parsed_data = JSON.parse(features[feature]['properties']['station_data']);
 
       //if (parsed_data.length !== 0){
-        //console.log("Station data available")
-        //console.log(parsed_data)
         if (station_data[station_name]) {
           station_data[station_name]['properties']['max_time'] = features[feature]['properties']['max_time']
         }
@@ -106,7 +100,6 @@ function parseStationData(result, station) {
     
     //};
   };
-  console.log(station_data);
   return station_data
 }
 

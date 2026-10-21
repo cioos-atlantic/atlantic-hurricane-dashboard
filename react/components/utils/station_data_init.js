@@ -19,7 +19,6 @@ export default function station_data_init(features, filter_station, skip_data=tr
         }
         return station_data
     } catch (err) {
-        console.log("Error reformatting data")
         return err
     }
 }

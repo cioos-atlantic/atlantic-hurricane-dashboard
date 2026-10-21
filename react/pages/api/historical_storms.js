@@ -20,7 +20,6 @@ export default async function handler(req, res) {
 
     const source_type = "HISTORICAL";
 
-    console.log("handler", storm_name, season, source, source_type, storm_id, filters, );
 
     try {
         const result = await wfs_query(storm_name, season, source, source_type, storm_id, filters, "")

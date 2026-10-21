@@ -23,7 +23,6 @@ function createWindDirVarPresence(stationValues, variablePresence){
 export function createVarPresenceDict(mergedData, stormCategory, stormType, stationValues){
 	const variablePresence={};
 
-	console.log(mergedData)
 	
   Object.keys(mergedData).forEach((key) => {
     variablePresence[key]= false;
@@ -54,7 +53,6 @@ export function createVarPresenceDict(mergedData, stormCategory, stormType, stat
 		}
   });
 
-	console.log(variablePresence);
 	return variablePresence;
 }
 
@@ -84,7 +82,6 @@ export function alignMergedData(merged_data, stormTimes, stationTimes) {
 		});
 	}
 	catch(error){
-		console.log("Issue merging data with category: " + category)
 		console.error(error)
 	}
   }

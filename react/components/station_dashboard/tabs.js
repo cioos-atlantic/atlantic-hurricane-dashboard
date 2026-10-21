@@ -77,7 +77,6 @@ export default function BasicTabs({stationName, sourceDataLink, stationData, sta
    * a `RenderChart` component with props `sourceData`, `stationName`, and `varCategory`.
    */
 
-  //console.log(stationName, stationData, stationSummaryText, variablePresence, selectedTab, setSelectedTab)
 
   function generateGraph(selectedVar) {
 

@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 import { storm_cat } from "@/lib/storm_cat";
 
 export function FiltersSelected({startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName}){
-  console.log("Selected Filters: ", {startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName});
 
   const isFiltered = startDate || endDate || startCategory || endCategory || polyFilterCoords || filterStormName.length;
   
@@ -41,7 +40,6 @@ export function FiltersSelected({startDate, endDate, startCategory, endCategory,
 
 
 export function FiltersSubmitted({filterQuery}){
-  console.log(filterQuery);
   const isEmpty =
   (filterQuery.endCategory === "" || filterQuery.endCategory === null || filterQuery.endCategory === undefined) &&
   !filterQuery.endDate &&

@@ -61,7 +61,7 @@ function RenderStormChart({ sourceData,  varCategory, timeData, hoverPointTime }
       },
       
       options: {
-        animation:ProgressiveAnimation(datasets),
+        animation:false,
         interaction: {
           intersect: false,
           mode: 'index',
@@ -92,9 +92,8 @@ function RenderStormChart({ sourceData,  varCategory, timeData, hoverPointTime }
           },
         },
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         spanGaps:true,
-        //maintainAspectRatio: false,
         plugins: {
           annotation: {
             annotations: {
@@ -137,17 +136,17 @@ function RenderStormChart({ sourceData,  varCategory, timeData, hoverPointTime }
         xMax: new Date(hoverPointTime),
         //yMin: yMin,
         //yMax: yMax,
-        borderColor: 'rgb(255, 99, 132)',
+        borderColor: 'black',
         borderWidth: 2,
         borderDash: [5,2],
         label: {
           display: true,
           content: `Hovered Date: ${highlightTime}`,
           position: 'end', // options: 'start', 'center', 'end'
-          backgroundColor: 'rgba(255,99,132,0.8)',
+          backgroundColor: '#1F1617',
           color: '#fff',
           font: {
-            weight: 'bold',
+            weight: '#1F1617',
             size: 10
           },
           padding: 4
@@ -167,16 +166,9 @@ function RenderStormChart({ sourceData,  varCategory, timeData, hoverPointTime }
 
 
   return (
-    <div className='chart-render'>
-    <canvas
-      ref={chartRef}
-      style={{
-        top: 0,
-        left: 0,
-        
-      }}
-    />
-  </div>
+    <div className='chart-box'>
+      <canvas ref={chartRef} />
+    </div>
   );
 }
 
@@ -194,8 +186,6 @@ const getRandomColor = () => {
 
 function getColour(var_name){
   let colour = '';
-  console.log(var_name)
-  console.log(storm_graph_color)
   colour = storm_graph_color[var_name] || getRandomColor();
   return colour;
 }
@@ -205,8 +195,8 @@ function getColour(var_name){
 function makeDataset(dataList, formattedTimeData, hoverPointTime) {
   const datasets=[];
   const hoverTimeStamp = new Date(hoverPointTime).getTime();
-  dataList.forEach((dataDict) => {console.log(dataDict);
-    Object.entries(dataDict).forEach(([key, value]) => {console.log(key)
+  dataList.forEach((dataDict) => {
+    Object.entries(dataDict).forEach(([key, value]) => {
       datasets.push({
         label: value.name,
         data: value.data,
@@ -219,7 +209,7 @@ function makeDataset(dataList, formattedTimeData, hoverPointTime) {
         },
         pointBackgroundColor: (context) => {
           const pointTime = new Date(formattedTimeData[context.dataIndex]).getTime();
-          return pointTime === hoverTimeStamp ? 'red' : 'blue';
+          return pointTime === hoverTimeStamp ? '#1F1617' : 'blue';
         },
       })
     })

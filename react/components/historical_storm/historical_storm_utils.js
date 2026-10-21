@@ -18,7 +18,6 @@ export async function getHistoricalStormList(){
   const oneYearAgo = subYears(new Date(), 1);
   const start_date = new Date(oneYearAgo).toISOString().split('T')[0] + "T00:00:00Z"; // get the current year
   const end_date = new Date().toISOString().split('T')[0] + "T00:00:00Z";
-  console.log(start_date, end_date)
   
 
 
@@ -31,17 +30,14 @@ export async function getHistoricalStormList(){
   try {
     const resource = await fetch(`${basePath}/api/filter_storms?${query}`);
     const storm_data = await resource.json();
-    //console.log(storm_data);
 
     //const historical_storm_data = parseStormData(storm_data, storm.name);
-    // console.log(historical_station_data);
 
     console.debug(`historical Storm Data for ${start_date} - ${end_date} : `, storm_data);
     const uniqueList= makeStormList(storm_data)
     // Create a set to track unique IDs and add objects to the result list
     
 
-    console.log(uniqueList);
     return uniqueList
 
 
@@ -73,12 +69,10 @@ export function parseStormData(storm_data, storm_name, map, Leaflet) {
     return null
   }
 
-  console.log(storm_data)
 
   let storm_details = {}
   let ib_storm_list = []
 
-  console.log(storm_data)
 
   storm_data.ib_data.features.map(storm_point => {
     if (!ib_storm_list.includes(storm_point.properties.NAME)) {
@@ -94,12 +88,10 @@ export function parseStormData(storm_data, storm_name, map, Leaflet) {
 
 
 
-  // console.log("parseStormData -> Storm Details: ", storm_details);
   let storm_features = build_storm_features(storm_details[storm_name]);
 
   parseForFlyToPoint(storm_details, storm_name, map, Leaflet)
 
-  // console.log("parseStormData -> Final Storm Features: ", storm_features);
   return storm_features;
 };
 
@@ -118,13 +110,10 @@ export function parseStormData(storm_data, storm_name, map, Leaflet) {
  * application state for further processing or display.
  */
 function handleHarvestHistoricalData(data, setStationPoints, setStormPoints) {
-  console.log("Harvested Historical Storm Data:", data);
-  //console.log(data.ib_data.features)
   //if(data.ib_data.features){}
   setStormPoints(data.storm_data);  // Set the storm data
   setStationPoints(data.station_data);  // Set the station data
   // Update the state with the harvested data
-  //console.log("Historical Storm Data set:", data);
 };
 
 
@@ -151,12 +140,10 @@ export async function getStationData(min_lon, min_lat, max_lon, max_lat, max_sto
 
   // process.env reading empty
 
-  //console.log(process)
   const resource = await fetch(`${basePath}/api/query_stations_historical?${query}`);
 
   const historical_station_data = await resource.json();
 
-  console.log(historical_station_data);
   return historical_station_data
 
   // Trigger the callback to send data back to the parent
@@ -179,11 +166,9 @@ export function getStationQueryParams(historical_storm_data) {
 
   const storm_id = historical_storm_data.ib_data.features['0'].id;
   const [_, __, storm_time] = storm_id.split('.');
-  console.log(storm_time)
 
   const max_storm_time = lightFormat(addDays(new Date(storm_time), 15), "yyyy-MM-dd'T'00:00:00");
   const min_storm_time = lightFormat(subDays(new Date(storm_time), 15), "yyyy-MM-dd'T'00:00:00");
-  console.log(min_lon, min_lat, max_lon, max_lat, max_storm_time, min_storm_time)
 
 
   return [min_lon, min_lat, max_lon, max_lat, max_storm_time, min_storm_time]
@@ -286,10 +271,8 @@ export function isStormId(input) {
  * @param Leaflet - Leaflet is a popular JavaScript library for interactive maps. It provides functionalities to create maps, add layers, markers, and other interactive elements to the map. 
  */
 export function parseForFlyToPoint(storm_details, storm_name, map, Leaflet){
-  //console.log(Leaflet);
   
   const storm_data = storm_details[storm_name];
-  console.log(storm_data)
   flyToPoint(storm_data, map, Leaflet) 
 }
 
@@ -323,10 +306,8 @@ export async function handleClick( storm, setStationPoints, setStormPoints, map,
   setIsStationDashOpen(false);
   setIsStormDashOpen(false);
 
-  //console.log(Leaflet);
   setSelectedStation(empty_station_obj)
   
-  console.log('Button clicked for', storm.name);
   const storm_name = storm.name;
   const storm_year = storm.year;
   const storm_id = storm.storm_id;
@@ -341,7 +322,6 @@ export async function handleClick( storm, setStationPoints, setStormPoints, map,
   else if (storm.source === 'ibtracs') {
     storm_source = "IBTRACS"
   }
-  //console.log(storm_source)
 
 
   // Construct query parameters
@@ -359,14 +339,11 @@ export async function handleClick( storm, setStationPoints, setStormPoints, map,
 
     
 
-    //console.log(historical_station_data)
     const station_resource = await fetch(`${basePath}/api/query_stations_historical?${query}`);
     const historical_station_data = await station_resource.json();
 
-    //console.log(Leaflet);
 
     const historical_storm_data = parseStormData(storm_data, storm.name, map, Leaflet);
-    //console.log(historical_storm_data);
 
     console.debug("Historical Storm Data: ", historical_storm_data);
     console.debug("Historical Station Data: ", historical_station_data);
@@ -398,14 +375,12 @@ export async function handleFormSubmit(e, setSearchResult){
   //prevent default behavior
   let storm_name = "";
   let storm_year = "";
-  console.log(e)
   e.preventDefault();
   
   const searchInputField = e.target.elements.historical_storm_search; // Reference to the input field
   let searchInput= searchInputField.value;
   const search_values= searchInput.split(" ")
   //if (search_values.length ===1) {}
-  console.log(search_values);
 
   for (let value of search_values){
     if (isYear(value)){storm_year = value}
@@ -417,7 +392,6 @@ export async function handleFormSubmit(e, setSearchResult){
   
   const uniqueList= await handleSearch(storm_name, storm_year)
 
-  console.log(uniqueList)
   setSearchResult(uniqueList)
 
   // Clear the input field
@@ -440,23 +414,18 @@ export async function handleSearch(storm_name, storm_year){
     season: storm_year     // Using season for storm year
   }).toString();
 
-  console.log(query)
 
   try {
     const resource = await fetch(`${basePath}/api/historical_storms?${query}`);
     const storm_data = await resource.json();
-    //console.log(storm_data);
 
     //const historical_storm_data = parseStormData(storm_data, storm.name);
-    // console.log(historical_station_data);
 
-    console.log(`historical Storm Data for ${storm_name} and ${storm_year}: `, storm_data);
     // Create a set to track unique IDs and add objects to the result list
     uniqueList = makeStormList(storm_data)
     // Create a set to track unique IDs and add objects to the result list
     
 
-    console.log(uniqueList);
     if (uniqueList.length === 0) {
       alert("No result found for this search, please try again...")
     }
@@ -471,7 +440,6 @@ export async function handleSearch(storm_name, storm_year){
 
 export function handleStormButtonClick(stormName, stormYear, stormID, router){
   const url = `/?page=historical&name=${stormName}&season=${stormYear}&sid=${stormID}`;
-  console.log(url)
   router.push(url);
   
   /*router.push(url).then(() => {

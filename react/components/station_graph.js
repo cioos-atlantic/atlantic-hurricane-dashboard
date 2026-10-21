@@ -16,11 +16,10 @@ Chart.register(LineController, LineElement, LinearScale, PointElement, CategoryS
  */
 function RenderChart({ sourceData, position, stationName, varCategory, hoverPointTime }) {
 
-
   const chartRef = useRef(null); // Reference to the canvas element
 
   const startAtZero = varCategory === 'air_pressure' ? false : true
-  
+
   useEffect(() => {
     // Check if chartData is available
     if (sourceData && sourceData.rows.length > 0) {
@@ -51,7 +50,7 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
           datasets: datasets, // Set the datasets
         },
         options: {
-          animation:ProgressiveAnimation(datasets),
+          animation:false,
           interaction: {
             intersect: false,
             mode: 'index',
@@ -83,7 +82,7 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
           },
           responsive: true,
           spanGaps:true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false, 
           
           plugins: {
             annotation: {
@@ -113,7 +112,6 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
       };
 
       // Destroy the previous chart if it exists
-      //console.log(chartRef.current.chart);
       if (chartRef.current.chart) {
         chartRef.current.chart.destroy();
       }
@@ -137,14 +135,14 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
           xMax: new Date(hoverPointTime),
           //yMin: yMin,
           //yMax: yMax,
-          borderColor: 'rgb(255, 99, 132)',
+          borderColor: '#1F1617',
           borderWidth: 2,
           borderDash: [5,2],
           label: {
             display: true,
             content: `Hovered Date: ${highlightTime}`,
             position: 'end', // options: 'start', 'center', 'end'
-            backgroundColor: 'rgba(255,99,132,0.8)',
+            backgroundColor: '#1F1617',
             color: '#fff',
             font: {
               weight: 'bold',
@@ -168,15 +166,8 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
 
   return (
 
-    <div  className='chart-render'>
-      <canvas
-        ref={chartRef}
-        style={{
-          top: 0,
-          left: 0,
-          
-        }}
-      />
+    <div className='chart-box'>
+      <canvas ref={chartRef} />
     </div>
 
       
@@ -248,7 +239,6 @@ function parseChartData(sourceData, varCategory, hoverPointTime){
         },
         pointBackgroundColor: (context) => {
           const pointTime = timeData[context.dataIndex];
-          //console.log(hoverTimestamp);
           return pointTime === hoverTimestamp ? 'red' : '';
         },
       })}
@@ -256,7 +246,6 @@ function parseChartData(sourceData, varCategory, hoverPointTime){
     });
     
   });
-      console.log(datasets)
       return {datasets: datasets,
               timeData: timeData}
 };
