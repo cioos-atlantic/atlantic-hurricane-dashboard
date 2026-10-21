@@ -21,7 +21,9 @@ export default function StationDashboard({state, dispatch, station_descriptions,
   const isExtraSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const [api_data, set_api_data] = useState(0)
 
-  //const [selectedTab, setSelectedTab] = useState(0);
+  // Local tab state; resets to 0 whenever a different station is opened because
+  // dashboard.js gives this component key={station name}, which remounts it.
+  const [selectedTab, setSelectedTab] = useState(0);
   const stationData = state.selected_station;
   const stationValues = stationData[1];
   // Determine if active or historic
@@ -212,8 +214,8 @@ export default function StationDashboard({state, dispatch, station_descriptions,
               stationData={api_data[stationName]?.properties?.station_data}
               stationSummaryText={dataText}
               variablePresence={variablePresence}
-              selectedTab={state.selectedTab}
-              setSelectedTab={(tab) => dispatch(mapActions.setSelectedTab(tab))}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
               hoverPointTime={hoverPointTime}
             />
           

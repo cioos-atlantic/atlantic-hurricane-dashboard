@@ -71,6 +71,7 @@ export function RenderDashboards({ source_type, time, state, dispatch
         {showStation && (
             <Box sx={{ flex: flexValue, minWidth: showStorm ? "50%" : "100%" }}>
             <StationDashboard
+                key={state.selected_station?.[0] ?? 'no-station'} // remount (and reset tab) when the station changes
                 state={state}
                 dispatch={dispatch}
                 //selected_station={selected_station}

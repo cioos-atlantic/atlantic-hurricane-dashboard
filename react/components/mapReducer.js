@@ -4,7 +4,6 @@ import { empty_point_obj, empty_station_obj, empty_storm_obj } from "./point_def
 
 export const initialMapState = {
   hover_marker: empty_point_obj,
-  selectedTab: 0,
   selected_station: empty_station_obj,
   filterResult: [],
   returnFilterResult: false,
@@ -40,7 +39,6 @@ export const mapActions = {
   openDashboard: (panel) => ({ type: 'OPEN_DASHBOARD', payload: panel }),    // panel: 'storm' | 'station'
   closeDashboard: (panel) => ({ type: 'CLOSE_DASHBOARD', payload: panel }),  // panel: 'storm' | 'station'
   closeAllDashboards: () => ({ type: 'CLOSE_ALL_DASHBOARDS' }),
-  setSelectedTab: (tab) => ({ type: 'SET_SELECTED_TAB', payload: tab }),
   closeStationDashboard: () => ({ type: 'CLOSE_STATION_DASHBOARD' }),
 
   // Drawer
@@ -75,8 +73,6 @@ export function mapReducer(state, action) {
       return { ...state, hover_marker: action.payload };
     case 'SET_STORM_POINT':
       return { ...state, storm_points: action.payload };
-    case 'SET_SELECTED_TAB':
-      return { ...state, selectedTab: action.payload };
     case 'SET_SELECTED_STATION':
       return { ...state, selected_station: action.payload };
     case 'SET_FILTER_RESULT':
@@ -142,14 +138,12 @@ export function mapReducer(state, action) {
         return {
           ...state,
           selected_station: action.payload,
-          selectedTab: 0,
           dashboards: { ...state.dashboards, station: true },
         };
       case 'CLOSE_STATION_DASHBOARD':
         return {
           ...state,
           selected_station: empty_station_obj,
-          selectedTab: 0,
         };
 
       case 'CLOSE_STORM_TRACKS':
