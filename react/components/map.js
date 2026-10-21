@@ -108,7 +108,6 @@ export default function Map({ children, station_data, source_type,  setStationPo
 
   
   
-  console.debug("Storm Points in map.js: ", state.storm_points);
   const measureOptions = {
     position: 'topright',
     primaryLengthUnit: 'meters',
