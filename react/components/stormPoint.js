@@ -6,6 +6,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import StormPointDetailsTooltip from "./storm_dashboard/storm_point_details_tooltip";
 import { createSvgIconWithText } from "./utils/storm_display_utils";
 import { getStormCategory } from "./storm_dashboard/utils";
+import { mapActions } from "@/components/mapReducer";
 
 
 
@@ -86,16 +87,15 @@ export default function StormMarker({ storm_point_data, storm_point_hover, dispa
             eventHandlers={{
                 mouseover: () => {
                     //setHoverMarker(storm_point_data);
-                    dispatch({ type: "SET_HOVER_MARKER", payload: storm_point_data });
+                    dispatch(mapActions.setHoverMarker(storm_point_data));
                     //setIsDashOpen(true);
                     //setIsStormDashOpen(true);
 
                     markerRef.current?.openPopup();
                 },
                 click: () => {
-                    dispatch({ type: "SET_HOVER_MARKER", payload: storm_point_data });
-                    dispatch({ type: "TOGGLE_DASH", payload: true });
-                    dispatch({ type: "TOGGLE_STORM_DASH", payload: true });
+                    dispatch(mapActions.setHoverMarker(storm_point_data));
+                    dispatch(mapActions.openDashboard('storm'));
                     clickedRef.current = true;
                 },
                 mouseout: () => {

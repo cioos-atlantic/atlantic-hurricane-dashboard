@@ -5,9 +5,13 @@ import {
   FeatureGroup
 } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
+import { useFilterDispatch } from "./FilterContext";
+import { filterActions } from "./filterReducer";
 import 'leaflet-draw/dist/leaflet.draw.css';
 
-export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter ({ setPolyFilterCoords}, ref) {
+export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter (props, ref) {
+  const filterDispatch = useFilterDispatch();
+  const setPolyFilterCoords = (coords) => filterDispatch(filterActions.setPolyFilterCoords(coords));
   const featureGroupRef = useRef(null);
   // Get the FeatureGroup reference
   function clearShapes(){

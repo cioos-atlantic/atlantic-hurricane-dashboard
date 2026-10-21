@@ -6,7 +6,6 @@ import BasicTabs from "./tabs";
 import { StormSummaryText } from "./storm_details";
 import StormDataLayout from "./storm_layout_small_screen";
 import { convert_unit_data } from "../utils/unit_conversion";
-import { empty_point_obj } from "../point_defaults";
 import { getStormCategory } from "./utils";
 
 
@@ -20,7 +19,7 @@ import { getStormCategory } from "./utils";
  */
 
 
-const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_marker, storm_points, isStormDashOpen }) {
+const StormDashboard = React.memo(function StormDashboard({ hover_marker, storm_points, onClose }) {
 
   const [selectedStormTab, setSelectedStormTab] = useState(0);
 
@@ -132,7 +131,7 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
       className={`station_dashboard`}
       sx={{
         //bottom: { xs: "20px", sm: "30px", md: "35px", lg: "50px", xl: "50px" },
-        display: isStormDashOpen ? 'flex':'none',
+        display: 'flex',
         
         
         
@@ -150,8 +149,7 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
           className="close"
           onClick={() => {
             setSelectedStormTab(0);
-            dispatch({ type: "SET_HOVER_MARKER", payload: empty_point_obj});
-            dispatch({ type: "TOGGLE_STORM_DASH", payload: false});
+            onClose();
           }}
           title="Close"
           aria-label="Close"
@@ -192,7 +190,7 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
       className={`station_dashboard`}
       sx={{
         //bottom: { xs: "20px", sm: "30px", md: "35px", lg: "50px", xl: "50px" },
-        display: isStormDashOpen ? 'flex':'none',
+        display: 'flex',
         
         
       }}
@@ -209,8 +207,7 @@ const StormDashboard = React.memo(function StormDashboard({  dispatch, hover_mar
           className="close"
           onClick={() => {
             setSelectedStormTab(0);
-            dispatch({ type: "SET_HOVER_MARKER", payload: empty_point_obj});
-            dispatch({ type: "TOGGLE_STORM_DASH", payload: false});
+            onClose();
           }}
           title="Close"
           aria-label="Close"

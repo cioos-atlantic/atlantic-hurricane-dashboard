@@ -5,6 +5,7 @@ import { Box, Button, Card, CardContent, CardActions, Slider } from "@mui/materi
 import {storm_cat} from "@/lib/storm_cat"
 import { ShowOptions, CloseOptions } from './filter';
 import { smallScreenIconButton } from './filter_utils';
+import { filterActions } from "@/components/Filter/filterReducer";
 export const storm_category_list = [
   { label: "C5", value: 6 },
   { label: "C4", value: 5 },
@@ -157,7 +158,7 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
   );
 }
 
-export function RenderCategoryFilter({ dispatch, setShowFilterOptions, startCategory, endCategory, showCatSelection }){
+export function RenderCategoryFilter({ filterDispatch, setShowFilterOptions, startCategory, endCategory, showCatSelection }){
   
   //const [showCatSelection, setShowCatSelection] = useState(false); 
   const hasValidCategory = startCategory && endCategory;
@@ -173,9 +174,9 @@ export function RenderCategoryFilter({ dispatch, setShowFilterOptions, startCate
 
   function handleIconClick(){
     //setShowCatSelection(prev => !prev);
-    dispatch({ type: "SHOW_FILTER_SELECTED", payload: true })
-    dispatch({ type: "TOGGLE_CAT_SELECTION"});
-    dispatch({ type: "SET_DATE_SELECTION", payload: false});
+    filterDispatch(filterActions.setShowFilterSelected(true))
+    filterDispatch(filterActions.toggleCatSelection());
+    filterDispatch(filterActions.setDateSelection(false));
     setShowFilterOptions(prev => ({
       ...prev,
       stormName: false, // stormName must be defined here
@@ -207,9 +208,9 @@ export function RenderCategoryFilter({ dispatch, setShowFilterOptions, startCate
 
     {showCatSelection && 
       (<CategoryRangeSlider 
-        setStartCategory = {(category) => dispatch({ type: "SET_START_CATEGORY", payload: category })}
-        setEndCategory = {(category) => dispatch({ type: "SET_END_CATEGORY", payload: category })}
-        setShowCatSelection={(status) => dispatch({ type: "SET_CAT_SELECTION", payload: status })}
+        setStartCategory = {(category) => filterDispatch(filterActions.setStartCategory(category))}
+        setEndCategory = {(category) => filterDispatch(filterActions.setEndCategory(category))}
+        setShowCatSelection={(status) => filterDispatch(filterActions.setCatSelection(status))}
         startCategory={startCategory}
         endCategory={endCategory}/>)}
 

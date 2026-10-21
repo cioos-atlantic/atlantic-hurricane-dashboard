@@ -10,6 +10,7 @@ import {Slider} from '@mui/material';
 import { smallScreenIconButton } from './filter_utils';
 import { ShowOptions, CloseOptions } from './filter';
 import Typography from "@mui/material/Typography";
+import { filterActions } from "@/components/Filter/filterReducer";
 
 
 
@@ -67,7 +68,7 @@ const reset= { label: 'Reset', getValue: () => [null, null] };
 
 
 
-export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, endDate, showDateSelection }) {
+export function RenderDateFilter({ filterDispatch, setShowFilterOptions, startDate, endDate, showDateSelection }) {
   //const [showDateSelection, setShowDateSelection] = useState(false); 
   const hasValidDates = startDate?.isValid?.() && endDate?.isValid?.();
   const buttonStyle = {
@@ -80,9 +81,9 @@ export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, en
   };
 
   function handleIconClick(){
-    dispatch({ type: "SHOW_FILTER_SELECTED", payload: true })
-    dispatch({ type: "TOGGLE_DATE_SELECTION"});
-    dispatch({ type: "SET_CAT_SELECTION", payload: false});
+    filterDispatch(filterActions.setShowFilterSelected(true))
+    filterDispatch(filterActions.toggleDateSelection());
+    filterDispatch(filterActions.setCatSelection(false));
     setShowFilterOptions(prev => ({
       ...prev,
       stormName: false, // stormName must be defined here
@@ -116,9 +117,9 @@ export function RenderDateFilter({ dispatch, setShowFilterOptions, startDate, en
       (<DateDisplay 
         startDate={startDate}
         endDate={endDate}
-        setStartDate = {(date) => dispatch({ type: "SET_START_DATE", payload: date })}
-        setEndDate = {(date) => dispatch({ type: "SET_END_DATE", payload: date })}
-        setShowDateSelection = {(date) => dispatch({ type: "SET_DATE_SELECTION", payload: date })}
+        setStartDate = {(date) => filterDispatch(filterActions.setStartDate(date))}
+        setEndDate = {(date) => filterDispatch(filterActions.setEndDate(date))}
+        setShowDateSelection = {(date) => filterDispatch(filterActions.setDateSelection(date))}
          />)}
 
     

@@ -18,7 +18,7 @@ import { RenderSpatialFilter } from "./Filter/Edit_spatial_filter";
 import CustomZoomControl from "./custom_zoom_control";
 import { RenderDashboards } from "./Dashboard/dashboard";
 import StormMarker from "./stormPoint";
-import { mapReducer, initialMapState } from "./mapReducer";
+import { mapReducer, initialMapState, mapActions } from "./mapReducer";
 import InfoScreen from "./message_screens/info_screen";
 import { IconButton, Stack } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
@@ -30,6 +30,7 @@ import Cookies from "js-cookie";
 
 
 import MeasureControl from 'react-leaflet-measure';
+import { FilterProvider } from "@/components/Filter/FilterContext";
 
 
 const defaultPosition = [46.9736, -54.69528]; // Mouth of Placentia Bay
@@ -121,23 +122,17 @@ export default function Map({ children, station_data, source_type,  setStationPo
   };
   
 
-  const mapContent = (<div className="map_container">
-      <div className='inner_container'>
-         
-       {showModal && (
+  const mapContent = (
+    <div className="map_container">
+      <div className="inner_container">
+        {showModal && (
           <div className="tour-modal-overlay">
             <div className="tour-modal">
               <h2>Welcome</h2>
-              <p>
-                Want a quick tour of how to explore storms and use the map?
-              </p>
+              <p>Want a quick tour of how to explore storms and use the map?</p>
 
               <div className="tour-actions">
-                <button
-                  onClick={startTour}
-                  className="primary"
-                  
-                >
+                <button onClick={startTour} className="primary">
                   Take a Tour
                 </button>
 
@@ -149,25 +144,19 @@ export default function Map({ children, station_data, source_type,  setStationPo
           </div>
         )}
 
-       
-      
-      
-        
-       
         {
           <RenderDashboards
-            source_type={source_type}
-            time = {new Date()}
-            state={state}
+            dashboards={state.dashboards}
+            selected_station={state.selected_station}
+            hover_marker={state.hover_marker}
+            storm_points={state.storm_points}
+            isDrawerOpen={state.isDrawerOpen}
             dispatch={dispatch}
-            
-            />
+          />
         }
-        {//state.isDrawerOpen && <div className="drawer-touch-blocker"/>
-         }
-
-       
-          
+        {
+          //state.isDrawerOpen && <div className="drawer-touch-blocker"/>
+        }
 
         <MapContainer
           center={defaultPosition}
@@ -176,60 +165,35 @@ export default function Map({ children, station_data, source_type,  setStationPo
           worldCopyJump={true}
           zoomControl={false}
           ref={setMap}
-          whenReady={() => {
-            
-          }}
-
-          
-          
-        > 
-        
-          {// Map Controls
+        >
+          {
+            // Map Controls
           }
-
-            <CustomZoomControl /> 
-            {source_type === "active" && (
-              <MeasureControl {...measureOptions} />
-            )}
-           
-          { source_type == "historical" &&
-              (<RenderSpatialFilter
-                ref={clearShapesRef} 
-                setPolyFilterCoords={(coords) => dispatch({ type: "SET_POLY_FILTER_COORDS", payload: coords })}
-                />)} {/* Calling the EditControl function here */}
-          
+          <CustomZoomControl />
+          {source_type === "active" && <MeasureControl {...measureOptions} />}
+          {source_type == "historical" && (
+            <RenderSpatialFilter ref={clearShapesRef} />
+          )}{" "}
+          {/* Calling the EditControl function here */}
           <Tooltip title="Take a tour of the tool features">
             <IconButton
               className="tour-reload"
-              sx={{   
-                 
-                left: state.isDrawerOpen == true ? "355px !important" : "9px !important" }}
+              sx={{
+                left:
+                  state.isDrawerOpen == true
+                    ? "355px !important"
+                    : "9px !important",
+              }}
               onClick={() => {
-                setIsOpen(false);// Reset any open tour popovers
-                setShowModal(true)
+                setIsOpen(false); // Reset any open tour popovers
+                setShowModal(true);
                 setTourStarted(false);
               }}
             >
               <InfoIcon />
             </IconButton>
           </Tooltip>
-
-          
-          
-
-
-       
-          
-          
-          
-       
-          
-          
-
-          
-
           <LayersControl position="bottomright">
-
             {/* OpenStreetMap */}
             <LayersControl.BaseLayer checked name="Open Street Map">
               <TileLayer
@@ -237,8 +201,6 @@ export default function Map({ children, station_data, source_type,  setStationPo
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>'
               />
             </LayersControl.BaseLayer>
-
-          
 
             {/* OpenTopoMap */}
             <LayersControl.BaseLayer name="Terrain">
@@ -251,12 +213,8 @@ export default function Map({ children, station_data, source_type,  setStationPo
                   url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
                   attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
                 />
-
               </LayerGroup>
-              
             </LayersControl.BaseLayer>
-
-            
 
             {/* ESRI Satellite*/}
             <LayersControl.BaseLayer name="Satellite">
@@ -270,140 +228,107 @@ export default function Map({ children, station_data, source_type,  setStationPo
                   attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
                 />
               </LayerGroup>
-              
             </LayersControl.BaseLayer>
-            
+
             {/* ESRI Topographic Map */}
-              <LayersControl.BaseLayer name="Topographic">
+            <LayersControl.BaseLayer name="Topographic">
+              <TileLayer
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+                attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+              />
+            </LayersControl.BaseLayer>
+
+            {/* ESRI World Physical Map */}
+            <LayersControl.BaseLayer name="Physical Map">
+              <LayerGroup>
                 <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}"
                   attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
                 />
-              </LayersControl.BaseLayer>
-             
-                {/* ESRI World Physical Map */}
-              <LayersControl.BaseLayer name="Physical Map">
-                <LayerGroup>
-                    <TileLayer
-                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}"
-                    attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
-                    />
-                    <TileLayer
-                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
-                      attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
-                    />
-
-                </LayerGroup>
-                
-              </LayersControl.BaseLayer>
-
-              {/* ESRI NatGeo World Map */}
-              <LayersControl.BaseLayer name="NatGeo World Map">
                 <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
-                  attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                  attribution='Labels &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
                 />
-              </LayersControl.BaseLayer>
-            
+              </LayerGroup>
+            </LayersControl.BaseLayer>
 
-          
-
+            {/* ESRI NatGeo World Map */}
+            <LayersControl.BaseLayer name="NatGeo World Map">
+              <TileLayer
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
+                attribution='Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>'
+              />
+            </LayersControl.BaseLayer>
 
             <LayersControl.Overlay checked name="ECCC Hurricane Response Zone">
               <LayerGroup>
                 <WMSTileLayer
                   url="https://geo.weather.gc.ca/geomet"
-                  layers='HURRICANE_RESPONSE_ZONE'
-                  format='image/png'
-                  transparent='true'
-                  styles='HURRICANE_LINE_BLACK_DASHED'
-                  attribution='<a href=&quot;https://www.canada.ca/en/environment-climate-change.html&quot;>ECCC</a>'
-                  version='1.3.0'
+                  layers="HURRICANE_RESPONSE_ZONE"
+                  format="image/png"
+                  transparent="true"
+                  styles="HURRICANE_LINE_BLACK_DASHED"
+                  attribution='<a href="https://www.canada.ca/en/environment-climate-change.html">ECCC</a>'
+                  version="1.3.0"
                 />
               </LayerGroup>
             </LayersControl.Overlay>
-           
-            <LayersControl.Overlay  checked name="Stations">
 
+            <LayersControl.Overlay checked name="Stations">
               <MarkerClusterGroup>
-                {
-                  station_data ? (
-                    Object.entries(station_data).map((station) => {
-                      let storm_timestamp = new Date()
-                      if("TIMESTAMP" in state.hover_marker.properties){
-                        storm_timestamp = new Date(["TIMESTAMP"]);
-                      }
-                      return (
-                        <StationMarker
-                          key={station[0]}
-                          station_data={station}
-                          time={storm_timestamp}
-                          selected_station={state.selected_station}
-                          dispatch={dispatch} 
-                    />)
-                      
-                    })
-                  ) : (
-                    <></>
-                  )
-                }
+                {station_data ? (
+                  // Only primitive / stable props, so React.memo can skip markers on storm hover
+                  Object.entries(station_data).map(([stationName, stationValues]) => (
+                    <StationMarker
+                      key={stationName}
+                      station_name={stationName}
+                      station_values={stationValues}
+                      isSelected={stationName === state.selected_station?.[0]}
+                      dispatch={dispatch}
+                    />
+                  ))
+                ) : (
+                  <></>
+                )}
               </MarkerClusterGroup>
-             
             </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Error Cone">
               <LayerGroup>
-                {
-                  state.storm_points?.err?.features?.map(err_cone => {
-                    return (
-                      <ErrorCone
-                        key={err_cone.id}
-                        error_cone_data={err_cone}
-                      />
-                    );
-                  })
-                }
+                {state.storm_points?.err?.features?.map((err_cone) => {
+                  return (
+                    <ErrorCone key={err_cone.id} error_cone_data={err_cone} />
+                  );
+                })}
               </LayerGroup>
             </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Points">
               <LayerGroup>
-                {
-                  state.storm_points?.pts?.features?.map(point => {
-                    return (
-
-                      <StormMarker
-                        key={point.id}
-                        storm_point_data={point}
-                        storm_point_hover= {state.hover_marker}
-                        dispatch={dispatch}
-
-                      />
-                    );
-                  })
-                }
+                {state.storm_points?.pts?.features?.map((point) => {
+                  return (
+                    <StormMarker
+                      key={point.id}
+                      storm_point_data={point}
+                      storm_point_hover={state.hover_marker}
+                      dispatch={dispatch}
+                    />
+                  );
+                })}
               </LayerGroup>
             </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Track Line">
               <LayerGroup>
-                { 
-                  state.storm_points?.lin?.features?.length > 0 &&
-                  state.storm_points?.lin?.features?.map(line => {
-                    
-
+                {state.storm_points?.lin?.features?.length > 0 &&
+                  state.storm_points?.lin?.features?.map((line) => {
                     return (
-                      <LineOfTravel
-                        key={line.id}
-                        storm_line_data={line}
-                      />
+                      <LineOfTravel key={line.id} storm_line_data={line} />
                     );
-                  })
-                }
+                  })}
               </LayerGroup>
             </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Wind Speed Radius">
               <LayerGroup>
-                {
-                  state.storm_points?.rad?.features?.length > 0 &&
-                  state.storm_points?.rad?.features?.map(radii => {
+                {state.storm_points?.rad?.features?.length > 0 &&
+                  state.storm_points?.rad?.features?.map((radii) => {
                     return (
                       <WindSpeedRadius
                         key={radii.id}
@@ -411,15 +336,13 @@ export default function Map({ children, station_data, source_type,  setStationPo
                         hover_marker={state.hover_marker}
                       />
                     );
-                  })
-                }
+                  })}
               </LayerGroup>
             </LayersControl.Overlay>
             <LayersControl.Overlay checked name="Sea Height Radius">
               <LayerGroup>
-                {
-                  state.storm_points?.sea?.features?.length > 0 &&
-                  state.storm_points?.sea?.features?.map(radii => {
+                {state.storm_points?.sea?.features?.length > 0 &&
+                  state.storm_points?.sea?.features?.map((radii) => {
                     return (
                       <SeaHeightRadius
                         key={radii.id}
@@ -427,16 +350,14 @@ export default function Map({ children, station_data, source_type,  setStationPo
                         hover_marker={state.hover_marker}
                       />
                     );
-                  })
-                }
+                  })}
               </LayerGroup>
             </LayersControl.Overlay>
           </LayersControl>
-
-          
         </MapContainer>
 
-        { map && (<Drawer
+        {map && (
+          <Drawer
             element_id="left-side"
             classes="left"
             source_type={source_type}
@@ -444,22 +365,30 @@ export default function Map({ children, station_data, source_type,  setStationPo
             state={state}
             dispatch={dispatch}
             map={map}
-            clearShapesRef= {clearShapesRef}
-          />)}
+            clearShapesRef={clearShapesRef}
+          />
+        )}
       </div>
-    </div>)
+    </div>
+  );
 
-  return  tourStarted ? (
-  <TourWrapper
-    steps={getTourSteps({
-      isActive: source_type === "active",
-      isHistorical: source_type === "historical",
-    })}
-      >
-        {mapContent}
-      </TourWrapper>
-    ) : (
-      mapContent
-    );
+  // FilterProvider wraps the tour conditional (not the other way round) so it stays at a stable
+  // position in the tree: toggling the tour remounts mapContent but keeps the filter state.
+  return (
+    <FilterProvider>
+      {tourStarted ? (
+        <TourWrapper
+          steps={getTourSteps({
+            isActive: source_type === "active",
+            isHistorical: source_type === "historical",
+          })}
+        >
+          {mapContent}
+        </TourWrapper>
+      ) : (
+        mapContent
+      )}
+    </FilterProvider>
+  );
   
 }
