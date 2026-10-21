@@ -6,7 +6,7 @@ export const initialMapState = {
   hover_marker: empty_point_obj,
   selectedTab: 0,
   selected_station: empty_station_obj,
-  filterResult: {},
+  filterResult: [],
   returnFilterResult: false,
   polyFilterCoords: '',
   isDashOpen: false,
@@ -23,8 +23,6 @@ export const initialMapState = {
   storm_points: empty_storm_obj,
   filterQuery:{},
   filterStormName:[],
-  selectedStormNames:[],
-  info:true,
   showFilterSelected:true
 };
 
@@ -40,8 +38,6 @@ export function mapReducer(state, action) {
       return { ...state, selected_station: action.payload };
     case 'SET_FILTER_RESULT':
       return { ...state, filterResult: action.payload };
-    case 'SET_SELECTED_STORM_NAMES':
-      return { ...state, selectedStormNames: action.payload };
     case 'TOGGLE_FILTER_RESULT':
       return { ...state, returnFilterResult: action.payload };
     case 'SET_POLY_FILTER_COORDS':
@@ -76,14 +72,12 @@ export function mapReducer(state, action) {
       return {...state, showDateSelection: !state.showDateSelection};
     case 'TOGGLE_DRAWER':
       return { ...state, isDrawerOpen: action.payload };
-    case 'SET_INFO_GUIDE':
-      return { ...state, info: action.payload };
     case 'SHOW_FILTER_SELECTED':
       return { ...state, showFilterSelected: action.payload };
     case 'CANCEL_FILTERS':
       return {
         ...state,
-        filterResult: {},
+        filterResult: [],
         returnFilterResult: false,
         polyFilterCoords: '',
         startDate: null,
@@ -99,8 +93,7 @@ export function mapReducer(state, action) {
           endDate: null,
           startCategory: null,
           endCategory: null,
-          filterStormName:"",
-          selectedStormNames:[]
+          filterStormName:[]
         };
       case 'SET_SELECTED_STATION_AND_OPEN_DASHBOARD':
         return {

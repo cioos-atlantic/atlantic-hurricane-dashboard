@@ -447,7 +447,7 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
 export async function processFilterRequest(filterParameters, setLoading) {
 
   console.log(filterParameters);
-  let uniqueList;
+  let uniqueList = [];
   const stormCategory = formatStormCategory(filterParameters['stormCategory']);
   const stormNames = formatStormName(filterParameters['stormName']);
   const startDate = formatFilterDate(filterParameters['startDate']);
