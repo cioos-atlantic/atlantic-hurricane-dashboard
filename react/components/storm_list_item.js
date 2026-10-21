@@ -21,7 +21,7 @@ function formatCoordinates(coordinates){
  * Flys the map to the bounding box of a storm's track.
  */
 export function flyToPoint(storm_data, map, Leaflet){
-    //console.log(Leaflet)
+
     const first_point = flip_coords(storm_data.data[0].geometry.coordinates);
     const last_point = flip_coords(storm_data.data.splice(-1)[0].geometry.coordinates);
 
@@ -49,8 +49,6 @@ export default function StormListItem({ storm_name, storm_data, setSelectedStorm
 
     // map.flyToBounds()
 
-
-    // console.log(storm_name, typeof is_selected, first_point, last_point);
     const selected = (is_selected) ? "selected_storm" : "";
     const storm_basin = get_storm_basin(last_point);
     return (
@@ -58,7 +56,6 @@ export default function StormListItem({ storm_name, storm_data, setSelectedStorm
             className={"storm_card " + selected }
             onClick={(e) => { 
                 populateStormDetails(e, storm_data, setSelectedStorm, setStormPoints, setSelectedStation);
-                console.log(storm_data)
                 flyToPoint(storm_data, map, Leaflet);
             }}
         >

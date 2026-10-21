@@ -4,15 +4,13 @@ import { useMediaQuery, Box, useTheme } from "@mui/material";
 import StationDataLayout from "./station_layout_small_screen";
 import BasicTabs from "./tabs";
 import {  getMatchedStation, getStationDataText, } from "../utils/station_data_format_util";
-import { fetch_value } from "@/lib/storm_utils";
 import { basePath } from "@/next.config";
 
 /**
  * The `StationDashboard` function renders a dashboard for a selected station with relevant data and
  * tabs for different variables.
  */
-export default function StationDashboard({state, dispatch, station_descriptions, time = new Date(), source_type
-}) {
+export default function StationDashboard({ station, hoverPointTime, onClose, time = new Date() }) {
 
   
   const theme = useTheme();
@@ -20,11 +18,10 @@ export default function StationDashboard({state, dispatch, station_descriptions,
   const isExtraSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const [api_data, set_api_data] = useState(0)
 
-  //const [selectedTab, setSelectedTab] = useState(0);
-  const stationData = state.selected_station;
-  const stationValues = stationData[1];
-  // Determine if active or historic
-  const isHistorical = source_type == "historical" ? true : false
+  // Local tab state; resets to 0 whenever a different station is opened because
+  // dashboard.js gives this component key={station name}, which remounts it.
+  const [selectedTab, setSelectedTab] = useState(0);
+  const stationValues = station?.[1];
 
 
   // const stationDescription = getMatchedStation(station_descriptions, stationName);
@@ -32,7 +29,6 @@ export default function StationDashboard({state, dispatch, station_descriptions,
   //const institution = stationDescription.institution || "Unknown Institution";
    //const institutionLink = stationDescription.institution_link || "#";\
 
-   //console.log(stationValues.properties)
 
   const displayName = stationValues?.properties?.dataset_title || "Unknown Station";
   const stationName = stationValues?.properties?.station
@@ -41,11 +37,18 @@ export default function StationDashboard({state, dispatch, station_descriptions,
 
   const station_id = stationValues?.properties?.station_id
   const storm = stationValues?.properties?.storm
+  // Active stations are cached with storm = "ACTIVE" (data_ingest/ERDDAP/cache_ERDDAP.py);
+  // historical ones carry the storm id. Same rule the /api/station_data route uses to pick the cache.
+  const isHistorical = storm !== "ACTIVE"
+
+  const erddapSource = stationValues?.properties?.source_url || ""
+  const datasetId = stationValues?.properties?.dataset || ""
+  const dataLink = erddapSource + "/tabledap/" + datasetId 
 
   useEffect(() => {
+    if (!station_id) return;
     const fetchData = async () => {
       try{
-        console.log(station_id)
         const query = new URLSearchParams({station_id, storm}).toString();
         const response = await fetch(`${basePath}/api/station_data?${query}`)
         const data = await response.json();
@@ -56,7 +59,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
       }
     };
     fetchData();
-  }, [state]);
+  }, [station_id, storm]);
   
   let dataText = ''
   let standardNames = []
@@ -99,7 +102,6 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         }
       });
   }
-  const hoverPointTime = fetch_value(state.hover_marker, ["TIMESTAMP", "ISO_TIME"]);
 
     return (
       isExtraSmall ? (
@@ -120,10 +122,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         >
           <button
             className="close"
-            onClick={() => {
-              dispatch({ type: "CLOSE_STATION_DASHBOARD"});
-              dispatch({ type: "TOGGLE_STATION_DASH", payload: false});
-            }}
+            onClick={onClose}
             title="Close"
             aria-label="Close"
           >
@@ -148,6 +147,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         >
             <StationDataLayout
               stationName={stationName}
+              sourceDataLink={dataLink}
               stationData={api_data[stationName]?.properties?.station_data}
               stationSummaryText={dataText}
               variablePresence={variablePresence}
@@ -174,11 +174,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         >
           <button
             className="close"
-            onClick={() => {
-              dispatch({ type: "CLOSE_STATION_DASHBOARD"});
-              dispatch({ type: "TOGGLE_STATION_DASH", payload: false});
-              //setIsStationDashOpen(false);
-            }}
+            onClick={onClose}
             title="Close"
             aria-label="Close"
           >
@@ -203,11 +199,12 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         >
             <BasicTabs
               stationName={stationName}
+              sourceDataLink={dataLink}
               stationData={api_data[stationName]?.properties?.station_data}
               stationSummaryText={dataText}
               variablePresence={variablePresence}
-              selectedTab={state.selectedTab}
-              setSelectedTab={(tab) => dispatch({ type: "SET_SELECTED_TAB", payload: tab })}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
               hoverPointTime={hoverPointTime}
             />
           

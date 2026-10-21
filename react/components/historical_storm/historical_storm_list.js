@@ -8,6 +8,10 @@ import { RenderFilterResult } from '../Filter/renderFilterResult.js';
 import LoadingScreen from '../loading_screen.js';
 import { empty_station_obj } from '../point_defaults.js';
 import {  FiltersSelected, FiltersSubmitted } from '../Filter/viewFilters.js';
+import { RenderFilter } from '../Filter/filter.js';
+import { mapActions } from "@/components/mapReducer";
+import { filterActions } from "@/components/Filter/filterReducer";
+import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
 
 
 
@@ -17,7 +21,9 @@ import {  FiltersSelected, FiltersSubmitted } from '../Filter/viewFilters.js';
  * clickable links, and allows users to search for specific storms by name or year.
  
  */
-export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, returnFilterResult, filterResult, drawerButtonClicked, startDate, endDate, startCategory, endCategory, polyFilterCoords, filterQuery, filterStormName, showFilterSelected}) {
+export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, drawerButtonClicked, clearShapesRef, isDrawerOpen }) {
+  const { filterResult, returnFilterResult } = useFilters();
+  const filterDispatch = useFilterDispatch();
 
   const [loading, setLoading] = useState(false);
 
@@ -27,17 +33,14 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
   const router = useRouter();
   const [previousQuery, setPreviousQuery] = useState(null);
 
-  console.log("Historical Storms Loading...");
-  const setStormPoints = (point) => dispatch({ type: "SET_STORM_POINT", payload: point });
-  const setSelectedStation= (station) => dispatch({ type: "SET_SELECTED_STATION", payload: station });
+  const setStormPoints = (point) => dispatch(mapActions.setStormPoints(point));
+  const setSelectedStation= (station) => dispatch(mapActions.setSelectedStation(station));
   //const setReturnFilterResult = (state) => dispatch({ type: "TOGGLE_FILTER_RESULT", payload: state });
   //const setDrawerButtonClicked = (clicked) => dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: clicked });
-  const setIsDashOpen= (state) => dispatch({ type: "TOGGLE_DASH", payload: state });
-  const setIsStormDashOpen= (state) => dispatch({ type: "TOGGLE_STORM_DASH", payload: state });
-  const setIsStationDashOpen= (state) => dispatch({ type: "TOGGLE_STATION_DASH", payload: state });
+  const closeAllDashboards = () => dispatch(mapActions.closeAllDashboards());
 
-  const cancelFilters = () => dispatch({ type: 'CANCEL_FILTERS' });
-  const setDrawerButtonClicked = (buttonClicked) => dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: buttonClicked });
+  const cancelFilters = () => filterDispatch(filterActions.cancelFilters());
+  const setDrawerButtonClicked = (buttonClicked) => dispatch(mapActions.setDrawerButtonClicked(buttonClicked));
 
 
    // Check query parameters on mount and trigger `handleClick`
@@ -46,7 +49,6 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
    useEffect(() => { 
     if (!router.isReady) return; // Ensure router is ready
     const { name, season, sid } = router.query;
-    console.log( name, season, sid )
     if (previousQuery?.name !== name || previousQuery?.season !== season || previousQuery?.sid !== sid ) {
     
       async function searchQuery(){
@@ -55,10 +57,8 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         parameters received from the router. If both parameters exist, it calls the `handleSearch`
         function with the `name` and `season` values to fetch storm data based on the search
         criteria. */
-        console.log('here')
         if (name && season) {
           const stormObjectList = await handleSearch(name, season);
-          console.log(stormObjectList);
 
           let selectedStorm;
           if (stormObjectList.length > 1){ // this accounts for unnamed storms that has the same name and season
@@ -71,14 +71,12 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
           }
           else{selectedStorm = stormObjectList[0];}
           
-          console.log(selectedStorm);
           if (selectedStorm) {
             //setDrawerButtonClicked(selectedStorm.storm_id);
-            console.log(selectedStorm.storm_id)
-            dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: selectedStorm.storm_id })
+            dispatch(mapActions.setDrawerButtonClicked(selectedStorm.storm_id))
             
 
-            await handleClick(selectedStorm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation,setLoading, setIsDashOpen, setIsStormDashOpen,setIsStationDashOpen);
+            await handleClick(selectedStorm, setStationPoints, setStormPoints, map, Leaflet, router, setSelectedStation,setLoading, closeAllDashboards);
           }
         }
     }
@@ -94,8 +92,6 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         const fetchedStormList = await getHistoricalStormList();
         setStormList(fetchedStormList);
 
-
-        console.log(fetchedStormList);  // Log the returned storm list
       } catch (error) {
         console.error('Error fetching storm list:', error);
       }
@@ -110,9 +106,9 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
 
   useEffect(() => {
     if (filterResult.length <= 0 && returnFilterResult) {
-      dispatch({ type: "TOGGLE_FILTER_RESULT", payload: false });
+      filterDispatch(filterActions.setReturnFilterResult(false));
     }
-  }, [filterResult.length, returnFilterResult, dispatch]);
+  }, [filterResult.length, returnFilterResult, filterDispatch]);
 
   // const [selected_storm, setSelectedStorm] = useState("");
   return (
@@ -121,15 +117,33 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         <LoadingScreen/>
         ) : (
         <>
-          <Box className='historical_page_drawer_header'
+          {/*<Box className='historical_page_drawer_header'
           sx={{
             fontSize: { xs: '20px', sm: '20px', md: '24px', lg: '24px' }
           }}
           >Historical Storms: </Box>
-          <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/>  {/* Bold line */}
+          <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' , margin: '5px'}}/>  {/* Bold line */}
+          
+
+
+        <div className="view-filter-space">
+          <RenderFilter
+            clearShapesRef={clearShapesRef} // Pass the ref to 
+            dispatch={dispatch}
+            setStationPoints={setStationPoints}
+            isDrawerOpen={isDrawerOpen}
+
+        />
+
+        </div>
+      
+        
+      
+
+
 
           
-      {(showFilterSelected )  ? (
+      {/*(showFilterSelected )  ? (
         <>
           <FiltersSelected
           startDate={startDate}
@@ -145,11 +159,11 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
           <FiltersSubmitted 
         filterQuery={filterQuery}/>
 
-        <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/>
+        
           </>
-        )}
+        )*/}
       
-       
+       <hr style={{ height: '4px', backgroundColor: 'black', border: 'none', margin: '5px' }}/>
 
       {returnFilterResult ?
         (<>
@@ -176,17 +190,17 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         )}
 
 
-      <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/> 
+      <hr style={{ height: '4px', backgroundColor: 'black', border: 'none', margin: '5px' }}/> 
       <Button
       onClick={()=> {
-        dispatch({ type: "CLOSE_STORM_TRACKS" })
+        dispatch(mapActions.closeStormTracks())
         setStationPoints(empty_station_obj)
     
-      router.push(`/?storms=historical`)
+      router.push(`/?page=historical`)
       }}
       className="cancel-search"
       >Clear Storm Tracks</Button>
-      <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/> 
+      <hr style={{ height: '4px', backgroundColor: 'black', border: 'none', margin: '5px' }}/> 
 
       
           

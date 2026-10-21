@@ -86,15 +86,14 @@ export async function queryStormName(startDate = null, endDate = null, polyCoord
       
 
     };
-  console.log(updatedParams);
 
   
   const start_date = formatFilterDate(updatedParams['startDate']);
   const end_date = formatFilterDate(updatedParams['endDate']);
   
   const storm_poly = updatedParams['polyCoords'];                       
-  const start_category= updatedParams['startCategory'];
-  const end_category = updatedParams['endCategory'];
+  const start_category= (updatedParams['startCategory']) ? updatedParams['startCategory'] : '';
+  const end_category = (updatedParams['endCategory']) ? updatedParams['endCategory'] : '';
 
   const query = new URLSearchParams({
     start_date: start_date,
@@ -104,18 +103,15 @@ export async function queryStormName(startDate = null, endDate = null, polyCoord
     end_category: end_category,
 
   }).toString();
-  console.log(query);
   let uniqueList;
   try {
     //const resource = await fetch_retry(`${basePath}/api/storm_names?`, 3)
     const resource = await fetch(`${basePath}/api/filter_storms?${query}`);
     const storm_data = await resource.json();
-    //console.log(storm_data)
     
     uniqueList = makeStormNameList(storm_data)
     // Create a set to track unique IDs and add objects to the result list
     
-    console.log(uniqueList);
     if (uniqueList.length === 0) {
       alert("No result found for this search, please try again...")
     }
@@ -129,7 +125,6 @@ export async function queryStormName(startDate = null, endDate = null, polyCoord
     
   }
 
-  console.log(uniqueList) 
   return uniqueList
   
 
@@ -177,16 +172,17 @@ export function formatFilterDate(date) {
 }
 
 export function formatStormCategory(category_list = []) {
-  console.log(category_list);
   const formattedCategoryList = category_list.join("_");
   return formattedCategoryList;
 }
 
 export function formatStormName(storm_list = []) {
   //storm_names = storm_names.replace(/\s+/g, ''); // Remove all spaces
-  console.log(storm_list);
   //const storm_list = storm_names.split(",");
 
-  const formattedStormList = storm_list.join("_");
+  const formattedStormList = [];
+  if (storm_list.length > 0) {
+    formattedStormList.push(storm_list.join("_"));
+  }
   return formattedStormList;
 }

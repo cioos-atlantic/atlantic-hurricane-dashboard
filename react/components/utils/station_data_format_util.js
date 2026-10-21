@@ -102,9 +102,7 @@ export function getDisplayName(station_descriptions, station_name){
     
     if (matchedDataset) {
       display_name = matchedDataset.title;
-      console.log(`Match found! Dataset title is: ${display_name}`);
     } else {
-      console.log("No match found.");
       display_name = station_name
     }
     return display_name;
@@ -129,7 +127,6 @@ export function getColumnNameList(column_std_names, column_names, variable){
 
     };
   });
-  //console.log(column_names_list)
   return column_names_list
 }
 

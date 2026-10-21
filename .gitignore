@@ -4,6 +4,8 @@ react/node_modules/
 react/.next/**/*.*
 react/.next/trace
 react/.next/BUILD_ID
+react/next-env.d.ts
+react/tsconfig.tsbuildinfo
 node_modules/
 
 __pycache__/

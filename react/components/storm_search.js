@@ -11,7 +11,6 @@ export default function StormSearch({ onSearch, onPopulateStormDetails, onPopula
     }
   });
 
-  console.log("Unique Days in Forecast", timeline_days);
 
   return (
     <>

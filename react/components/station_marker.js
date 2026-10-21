@@ -1,60 +1,49 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
+import L from "leaflet";
 import { flip_coords } from "@/lib/storm_utils";
-import { Marker, Tooltip, Popup, Icon } from "react-leaflet";
-import { getDisplayName } from "./utils/station_data_format_util";
+import { Marker, Tooltip } from "react-leaflet";
+import { mapActions } from "@/components/mapReducer";
+import { basePath } from "@/next.config";
+
+// Icons are created once. A new icon object on every render makes react-leaflet call
+// marker.setIcon(), which rebuilds the marker's DOM element (visible flicker on every hover).
+// Red = selected station, blue = all others.
+// iconRetinaUrl must be set too: on HiDPI screens Leaflet uses iconRetinaUrl instead of iconUrl,
+// and leaflet-defaulticon-compatibility fills any missing option from its CSS (the *blue* 2x image).
+// Images: public/markers/ (from pointhi/leaflet-color-markers, BSD-2-Clause, see THIRD_PARTY_NOTICES.md).
+const redIcon = new L.Icon.Default({
+  iconUrl: `${basePath}/markers/marker-icon-red.png`,
+  iconRetinaUrl: `${basePath}/markers/marker-icon-2x-red.png`,
+})
+const blueIcon = new L.Icon.Default()
 
 /**
- * 
- * @param {[Object]} station_data Station Data object after being retrieved from WFS and processed. 
- * First element is station name, second element is a dictionary of station data. See readme for format
- * @param {Date} time Time of the station data to retrieve. Defaults to most recent data if not provided
+ *
+ * @param {string} station_name Station name (key of the station data object)
+ * @param {Object} station_values Station feature retrieved from WFS and processed. See readme for format
+ * @param {boolean} isSelected Whether this station is the one open in the station dashboard
  * @returns StationMarker JavaScript snippet
  */
-export default function StationMarker({station_data, time = new Date(), selected_station, dispatch}) {
-  // Turns selected marker red, others return as blue
-  function getMarkerIcon(selected_station, station_name) {
-    try {
-      if (station_name === selected_station[0]) {
-        return redIcon
-      }
-      else {
-        return blueIcon
-      }
-    } catch (error) {
-      return blueIcon
-    }
-  }
-
-  //Check if selected var contains any of the following
-  //wind_speed, temperature, sea_surface_wave, air_pressure
-
-  const station_name = station_data[0]
-  const station_values = station_data[1]
-  // Change to call from ERDDAP
+function StationMarker({ station_name, station_values, isSelected, dispatch }) {
   const display_name = station_values?.properties?.dataset_title
   const station = station_values?.properties?.station || ""
 
-  // Data for station doesn't exist at the provided time
-  const redIcon = new L.Icon.Default({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/refs/heads/master/img/marker-icon-2x-red.png'
-  })
+  // Stable position: a new [lat, lon] array on every render makes react-leaflet call setLatLng(),
+  // and MarkerClusterGroup handles that "move" by removing and re-adding the marker.
+  const coordinates = station_values?.geometry?.coordinates
+  const position = useMemo(() => flip_coords(coordinates), [coordinates])
 
-  const blueIcon = new L.Icon.Default()
+  const eventHandlers = useMemo(() => ({
+    click: () => {
+      dispatch(mapActions.selectStationAndOpenDashboard([station_name, station_values]));
+    }
+  }), [dispatch, station_name, station_values])
 
   return (
     <Marker
-      key={station_name}
-      position={flip_coords(station_values?.geometry?.coordinates)}
-      icon={getMarkerIcon(selected_station, station_name)}
-      eventHandlers={{
-        click: (e) => {
-          dispatch({
-            type: 'SET_SELECTED_STATION_AND_OPEN_DASHBOARD',
-            payload: station_data,
-          });
-          
-        }
-      }}
+      position={position}
+      icon={isSelected ? redIcon : blueIcon}
+      eventHandlers={eventHandlers}
     >
       <Tooltip>
         <h4>{display_name}</h4>
@@ -63,3 +52,6 @@ export default function StationMarker({station_data, time = new Date(), selected
     </Marker>
   )
 }
+
+// Only re-render when this marker's own props change (not on every storm hover).
+export default React.memo(StationMarker)

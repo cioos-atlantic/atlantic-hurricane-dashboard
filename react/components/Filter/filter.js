@@ -26,6 +26,10 @@ import InfoScreen from "../message_screens/info_screen";
 import { empty_station_obj } from "../point_defaults";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { formatFilterDate, formatStormCategory, formatStormName } from "./filter_utils";
+import { FiltersSelected, FiltersSubmitted } from "./viewFilters";
+import { mapActions } from "@/components/mapReducer";
+import { filterActions } from "@/components/Filter/filterReducer";
+import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
 
 
 const ITEM_HEIGHT = 35;
@@ -45,7 +49,10 @@ export const ShowOptions = KeyboardDoubleArrowDownIcon;
 export const CloseOptions = KeyboardDoubleArrowUpIcon;
 
 
-export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoints }) {
+export function RenderFilter({ clearShapesRef, dispatch, setStationPoints, isDrawerOpen }) {
+  const { startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName,
+    showDateSelection, showCatSelection, showFilterSelected, filterQuery } = useFilters();
+  const filterDispatch = useFilterDispatch();
   const [showFilterIcons, setShowFilterIcons] = useState(false);
   const [showFilterOptions, setShowFilterOptions] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -56,7 +63,7 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
   
 
   const [openSpeedDial, setOpenSpeedDial] = useState(false);
-  const setFilterStormName = (state) => dispatch({ type: "SET_FILTER_STORM_NAME", payload: state });
+  const setFilterStormName = (state) => filterDispatch(filterActions.setFilterStormName(state));
 
   
   const handleOpen = () => setOpenSpeedDial(true);
@@ -72,12 +79,12 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
 
   const router = useRouter(); // Next.js useRouter
   const drawerWidth = 258;
-  const drawerOpen = state.isDrawerOpen;
+  const drawerOpen = isDrawerOpen;
 
 
   function handleClearAllFilters() {
     setSelectedOptions([]);
-    dispatch({ type: "RESET_FILTERS" })
+    filterDispatch(filterActions.resetFilters())
 
     const hasClearShapesRef = clearShapesRef && clearShapesRef.current;
     
@@ -87,16 +94,15 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
       clearShapesRef.current.clearShapes();
     }
 
-    console.log("All filters and shapes cleared!");
   }
 
 
   async function handleFilterSubmit() {
     //setDrawerButtonClicked('');
-    dispatch({ type: "SHOW_FILTER_SELECTED", payload: false });
-    dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: '' });
-    dispatch({ type: "SET_CAT_SELECTION", payload: false});
-    dispatch({ type: "SET_DATE_SELECTION", payload: false});
+    filterDispatch(filterActions.setShowFilterSelected(false));
+    dispatch(mapActions.setDrawerButtonClicked(''));
+    filterDispatch(filterActions.setCatSelection(false));
+    filterDispatch(filterActions.setDateSelection(false));
     setShowFilterOptions(prev => ({
       ...prev,
       stormName: false, // stormName must be defined here
@@ -107,39 +113,34 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
     
     const updatedParams = {
       //...selectedOptions, // Spread selected options correctly
-      startDate: state.startDate, // Ensure start and end dates are included
-      endDate: state.endDate,
-      polyCoords: state.polyFilterCoords,
-      startCategory: state.startCategory,
-      endCategory:state.endCategory,
-      stormName:state.filterStormName
+      startDate: startDate, // Ensure start and end dates are included
+      endDate: endDate,
+      polyCoords: polyFilterCoords,
+      startCategory: startCategory,
+      endCategory: endCategory,
+      stormName: filterStormName
 
     };
-
-    console.log(updatedParams); // 
-    dispatch({ type: "SET_FILTER_QUERY", payload: updatedParams});
-
-   
-
-
+ 
+    filterDispatch(filterActions.setFilterQuery(updatedParams));
 
     const stormResult = await processFilterRequest(updatedParams, setLoading);
-    console.log(stormResult);
-    dispatch({ type: "SET_FILTER_RESULT", payload: stormResult});
-    router.push(`/?storms=historical`);
+
+    filterDispatch(filterActions.setFilterResult(stormResult));
+    router.push(`/?page=historical`);
 
     //setIsDrawerOpen(true);
     //setReturnFilterResult(true);
-    dispatch({ type: "TOGGLE_DRAWER", payload: true});
-    dispatch({ type: "TOGGLE_FILTER_RESULT", payload: true});
-    dispatch({ type: "CLOSE_STORM_TRACKS" })
+    dispatch(mapActions.setDrawerOpen(true));
+    filterDispatch(filterActions.setReturnFilterResult(true));
+    dispatch(mapActions.closeStormTracks())
     setStationPoints(empty_station_obj)
-    dispatch({ type: "SET_START_DATE", payload: null});
-    dispatch({ type: "SET_END_DATE", payload: null});
-    dispatch({ type: "SET_POLY_FILTER_COORDS", payload: ''});
-    dispatch({ type: "SET_START_CATEGORY", payload: ''});
-    dispatch({ type: "SET_END_CATEGORY", payload: ''});
-    dispatch({ type: "SET_FILTER_STORM_NAME", payload: []});
+    filterDispatch(filterActions.setStartDate(null));
+    filterDispatch(filterActions.setEndDate(null));
+    filterDispatch(filterActions.setPolyFilterCoords(''));
+    filterDispatch(filterActions.setStartCategory(null));
+    filterDispatch(filterActions.setEndCategory(null));
+    filterDispatch(filterActions.setFilterStormName([]));
     
 
   }
@@ -152,119 +153,25 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
         <LoadingScreen />
       ) : (
         <>
-          <SpeedDial
-            ariaLabel="Filter Options"
-            sx={{
-              position: 'absolute', bottom: 65, right: 7,
-              display: { xs: "block", md: "none" }, '& .MuiSpeedDial-fab': {
-                backgroundColor: '#e55162',  // Change SpeedDial button background color
-                '&:hover': {
-                  backgroundColor: '#b9acac', // Change SpeedDial button hover color
-                }
-              }
-            }}
-            icon={<FilterAltIcon />}
-            
 
-            //onClick={handleSpeedDialToggle}
-            open={openSpeedDial}
-            onOpen={handleOpen}
-            onClose={handleClose}
-          >
-
-            <SpeedDialAction
-            className="filters-speed-dial"
-              icon={<CloseRoundedIcon/>}
-              tooltipTitle="Clear Filters"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleClearAllFilters()
-              }}
-            />
-            <SpeedDialAction
-              className="filters-speed-dial"
-              icon={<PublishRoundedIcon />}
-              tooltipTitle="Submit"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleFilterSubmit()
-              }}
-            />
           
-             {openSpeedDial && (input_filters.map((input_filter, index) => {
-              return (
-                <div className="filter-group" key={index}>
-                  <InputFilter
-                    input_filter={input_filter}
-                    showFilterOptions={showFilterOptions}
-                    setShowFilterOptions={setShowFilterOptions}
-                    dispatch={dispatch}
-                    filterStormName={state.filterStormName}
-                    setFilterStormName= {setFilterStormName}
-                    startDate= {state.startDate} 
-                    endDate= {state.endDate}
-                    polyCoords= {state.polyFilterCoords}
-                    startCategory= {state.startCategory}
-                    endCategory={state.endCategory}
-                  />
-                </div>
-              )
-            }))
-
-            }
-            {openSpeedDial && (<div className="filter-group">
-              <RenderDateFilter
-                state={state}
-                dispatch={dispatch}
-                setShowFilterOptions={setShowFilterOptions}
-
-              />
-
-            </div>
-            )
-
-            }
-            {openSpeedDial && (<div className="filter-group">
-              <RenderCategoryFilter
-                  state={state}
-                  dispatch={dispatch}
-                  setShowFilterOptions={setShowFilterOptions}
-                />
-
-            </div>
-            )
-
-            }
-            {/*openSpeedDial && (filters.map((filter, index) => {
-              return (
-
-                <div className="filter-group" key={index}>
-
-
-                  <Badges
-                    filter={filter}
-                    showFilterOptions={showFilterOptions}
-                    setShowFilterOptions={setShowFilterOptions}
-                    setSelectedOptions={setSelectedOptions}
-                    selectedOptions={selectedOptions}
-                  />
-
-                </div>
-
-
-              )
-            }))
-
-            */}
-
-          </SpeedDial>
-
           <Stack
-            direction="row"
-            spacing={0.1}
-            sx={{ display: { xs: "none", md: "flex" },  left: drawerOpen ? `${drawerWidth}px` : 0,
-            width: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%',   }}
+            direction="column"
+            spacing={0.4}
+            sx={{ display: 'flex'
+              }}
             className='filter-icons-list'>
+            
+            
+            
+            <Box className='historical_page_drawer_subheader'
+              sx={{
+                fontSize: '14px',
+                
+              }}
+              >Filter Storms</Box>
+            
+            
             {
               input_filters.map((input_filter, index) => {
                 return (
@@ -274,36 +181,42 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
                     input_filter={input_filter}
                     showFilterOptions={showFilterOptions}
                     setShowFilterOptions={setShowFilterOptions}
-                    dispatch={dispatch}
-                    filterStormName={state.filterStormName}
+                    filterDispatch={filterDispatch}
+                    filterStormName={filterStormName}
                     setFilterStormName= {setFilterStormName}
-                    startDate= {state.startDate} 
-                    endDate= {state.endDate}
-                    polyCoords= {state.polyFilterCoords}
-                    startCategory= {state.startCategory}
-                    endCategory={state.endCategory}
+                    startDate= {startDate} 
+                    endDate= {endDate}
+                    polyCoords= {polyFilterCoords}
+                    startCategory= {startCategory}
+                    endCategory={endCategory}
                   />
 
-                  </div>
-                )
-              })
-            }
+                    </div>
+                  )
+                })
+              }
 
 
             <div className="filter-group">
               <RenderDateFilter
-                state={state}
-                dispatch={dispatch}
+                filterDispatch={filterDispatch}
                 setShowFilterOptions={setShowFilterOptions}
+                startDate= {startDate} 
+                endDate= {endDate}
+                showDateSelection= {showDateSelection}
               />
             </div>
             <div className="filter-group">
               <RenderCategoryFilter
-                  state={state}
-                  dispatch={dispatch}
+                  filterDispatch={filterDispatch}
                   setShowFilterOptions={setShowFilterOptions}
+                  startCategory={startCategory}
+                  endCategory={endCategory}
+                  showCatSelection={showCatSelection}
                 />
             </div>
+            
+
             
 
             {/*
@@ -324,17 +237,40 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
             */}
 
             <Button
-              className="filter-submit-button"
+              id="filter-submit-button"
+              className="filter-badge"
               onClick={handleFilterSubmit}
               startIcon={<PublishRoundedIcon />}>
-              Submit
+              Submit FILTER QUERY
             </Button>
             <Button
-              id="cancel-filter-icon"
-              className="filter-icons"
+              
+              className="filter-badge"
               onClick={handleClearAllFilters}>
-              X
+              CLEAR FILTER QUERY
             </Button>
+
+            <div className="filter-group">
+              {(showFilterSelected)  ? (
+                <>
+                  <FiltersSelected
+                  startDate={startDate}
+                  endDate={endDate}
+                  startCategory={startCategory}
+                  endCategory={endCategory}
+                  polyFilterCoords={polyFilterCoords}
+                  filterStormName={filterStormName}/>
+                  
+                </>
+                ): (
+                  <>
+                  <FiltersSubmitted 
+                filterQuery={filterQuery}/>
+
+                
+                  </>
+                )}
+            </div>
           
           </Stack>
         
@@ -360,7 +296,6 @@ export function RenderFilter({  clearShapesRef, state, dispatch, setStationPoint
       clearShapesRef.current.clearShapes();
     }
 
-    console.log("All filters and shapes cleared!");
   }
 
 export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSelectedOptions, selectedOptions }) {
@@ -395,7 +330,7 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
       ...prev,
       [name]: [] // Clear the options for the specific filter name
     }));
-    console.log({ [name]: [] }); // Log the cleared options
+ 
   };
 
   function handleIconClick() {
@@ -425,8 +360,6 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
         }>
 
         {filter.display_name}
-
-        {console.log(showFilterOptions)}
 
       </Button>
 
@@ -492,11 +425,6 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
 
           </Stack>
 
-
-
-          {console.log(selectedOptions)}
-          {console.log(filter.options)}
-
         </Paper>
       )}
 
@@ -510,19 +438,17 @@ export function Badges({ filter, showFilterOptions, setShowFilterOptions, setSel
 
 export async function processFilterRequest(filterParameters, setLoading) {
 
-  console.log(filterParameters);
-  let uniqueList;
+  let uniqueList = [];
   const stormCategory = formatStormCategory(filterParameters['stormCategory']);
   const stormNames = formatStormName(filterParameters['stormName']);
   const startDate = formatFilterDate(filterParameters['startDate']);
   const endDate = formatFilterDate(filterParameters['endDate']);
   
   const stormPoly = filterParameters['polyCoords'];                       
-  const startCategory= filterParameters['startCategory'];
-  const endCategory = filterParameters['endCategory'];
+  const startCategory= (filterParameters['startCategory']) ? filterParameters['startCategory'] : '';
+  const endCategory = (filterParameters['endCategory']) ? filterParameters['endCategory'] : '';
 
 
-  console.log(stormCategory, stormNames, startDate, endDate)
 
 
 
@@ -537,15 +463,12 @@ export async function processFilterRequest(filterParameters, setLoading) {
 
   }).toString();
 
-  console.log(query)
   setLoading(true);
   try {
     const resource = await fetch(`${basePath}/api/filter_storms?${query}`);
     const storm_data = await resource.json();
-    //console.log(storm_data);
 
     //const historical_storm_data = parseStormData(storm_data, storm.name);
-    // console.log(historical_station_data);
 
     console.debug(`historical Storm Data for ${stormCategory} Between  ${startDate} and ${endDate}: `, storm_data);
     // Create a set to track unique IDs and add objects to the result list
@@ -553,7 +476,6 @@ export async function processFilterRequest(filterParameters, setLoading) {
     // Create a set to track unique IDs and add objects to the result list
     setLoading(false);
 
-    console.log(uniqueList);
     if (uniqueList.length === 0) {
       alert("No result found for this search, please try again...")
     }

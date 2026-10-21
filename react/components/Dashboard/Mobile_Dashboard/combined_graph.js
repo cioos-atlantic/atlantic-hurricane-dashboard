@@ -89,9 +89,8 @@ function RenderCombinedChart({ sourceData, varCategory, timeData, hoverPointTime
           },
         },
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false, 
         spanGaps: true,
-        //maintainAspectRatio: false,
         plugins: {
           annotation: {
             annotations: {
@@ -165,14 +164,8 @@ function RenderCombinedChart({ sourceData, varCategory, timeData, hoverPointTime
 
 
   return (
-    <div className='chart-render'>
-      <canvas
-        ref={chartRef}
-        style={{
-          top: 0,
-          left: 0,
-        }}
-      />
+    <div className='chart-box'>
+      <canvas ref={chartRef} />
     </div>
   );
 }
@@ -189,8 +182,6 @@ const getRandomColor = () => {
 
 function getColour(graph_colour_list, var_name, indx) {
   let colour = '';
-  // console.log(var_name);
-  // console.log(graph_colour_list);
 
   colour = var_name in graph_colour_list ? combined_graph_color[var_name][indx] : getRandomColor()
   return colour;
@@ -203,9 +194,9 @@ function makeDataset(dataList, varCategory) {
   Object.assign(graph_colour_list, combined_graph_color);
 
   dataList.forEach((dataDict, index) => {
-    // console.log(dataDict);
+
     Object.entries(dataDict).forEach(([key, value]) => {
-      // console.log(key)
+
       datasets.push({
         label: value.name,
         data: value.data,
@@ -219,7 +210,6 @@ function makeDataset(dataList, varCategory) {
     })
   })
 
-  // console.log(datasets);
   return datasets;
 }
 

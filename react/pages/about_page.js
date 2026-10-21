@@ -88,8 +88,7 @@ export default function About(){
                     aria-label={`Learn more about the storm: ${storm.title}`}
                     role="button"
                     tabIndex="0"
-                    onClick={() =>{console.log(`${storm.title} clicked`)
-                                    handleStormNameClick(storm.name, storm.year, router)}}
+                    onClick={() => handleStormNameClick(storm.name, storm.year, router)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         handleStormNameClick(storm.name, storm.year, router);
@@ -146,8 +145,7 @@ export default function About(){
  */
 
 export function handleStormNameClick(stormName, stormYear, router){
-  const url = `/?storms=historical&name=${stormName}&season=${stormYear}`;
-  console.log(url)
+  const url = `/?page=historical&name=${stormName}&season=${stormYear}`;
   router.push(url);
   
   

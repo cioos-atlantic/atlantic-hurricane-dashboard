@@ -4,6 +4,7 @@ import React from "react";
 import StormType from '../Storm_popup/Storm_type';
 import StormCategory from '../Storm_popup/storm_category';
 import StormPressure from '../Storm_popup/storm_pressure';
+import { getStormCategory } from './utils';
 
 
 
@@ -22,6 +23,7 @@ export function StormSummaryText({storm_point_hover}){
       const MAXWIND = fetch_value(storm_point_hover, ["MAXWIND", "WMO_WIND", "USA_WIND"]) || fallbackValue;
       const MINPRESS = fetch_value(storm_point_hover, ["MSLP", "WMO_PRES", "USA_PRES"]) || fallbackValue;
       const STORMSTATUS = storm_point_hover.properties.TCDVLP || fallbackValue;
+      const STORMCAT = getStormCategory(storm_point_hover) || "";
   
   
   
@@ -37,9 +39,10 @@ export function StormSummaryText({storm_point_hover}){
   
             }}>
              
-                    <StormType STORMTYPE={STORMTYPE}/>
+                    {//<StormType STORMTYPE={STORMTYPE}/>
+                    }
                   <div><strong>Storm Status:</strong> {STORMSTATUS}</div>
-                  <StormCategory STORMFORCE={STORMFORCE} />
+                  <StormCategory STORMCAT={STORMCAT} />
                   <div><strong>Timestamp:</strong> {TIMESTAMP}</div>
                   <div><strong>Lat/Long:</strong> {storm_point_hover.properties.LAT}&deg; N, {storm_point_hover.properties.LON}&deg; W</div>
                   <div><strong>Max Windspeed:</strong> {MAXWIND} knots ({(MAXWIND * 1.84).toFixed(2)} km/h)</div>

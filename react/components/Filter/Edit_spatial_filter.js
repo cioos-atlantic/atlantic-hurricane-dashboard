@@ -5,9 +5,13 @@ import {
   FeatureGroup
 } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
+import { useFilterDispatch } from "./FilterContext";
+import { filterActions } from "./filterReducer";
 import 'leaflet-draw/dist/leaflet.draw.css';
 
-export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter ({ setPolyFilterCoords}, ref) {
+export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter (props, ref) {
+  const filterDispatch = useFilterDispatch();
+  const setPolyFilterCoords = (coords) => filterDispatch(filterActions.setPolyFilterCoords(coords));
   const featureGroupRef = useRef(null);
   // Get the FeatureGroup reference
   function clearShapes(){
@@ -33,7 +37,6 @@ export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter ({ se
     e.layers.eachLayer(layer => {
       numEdited += 1;
     });
-    console.log(`_onEdited: edited ${numEdited} layers`, e);
      
     
 
@@ -44,7 +47,6 @@ export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter ({ se
     
     let type = e.layerType;
     let layer = e.layer;
-    console.log(layer);
     
 
     featureGroupRef.current.addLayer(layer);
@@ -58,10 +60,8 @@ export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter ({ se
 
   
     if (type === "rectangle") {
-      console.log("_onCreated: Rectangle created");
       
     } else if (type === "polygon") {
-      console.log("_onCreated: Polygon created");
       
     } 
       const poly = processPolygon(layer.getLatLngs())
@@ -71,7 +71,6 @@ export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter ({ se
   
 
   
-    console.log("GeoJSON", layer.toGeoJSON());
   };
 
   const _onDeleted = e => {
@@ -81,21 +80,17 @@ export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter ({ se
     });
     
     setPolyFilterCoords('');      // Clear polygon filter
-    console.log(`onDeleted: removed ${numDeleted} layers`, e);
 
     // this._onChange();
   };
 
   const _onMounted = drawControl => {
-    console.log("_onMounted", drawControl);
   };
 
   const _onEditStart = e => {
-    console.log("_onEditStart", e);
   };
 
   const _onEditStop = e => {
-    console.log("_onEditStop", e);
     const featureGroup = featureGroupRef.current;
 
     if (featureGroup) {
@@ -104,33 +99,27 @@ export const RenderSpatialFilter = forwardRef(function RenderSpatialFilter ({ se
                 const bbox = processRectangle(layer.getLatLngs());
                 setPolyFilterCoords('');
                 setBboxFilterCoordinates(bbox);
-                console.log("Updated BBOX Coordinates:", bbox);
 
             } else if (layer instanceof L.Polygon) {
                 const poly = processPolygon(layer.getLatLngs());
                 setBboxFilterCoordinates('');
                 setPolyFilterCoords(poly);
-                console.log("Updated Polygon Coordinates:", poly);
             }*/
                 const poly = processPolygon(layer.getLatLngs());
                 setPolyFilterCoords(poly);
-                console.log("Updated Polygon Coordinates:", poly);
         });
     }
     
   };
 
   const _onDeleteStart = e => {
-    console.log("_onDeleteStart", e);
   };
 
   const _onDeleteStop = e => {
-    console.log("_onDeleteStop", e);
   };
 
   const _onDrawStart = e => {
     clearShapes(); 
-    console.log("_onDrawStart", e);
     
   };
 
@@ -172,21 +161,15 @@ onEditVertex	function	hook to leaflet-draw's draw:editvertex event*/
 
 
 export function processRectangle(coords){
-  console.log(coords)
   const latitudes = coords.flat().map(coord => coord.lat);
   const longitudes = coords.flat().map(coord => coord.lng);
 
 
-  console.log(latitudes, longitudes);
   const minLat = Math.min(...latitudes);
   const maxLat = Math.max(...latitudes);
   const minLng = Math.min(...longitudes);
   const maxLng = Math.max(...longitudes);
 
-  console.log("Min Latitude:", minLat);
-  console.log("Max Latitude:", maxLat);
-  console.log("Min Longitude:", minLng);
-  console.log("Max Longitude:", maxLng);
   return `${minLat}_${minLng}_${maxLat}_${maxLng}`
 
 }; 
@@ -208,8 +191,6 @@ export function processPolygon(coords){
   const polyCoords = polyList.join(",")
   
 
-  console.log(polyList);
-  console.log(polyCoords);
   return polyCoords;
 
   

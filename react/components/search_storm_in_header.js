@@ -79,7 +79,7 @@ export function RenderSearchResult({searchResult, router}){
           
         }}
       >
-        {console.log(searchResult)}
+
         {searchResult.length > 0 ? (
           <>
           <Box
@@ -91,11 +91,9 @@ export function RenderSearchResult({searchResult, router}){
           {searchResult.map((storm, index) => (
           <Paper
             key={storm.storm_id}
-            onClick={(e) => { console.log()
+            onClick={(e) => { 
                               handleStormNameClick(storm.name, storm.year, router);
                               //triggerReload(); // Reload page when a storm is clicked
-            
-                              //console.log(storm);
                               }}      
           >
             <Typography className='search-output'>
@@ -118,8 +116,7 @@ export function RenderSearchResult({searchResult, router}){
 
 
 export function changeUrlToHistorical(router){
-  const url = `/?storms=historical`;
-  console.log(url)
+  const url = `/?page=historical`;
   router.push(url);
 }
 

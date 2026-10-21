@@ -1,39 +1,51 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import StormDashboard from '../storm_dashboard/storm_dashboard';
 import StationDashboard from '../station_dashboard/station_dashboard';
 import { Stack } from '@mui/material';
 import { useMediaQuery, Box, useTheme } from "@mui/material";
 import { RenderSmallDashboard } from './Mobile_Dashboard/dashboard_small';
+import { mapActions } from "@/components/mapReducer";
+import { fetch_value } from "@/lib/storm_utils";
 
 
 
 
-export function RenderDashboards({ source_type, time, state, dispatch
+export function RenderDashboards({ dashboards, selected_station, hover_marker, storm_points, isDrawerOpen, dispatch
     }){
-        
 
-        const showStorm = state.isStormDashOpen;
-        const showStation = state.isStationDashOpen;
-        console.log(showStation, showStorm)
-            // Determine width dynamically
+
+        const showStorm = dashboards.storm;
+        const showStation = dashboards.station;
+        
+        // Determine width dynamically
         const flexValue = showStorm && showStation ? 1 : 2; // 50% if both, 100% if one
         const theme = useTheme();
         const isSmall = useMediaQuery(theme.breakpoints.down('md')); // `md` in MUI = 960px
         const isExtraSmall = useMediaQuery(theme.breakpoints.down('sm'));
-    
-        if (!state.isDashOpen) return null;
+
+        // Stable callbacks (dispatch never changes), so they don't defeat React.memo on the dashboards
+        // closeDashboard also clears the panel's selection (see CLOSE_DASHBOARD in mapReducer)
+        const closeStormDashboard = useCallback(() => {
+            dispatch(mapActions.closeDashboard('storm'));
+        }, [dispatch]);
+        const closeStationDashboard = useCallback(() => {
+            dispatch(mapActions.closeDashboard('station'));
+        }, [dispatch]);
+        const closeAllDashboards = useCallback(() => {
+            dispatch(mapActions.closeAllDashboards());
+        }, [dispatch]);
+
+        if (!showStorm && !showStation) return null;
+
+        const hoverPointTime = fetch_value(hover_marker, ["TIMESTAMP", "ISO_TIME"]);
 
     return (
     isExtraSmall && showStorm && showStation ? (
         <RenderSmallDashboard
-        selected_station={state.selected_station}
-        hover_point={state.hover_marker}
-        source_type={source_type}
-        time={time}
-        storm_points={state.storm_points}
-        setIsDashOpen= {(state) => dispatch({ type: "TOGGLE_DASH", payload: state })}
-        setIsStormDashOpen={(state) => dispatch({ type: "TOGGLE_STORM_DASH", payload: state })}
-        setIsStationDashOpen={(state) => dispatch({ type: "TOGGLE_STATION_DASH", payload: state })}
+        selected_station={selected_station}
+        hover_point={hover_marker}
+        storm_points={storm_points}
+        onClose={closeAllDashboards}
         />
     ) : (
         <Stack
@@ -41,16 +53,17 @@ export function RenderDashboards({ source_type, time, state, dispatch
         className="dashboards"
         direction="row"
         sx={{
-            bottom: { xs: "20px", sm: "30px", md: "35px", lg: "50px", xl: "50px" },
+            // Must match the footer height in layout.js (35px from md up)
+            bottom: { xs: "20px", sm: "30px", md: "35px", lg: "35px", xl: "35px" },
             width: {
             xs: "100%",
             md: "100%",
-            lg: state.isDrawerOpen ? "calc(100vw - 258px)" : "100%",
+            lg: isDrawerOpen ? "calc(100vw - 350px)" : "100%",
             },
             marginLeft: {
             xs: 0,
             md: 0,
-            lg: state.isDrawerOpen ? "258px" : 0,
+            lg: isDrawerOpen ? "350px" : 0,
             },
             gap: 0,
             display: "flex",
@@ -61,28 +74,19 @@ export function RenderDashboards({ source_type, time, state, dispatch
         {showStorm && (
             <Box sx={{ flex: flexValue, minWidth: showStation ? "50%" : "100%" }}>
             <StormDashboard
-                dispatch={dispatch}
-                hover_marker={state.hover_marker}
-                storm_points={state.storm_points}
-                isStormDashOpen={state.isStormDashOpen}
-                
+                hover_marker={hover_marker}
+                storm_points={storm_points}
+                onClose={closeStormDashboard}
             />
             </Box>
         )}
         {showStation && (
             <Box sx={{ flex: flexValue, minWidth: showStorm ? "50%" : "100%" }}>
             <StationDashboard
-                state={state}
-                dispatch={dispatch}
-                //selected_station={selected_station}
-                //setSelectedStation={setSelectedStation}
-                storm_timestamp={new Date()}
-                //selectedTab={selectedTab}
-                //setSelectedTab={setSelectedTab}
-                source_type={source_type}
-                //isStationDashOpen={isStationDashOpen}
-                //setIsStationDashOpen={setIsStationDashOpen}
-                //hover_point={hover_point}
+                key={selected_station?.[0] ?? 'no-station'} // remount (and reset tab) when the station changes
+                station={selected_station}
+                hoverPointTime={hoverPointTime}
+                onClose={closeStationDashboard}
             />
             </Box>
         )}

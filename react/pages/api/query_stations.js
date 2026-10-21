@@ -7,7 +7,6 @@ export default async function handler(req, res) {
     const source_type = "ACTIVE"
 
     try {
-        console.log("handler", source, source_type);
         const result = await wfs_query("","",source,source_type)
         const features = result['erddap_data']['features']
         const station_data = station_data_init(features, filter_station)

@@ -17,7 +17,6 @@ export function RenderSearchResult({searchResult, router, setIsSearchSubmitted})
           
         }}
       >
-        {console.log(searchResult)}
         {searchResult.length > 0 ? (
           <>
           <Box
@@ -29,11 +28,10 @@ export function RenderSearchResult({searchResult, router, setIsSearchSubmitted})
           {searchResult.map((storm, index) => (
           <Paper
             key={storm.storm_id}
-            onClick={(e) => { console.log()
+            onClick={(e) => {
               handleStormButtonClick(storm.name, storm.year, storm.storm_id, router);
                               //triggerReload(); // Reload page when a storm is clicked
             
-                              //console.log(storm);
                               }}      
           >
             <Typography className='search-output'>

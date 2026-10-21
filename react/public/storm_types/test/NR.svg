@@ -1,0 +1,14 @@
+
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(60,60)">
+    <circle r="50" fill="grey" stroke="black" stroke-width="4"/>
+    <text 
+      text-anchor="middle" 
+      dominant-baseline="central" 
+      font-size="45px" 
+      font-weight="bold" 
+      fill="black">
+      NR
+    </text>
+  </g>
+</svg>

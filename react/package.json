@@ -6,7 +6,8 @@
     "dev": "next dev -p 3500",
     "build": "next build",
     "start": "next start -p 3600",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@antv/g2": "^5.2.12",
@@ -16,6 +17,7 @@
     "@mui/lab": "^6.0.0-beta.23",
     "@mui/material": "^6.4.0",
     "@mui/x-date-pickers": "^7.27.0",
+    "@reactour/tour": "^3.8.0",
     "@usersnap/browser": "^0.0.5",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
@@ -30,9 +32,11 @@
     "geolib": "^3.3.4",
     "glob": "^10.4.5",
     "html-react-parser": "^5.2.2",
+    "js-cookie": "^3.0.8",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "leaflet-draw": "^1.0.4",
+    "leaflet.markercluster": "^1.5.3",
     "luxon": "^3.5.0",
     "next": "^15.2.4",
     "path": "^0.12.7",
@@ -42,12 +46,18 @@
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.9",
     "react-bootstrap-icons": "^1.11.5",
+    "react-cookie": "^8.1.2",
     "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
     "react-leaflet": "^4.2.1",
     "react-leaflet-draw": "^0.20.6",
+    "react-leaflet-markercluster": "^4.2.1",
+    "react-leaflet-measure": "^3.0.1",
     "react-plotly.js": "^2.6.0",
     "react-responsive": "^10.0.0",
     "swr": "^2.3.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
   }
 }

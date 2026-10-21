@@ -76,7 +76,12 @@ export function remap_coord_array(coordinates) {
  * @returns {array}
  */
 export function flip_coords(coordinates) {
-    return ([coordinates[1], coordinates[0]]);
+     try {
+        return [coordinates[1], coordinates[0]];
+    } catch (e) {
+        return null;
+    }
+    
 }
 
 /**
@@ -519,7 +524,6 @@ export function populateStormDetails(event, storm_data, setSelectedStorm, setSto
     setStormPoints(empty_storm_obj);
     setSelectedStation(empty_station_obj);
 
-    console.log("Set Selected storm to: " + storm_data.data[0].properties.NAME);
     setSelectedStorm(storm_data.data[0].properties.NAME);
 
     let storm_features = build_storm_features(storm_data);

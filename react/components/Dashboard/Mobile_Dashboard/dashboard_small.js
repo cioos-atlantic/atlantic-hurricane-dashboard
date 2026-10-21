@@ -14,39 +14,36 @@ import { processWindSpeeds } from "@/components/station_dashboard/wind_rose_util
 import { RenderPlotlyRose } from "@/components/station_dashboard/plotly_rose";
 
 
-export function RenderSmallDashboard({selected_station, hover_point, source_type, time, storm_points, setIsDashOpen, setIsStormDashOpen, setIsStationDashOpen  }){
+export function RenderSmallDashboard({selected_station, hover_point, storm_points, onClose }){
 	const stationData = selected_station;
-	console.log(stationData);
 	const stationName = stationData[0];
   const stationValues = stationData[1];
 
   const hoverPointTime = fetch_value(hover_point, ["TIMESTAMP", "ISO_TIME"]);
-  console.log(hoverPointTime);
 	const stationDataDict = parseStationData(stationValues)
-	console.log(stationDataDict);
 	const ibtracs_link = 'https://www.ncei.noaa.gov/products/international-best-track-archive';
 
-	const [stationSummary, stationDisplayName, institution, institutionLink] = getStationInfo(stationValues, stationName, source_type, time);
-  console.log(stationSummary, stationDisplayName, institution, institutionLink);
+	//const [stationSummary, stationDisplayName, institution, institutionLink] = getStationInfo(stationValues, stationName, source_type, time);
+  	const stationDisplayName = stationValues?.properties?.dataset_title || "Unknown Station";
+  	const institution = stationValues?.properties?.institution || "Unknown Institution";
+  	const institutionLink = stationValues?.properties?.institution_link || "#";  
+
 	const [stormName, stormTimes, stormType, stormDataDict, stormCategory] = parseStormData(storm_points);
 
 	const mergedData = mergeData(stationDataDict, stormDataDict);
 
-	console.log(mergedData);
 	const stationTimes = get_station_field_data(stationValues?.properties?.station_data,"time", "column_std_names")?.data
 
 	const convertedStormTimes = stormTimes.map(time =>  Date.parse(time));
 
 	const { unifiedTimes, alignedMergedData } = alignMergedData(mergedData, convertedStormTimes, stationTimes);
 
-	console.log(unifiedTimes, alignedMergedData);
 
 	const variablePresence = createVarPresenceDict(alignedMergedData, stormCategory, stormType, stationValues );
 	const allStationData =stationValues?.properties?.station_data;
 	const timeData = get_station_field_data(allStationData, "time", "column_std_names").data;
 	const directionData = get_station_field_data(allStationData, 'wind_from_direction', "column_std_names").data;
 	const  windSpeedData = processWindSpeeds(allStationData);
-	console.log(timeData, directionData, windSpeedData);
 	
 
 	function generateGraph(selectedVar){
@@ -97,12 +94,7 @@ export function RenderSmallDashboard({selected_station, hover_point, source_type
       >
         <button
           className="close"
-          onClick={() => {
-            setIsDashOpen(false);
-						setIsStationDashOpen(false);
-						setIsStormDashOpen(false);
-
-          }}
+          onClick={onClose}
           title="Close"
           aria-label="Close"
         >

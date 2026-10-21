@@ -44,17 +44,7 @@ export default function StormDataLayout({ stormData, stormSummaryText, variableP
         
       </section>
 
-      {/* Storm Type */}
-      <section className="station_dashboard_small_screen_section">
-        <Box
-          sx= {{
-            fontSize: { xs: '14px', sm: '16px'}
-          }}
-          className="section-header"
-        >{stormType['name']}</Box>
-        <p>{<StormTypeChart chartData={stormType}/>}</p>
-        
-      </section>
+      
 
 
       {/* Storm Category */}

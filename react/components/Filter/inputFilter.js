@@ -6,6 +6,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import React, { forwardRef } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
+import { filterActions } from "@/components/Filter/filterReducer";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -19,7 +20,7 @@ function sleep(duration) {
 }
 
 
-export function InputFilter({input_filter, showFilterOptions, setShowFilterOptions, dispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
+export function InputFilter({input_filter, showFilterOptions, setShowFilterOptions, filterDispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
   //console.log(startDate, endDate, polyCoords, startCategory, endCategory)
   const [inputValue, setInputValue] = useState(""); // Controlled input field
   const [stormNameList, setStormNameList] = useState([]);
@@ -79,10 +80,10 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
 
 
  function handleIconClick(){
-    console.log(showFilterOptions);
-    dispatch({ type: "SHOW_FILTER_SELECTED", payload: true })
-    dispatch({ type: "SET_CAT_SELECTION", payload: false});
-    dispatch({ type: "SET_DATE_SELECTION", payload: false});
+
+    filterDispatch(filterActions.setShowFilterSelected(true))
+    filterDispatch(filterActions.setCatSelection(false));
+    filterDispatch(filterActions.setDateSelection(false));
     setShowFilterOptions((prev) => ({
       ...prev,
       [input_filter.name]: !prev[input_filter.name],
@@ -92,9 +93,8 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
     setOpen(true);
     (async () => {
       setLoading(true);
-      //console.log(startDate, endDate, polyCoords, startCategory, endCategory)
+  
       const stormNames = await input_filter.query(startDate, endDate, polyCoords, startCategory, endCategory); 
-      console.log(stormNames);
       if (!stormNames || !Array.isArray(stormNames))
         { alert("No storm name data available...")
           setLoading(false);
@@ -113,7 +113,6 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
     //setStormNameList([]);
   };
 
-  console.log(stormNameList);
   return(
     <>
     <Button
@@ -122,13 +121,13 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
       startIcon={input_filter.Icon ? <input_filter.Icon /> : null}
       endIcon={ !showFilterOptions[input_filter.name] ? (<ShowOptions/>):(<CloseOptions/>)}
       sx={{...buttonStyle,
-        display: { xs: "none", md: "inline-flex" }}
+        display: "inline-flex",}
       }
     >{input_filter.display_name}
 
     </Button>
 
-    {smallScreenIconButton(input_filter.display_name, handleIconClick, buttonStyle, input_filter.Icon)}
+    
 
     
     
@@ -137,17 +136,17 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
       <Paper elevation={3} 
         key={input_filter.name}
         className="input-filter"
-        sx={{top:{xs: '6px', md: '100%',},
-        right:{xs: '100%', md: '0px',},
-        width:'210px',
+        sx={{top:'1px',
+        right:'0px',
+        
         
         }}>
-          <Stack direction="row"  spacing={4} sx={{ mt: {xs: 0.2, md: 0.5 }, mb:{xs: 0.8, md: 1 }, justifyContent: 'center' }}>
+          <Stack direction="row"  spacing={4} sx={{ mt: 0.5, mb: 1, justifyContent: 'center' }}>
                       
         
            
-            <Button size="small" className="filter-submit-button" onClick={handleClearAll}>Clear</Button>
-            <Button size="small" className="filter-submit-button" onClick={() => setShowFilterOptions({ ...showFilterOptions, [input_filter.name]: false })}>
+            <Button size="small" className="shortcut-button" onClick={handleClearAll}>Clear</Button>
+            <Button size="small" className="shortcut-button" onClick={() => setShowFilterOptions({ ...showFilterOptions, [input_filter.name]: false })}>
               Close
             </Button>
     
@@ -200,7 +199,7 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
               sx={{ 
                   marginRight: 1.5,
                   color: '#e55162', 
-                  padding: {sm:'0px', md:'6px'}, 
+                  padding: '6px', 
                   alignSelf: 'center' }}
               checked={selected}
             />
