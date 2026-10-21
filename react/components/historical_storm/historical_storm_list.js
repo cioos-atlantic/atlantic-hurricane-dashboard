@@ -11,6 +11,7 @@ import {  FiltersSelected, FiltersSubmitted } from '../Filter/viewFilters.js';
 import { RenderFilter } from '../Filter/filter.js';
 import { mapActions } from "@/components/mapReducer";
 import { filterActions } from "@/components/Filter/filterReducer";
+import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
 
 
 
@@ -20,7 +21,9 @@ import { filterActions } from "@/components/Filter/filterReducer";
  * clickable links, and allows users to search for specific storms by name or year.
  
  */
-export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, filterDispatch, returnFilterResult, filterResult, drawerButtonClicked, startDate, endDate, startCategory, endCategory, polyFilterCoords, filterQuery, filterStormName, showFilterSelected, clearShapesRef, isDrawerOpen, showDateSelection, showCatSelection }) {
+export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, drawerButtonClicked, clearShapesRef, isDrawerOpen }) {
+  const { filterResult, returnFilterResult } = useFilters();
+  const filterDispatch = useFilterDispatch();
 
   const [loading, setLoading] = useState(false);
 
@@ -135,19 +138,8 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
           <RenderFilter
             clearShapesRef={clearShapesRef} // Pass the ref to 
             dispatch={dispatch}
-            filterDispatch={filterDispatch}
             setStationPoints={setStationPoints}
-            startDate={startDate}
-            endDate={endDate}
-            startCategory={startCategory}
-            endCategory={endCategory}
-            polyFilterCoords={polyFilterCoords}
             isDrawerOpen={isDrawerOpen}
-            filterStormName={filterStormName}
-            showDateSelection={showDateSelection}
-            showCatSelection={showCatSelection}
-            showFilterSelected={showFilterSelected}
-            filterQuery={filterQuery}
 
         />
 

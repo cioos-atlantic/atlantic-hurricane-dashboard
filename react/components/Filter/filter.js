@@ -29,6 +29,7 @@ import { formatFilterDate, formatStormCategory, formatStormName } from "./filter
 import { FiltersSelected, FiltersSubmitted } from "./viewFilters";
 import { mapActions } from "@/components/mapReducer";
 import { filterActions } from "@/components/Filter/filterReducer";
+import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
 
 
 const ITEM_HEIGHT = 35;
@@ -48,7 +49,10 @@ export const ShowOptions = KeyboardDoubleArrowDownIcon;
 export const CloseOptions = KeyboardDoubleArrowUpIcon;
 
 
-export function RenderFilter({  clearShapesRef, dispatch, filterDispatch, setStationPoints, startDate, endDate, startCategory, endCategory, polyFilterCoords, isDrawerOpen, filterStormName, showDateSelection, showCatSelection,filterQuery, showFilterSelected }) {
+export function RenderFilter({ clearShapesRef, dispatch, setStationPoints, isDrawerOpen }) {
+  const { startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName,
+    showDateSelection, showCatSelection, showFilterSelected, filterQuery } = useFilters();
+  const filterDispatch = useFilterDispatch();
   const [showFilterIcons, setShowFilterIcons] = useState(false);
   const [showFilterOptions, setShowFilterOptions] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
