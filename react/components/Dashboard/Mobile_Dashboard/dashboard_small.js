@@ -14,7 +14,7 @@ import { processWindSpeeds } from "@/components/station_dashboard/wind_rose_util
 import { RenderPlotlyRose } from "@/components/station_dashboard/plotly_rose";
 
 
-export function RenderSmallDashboard({selected_station, hover_point, source_type, time, storm_points, onClose }){
+export function RenderSmallDashboard({selected_station, hover_point, storm_points, onClose }){
 	const stationData = selected_station;
 	const stationName = stationData[0];
   const stationValues = stationData[1];

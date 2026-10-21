@@ -4,16 +4,13 @@ import { useMediaQuery, Box, useTheme } from "@mui/material";
 import StationDataLayout from "./station_layout_small_screen";
 import BasicTabs from "./tabs";
 import {  getMatchedStation, getStationDataText, } from "../utils/station_data_format_util";
-import { fetch_value } from "@/lib/storm_utils";
 import { basePath } from "@/next.config";
-import { mapActions } from "@/components/mapReducer";
 
 /**
  * The `StationDashboard` function renders a dashboard for a selected station with relevant data and
  * tabs for different variables.
  */
-export default function StationDashboard({state, dispatch, station_descriptions, time = new Date(), source_type
-}) {
+export default function StationDashboard({ station, hoverPointTime, onClose, time = new Date() }) {
 
   
   const theme = useTheme();
@@ -24,10 +21,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
   // Local tab state; resets to 0 whenever a different station is opened because
   // dashboard.js gives this component key={station name}, which remounts it.
   const [selectedTab, setSelectedTab] = useState(0);
-  const stationData = state.selected_station;
-  const stationValues = stationData[1];
-  // Determine if active or historic
-  const isHistorical = source_type == "historical" ? true : false
+  const stationValues = station?.[1];
 
 
   // const stationDescription = getMatchedStation(station_descriptions, stationName);
@@ -44,12 +38,16 @@ export default function StationDashboard({state, dispatch, station_descriptions,
 
   const station_id = stationValues?.properties?.station_id
   const storm = stationValues?.properties?.storm
+  // Active stations are cached with storm = "ACTIVE" (data_ingest/ERDDAP/cache_ERDDAP.py);
+  // historical ones carry the storm id. Same rule the /api/station_data route uses to pick the cache.
+  const isHistorical = storm !== "ACTIVE"
 
   const erddapSource = stationValues?.properties?.source_url || ""
   const datasetId = stationValues?.properties?.dataset || ""
   const dataLink = erddapSource + "/tabledap/" + datasetId 
 
   useEffect(() => {
+    if (!station_id) return;
     const fetchData = async () => {
       try{
         const query = new URLSearchParams({station_id, storm}).toString();
@@ -62,7 +60,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
       }
     };
     fetchData();
-  }, [state]);
+  }, [station_id, storm]);
   
   let dataText = ''
   let standardNames = []
@@ -105,7 +103,6 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         }
       });
   }
-  const hoverPointTime = fetch_value(state.hover_marker, ["TIMESTAMP", "ISO_TIME"]);
 
     return (
       isExtraSmall ? (
@@ -126,10 +123,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         >
           <button
             className="close"
-            onClick={() => {
-              dispatch(mapActions.closeStationDashboard());
-              dispatch(mapActions.closeDashboard('station'));
-            }}
+            onClick={onClose}
             title="Close"
             aria-label="Close"
           >
@@ -181,11 +175,7 @@ export default function StationDashboard({state, dispatch, station_descriptions,
         >
           <button
             className="close"
-            onClick={() => {
-              dispatch(mapActions.closeStationDashboard());
-              dispatch(mapActions.closeDashboard('station'));
-              //setIsStationDashOpen(false);
-            }}
+            onClick={onClose}
             title="Close"
             aria-label="Close"
           >

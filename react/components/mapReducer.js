@@ -39,7 +39,6 @@ export const mapActions = {
   openDashboard: (panel) => ({ type: 'OPEN_DASHBOARD', payload: panel }),    // panel: 'storm' | 'station'
   closeDashboard: (panel) => ({ type: 'CLOSE_DASHBOARD', payload: panel }),  // panel: 'storm' | 'station'
   closeAllDashboards: () => ({ type: 'CLOSE_ALL_DASHBOARDS' }),
-  closeStationDashboard: () => ({ type: 'CLOSE_STATION_DASHBOARD' }),
 
   // Drawer
   setDrawerOpen: (isOpen) => ({ type: 'TOGGLE_DRAWER', payload: isOpen }),
@@ -83,10 +82,22 @@ export function mapReducer(state, action) {
       return { ...state, polyFilterCoords: action.payload };
     case 'OPEN_DASHBOARD':
       return { ...state, dashboards: { ...state.dashboards, [action.payload]: true } };
+    // Closing a panel also clears the selection that belongs to it:
+    // storm panel -> hovered storm point, station panel -> selected station
     case 'CLOSE_DASHBOARD':
-      return { ...state, dashboards: { ...state.dashboards, [action.payload]: false } };
+      return {
+        ...state,
+        dashboards: { ...state.dashboards, [action.payload]: false },
+        ...(action.payload === 'storm' && { hover_marker: empty_point_obj }),
+        ...(action.payload === 'station' && { selected_station: empty_station_obj }),
+      };
     case 'CLOSE_ALL_DASHBOARDS':
-      return { ...state, dashboards: { storm: false, station: false } };
+      return {
+        ...state,
+        dashboards: { storm: false, station: false },
+        hover_marker: empty_point_obj,
+        selected_station: empty_station_obj,
+      };
     case 'SET_DRAWER_BUTTON_CLICKED':
       return { ...state, drawerButtonClicked: action.payload };
     case 'SET_START_DATE':
@@ -140,12 +151,6 @@ export function mapReducer(state, action) {
           selected_station: action.payload,
           dashboards: { ...state.dashboards, station: true },
         };
-      case 'CLOSE_STATION_DASHBOARD':
-        return {
-          ...state,
-          selected_station: empty_station_obj,
-        };
-
       case 'CLOSE_STORM_TRACKS':
         return {
           ...state,

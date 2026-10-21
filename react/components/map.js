@@ -158,11 +158,12 @@ export default function Map({ children, station_data, source_type,  setStationPo
        
         {
           <RenderDashboards
-            source_type={source_type}
-            time = {new Date()}
-            state={state}
+            dashboards={state.dashboards}
+            selected_station={state.selected_station}
+            hover_marker={state.hover_marker}
+            storm_points={state.storm_points}
+            isDrawerOpen={state.isDrawerOpen}
             dispatch={dispatch}
-            
             />
         }
         {//state.isDrawerOpen && <div className="drawer-touch-blocker"/>
