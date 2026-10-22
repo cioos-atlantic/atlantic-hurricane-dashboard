@@ -31,8 +31,8 @@ export const filterActions = {
   setEndCategory: (category) => ({ type: 'SET_END_CATEGORY', payload: category }),
   setPolyFilterCoords: (coords) => ({ type: 'SET_POLY_FILTER_COORDS', payload: coords }),
   setFilterStormName: (names) => ({ type: 'SET_FILTER_STORM_NAME', payload: names }),
-  resetFilters: () => ({ type: 'RESET_FILTERS' }),
-  cancelFilters: () => ({ type: 'CANCEL_FILTERS' }),
+  // Clears everything: filter values, open panel, submitted query and results
+  clearAll: () => ({ type: 'CLEAR_ALL' }),
 
   // Filter UI
   togglePanel: (panel) => ({ type: 'TOGGLE_PANEL', payload: panel }),
@@ -71,27 +71,8 @@ export function filterReducer(state, action) {
       return { ...state, filterResult: action.payload };
     case 'TOGGLE_FILTER_RESULT':
       return { ...state, returnFilterResult: action.payload };
-    case 'CANCEL_FILTERS':
-      return {
-        ...state,
-        filterResult: [],
-        returnFilterResult: false,
-        polyFilterCoords: '',
-        startDate: null,
-        endDate: null,
-        startCategory: null,
-        endCategory: null,
-      };
-    case 'RESET_FILTERS':
-      return {
-        ...state,
-        polyFilterCoords: '',
-        startDate: null,
-        endDate: null,
-        startCategory: null,
-        endCategory: null,
-        filterStormName: [],
-      };
+    case 'CLEAR_ALL':
+      return initialFilterState;
     default:
       return state;
   }

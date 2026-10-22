@@ -20,18 +20,21 @@ import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext
 
 export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
   const { startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName,
-    showFilterSelected, filterQuery } = useFilters();
+    showFilterSelected, filterQuery, returnFilterResult } = useFilters();
   const filterDispatch = useFilterDispatch();
   const [loading, setLoading] = useState(false);
 
   const setFilterStormName = (state) => filterDispatch(filterActions.setFilterStormName(state));
+  // Submit needs a filter value; Clear also has work to do while a submitted query or its results are shown
   const filtersSelected = hasActiveFilters({ filterStormName, startDate, endDate, startCategory, endCategory, polyFilterCoords });
+  const hasSubmittedQuery = returnFilterResult || Object.keys(filterQuery).length > 0;
+  const canClear = filtersSelected || hasSubmittedQuery;
 
   const router = useRouter(); // Next.js useRouter
 
 
   function handleClearAllFilters() {
-    filterDispatch(filterActions.resetFilters())
+    filterDispatch(filterActions.clearAll())
 
     // Clear shapes via reference
     if (clearShapesRef && clearShapesRef.current) {
@@ -138,11 +141,11 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
               </Button>
             </span>
           </Tooltip>
-          <Tooltip title={filtersSelected ? "" : "Select a filter first"}>
+          <Tooltip title={canClear ? "" : "Nothing to clear"}>
             <span className="filter-group">
               <Button
                 className="filter-badge"
-                disabled={!filtersSelected}
+                disabled={!canClear}
                 onClick={handleClearAllFilters}>
                 CLEAR FILTER QUERY
               </Button>

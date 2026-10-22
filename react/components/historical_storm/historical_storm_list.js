@@ -40,7 +40,11 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
   const closeAllDashboards = () => dispatch(mapActions.closeAllDashboards());
 
   // Stable callbacks so the memoized storm lists below don't re-render on every filter change
-  const cancelFilters = useCallback(() => filterDispatch(filterActions.cancelFilters()), [filterDispatch]);
+  // "Clear Results" does the same as "Clear filter query": reset all filter state and remove the drawn shape
+  const cancelFilters = useCallback(() => {
+    filterDispatch(filterActions.clearAll());
+    clearShapesRef?.current?.clearShapes();
+  }, [filterDispatch, clearShapesRef]);
   const setDrawerButtonClicked = useCallback(
     (buttonClicked) => dispatch(mapActions.setDrawerButtonClicked(buttonClicked)), [dispatch]);
 
