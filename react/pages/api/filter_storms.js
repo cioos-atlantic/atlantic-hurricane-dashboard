@@ -19,9 +19,13 @@ export default async function handler(req, res) {
 
     const filters = {};  // Use an object, not an array
 
-    if (start_date !== "" && end_date !== "") {
-        //filters["(ISO_TIME BETWEEN "] =  `'${start_date}' AND '${end_date}')`;
-        filters["(ISO_TIME_START >= "] = `'${start_date}' AND ISO_TIME_END <= '${end_date}')`};
+    // Each date is optional: start only = storms from that date on, end only = storms up to that date
+    if (start_date !== "") {
+        filters["(ISO_TIME_START >= "] = `'${start_date}')`;
+    }
+    if (end_date !== "") {
+        filters["(ISO_TIME_END <= "] = `'${end_date}')`;
+    }
 
     /*if (start_category !== "" && end_category !== "") {
         filters["(USA_SSHS_MIN >= "] = `'${start_category}' AND USA_SSHS_MAX <= '${end_category}')`};*/

@@ -2,8 +2,9 @@ import dayjs from "dayjs";
 import { basePath } from "@/next.config";
 import { storm_cat } from "@/lib/storm_cat";
 
-// Earliest and latest dates the date filter allows (pickers and year slider)
-export const MIN_DATE = dayjs('1860-01-01');
+// Earliest and latest dates the date filter allows (pickers and year slider).
+// MIN_DATE is the start of the earliest storm in the historical data (SID 1851175N26270).
+export const MIN_DATE = dayjs('1851-06-23');
 export const MAX_DATE = dayjs().endOf('day');
 
 export function titleCase(str) {

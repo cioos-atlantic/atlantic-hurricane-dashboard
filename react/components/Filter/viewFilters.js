@@ -2,6 +2,16 @@ import { Box, Stack } from "@mui/material";
 import dayjs from "dayjs";
 import { storm_cat } from "@/lib/storm_cat";
 
+// One summary line for the date filter; either date can be missing (open-ended range)
+function DateRangeLine({ startDate, endDate }) {
+  const format = (date) => dayjs(date).format('DD/MM/YYYY');
+
+  if (startDate && endDate) return <Box>Date Range: {format(startDate)} - {format(endDate)}</Box>;
+  if (startDate) return <Box>Date Range: From {format(startDate)}</Box>;
+  if (endDate) return <Box>Date Range: Until {format(endDate)}</Box>;
+  return null;
+}
+
 export function FiltersSelected({startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName}){
 
   const isFiltered = Boolean(startDate || endDate || startCategory || endCategory || polyFilterCoords || filterStormName.length);
@@ -19,9 +29,7 @@ export function FiltersSelected({startDate, endDate, startCategory, endCategory,
           {filterStormName.length > 0 && (<Box>
             Storm Name(s): {filterStormName.join(", ")}
           </Box>)}
-          {startDate && endDate && (<Box>
-            Date Range: {dayjs(startDate).format('DD/MM/YYYY') } - {dayjs(endDate).format('DD/MM/YYYY') }
-          </Box>)}
+          <DateRangeLine startDate={startDate} endDate={endDate} />
           {startCategory != null && endCategory != null ? (<Box>
             Category Range: ({storm_cat[startCategory]?.name?.en} -{" "} {storm_cat[endCategory]?.name?.en})
           </Box>): null}
@@ -63,9 +71,7 @@ export function FiltersSubmitted({filterQuery}){
           {isEmpty && (<Box>
             No Filters Applied!
           </Box>)}
-          {filterQuery?.startDate && filterQuery?.endDate && (<Box>
-            Date Range: {dayjs(filterQuery.startDate).format('DD/MM/YYYY') } - {dayjs(filterQuery.endDate).format('DD/MM/YYYY') }
-          </Box>)}
+          <DateRangeLine startDate={filterQuery?.startDate} endDate={filterQuery?.endDate} />
           {filterQuery?.startCategory != null && filterQuery?.endCategory != null ? (<Box>
             Category Range: ({storm_cat[filterQuery.startCategory]?.name?.en} -{" "} {storm_cat[filterQuery.endCategory]?.name?.en})
           </Box>): null}

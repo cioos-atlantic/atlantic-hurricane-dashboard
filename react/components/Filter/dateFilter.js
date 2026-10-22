@@ -62,7 +62,8 @@ export const shortcutsItems = [
 ];
 
 export function RenderDateFilter({ filterDispatch, startDate, endDate }) {
-  const hasValidDates = startDate?.isValid?.() && endDate?.isValid?.();
+  // Either date on its own is a filter (open-ended range)
+  const hasValidDates = Boolean(startDate?.isValid?.() || endDate?.isValid?.());
 
   return (
     <FilterPanel
@@ -171,6 +172,7 @@ export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDa
             onChange={handlePickerChange(setStartDate)}
             minDate={MIN_DATE}
             maxDate={startMaxDate}
+            referenceDate={MIN_DATE} // an empty start picker opens at the earliest date, not today
             slotProps={slotProps}
             />
           <DatePicker
