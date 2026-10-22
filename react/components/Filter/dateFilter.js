@@ -3,11 +3,11 @@ import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import {  useState } from 'react';
 import {  Box,  Button,  CardContent, Card, CardActions } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {Slider} from '@mui/material';
 import { FilterPanel } from './FilterPanel';
+import { MIN_DATE, MAX_DATE } from './filter_utils';
 import { filterActions } from "@/components/Filter/filterReducer";
 
 
@@ -92,25 +92,17 @@ export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDa
     popper:{ sx: { zIndex: 9999 },},
     
     textField: {
-      sx: { 
+      // MUI's small size is 40px tall with the label and calendar icon centred
+      size: 'small',
+      sx: {
         color: '#e55162', // Change text color
         '& label': { color: '#e55162' }, // Change label color
         '& .MuiOutlinedInput-root': {
-          height:'40px !important',
           fontSize:'14px !important',
           '& fieldset': { borderColor: '#e55162' }, // Default border color
           '&:hover fieldset': { borderColor: '#d43b50' }, // Hover effect
           '&.Mui-focused fieldset': { borderColor: 'red' }, // Focused border color
         },
-        '& .MuiOutlinedInput-notchedOutline': {
-          height:'inherit !important',
-        },
-        '& .MuiInputLabel-root': {
-          fontSize:'16px !important',
-          left: '-3px !important',
-          
-          
-        }
       },
     },
     openPickerIcon: {
@@ -121,9 +113,10 @@ export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDa
     },
     }
   const handleShortcutClick = (getValue) => {
-    const [newStartDate, newEndDate] = getValue();    
+    const [newStartDate, newEndDate] = getValue();
     setStartDate(newStartDate);
-    setEndDate(newEndDate);}
+    // "This Week" / "Current Month" end in the future; keep them within the allowed range
+    setEndDate(newEndDate.isAfter(MAX_DATE) ? MAX_DATE : newEndDate);}
   return(
     <Card
      className='input-filter'
@@ -157,25 +150,23 @@ export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDa
           sx={{ paddingTop: '6px' }} // Allows wrapping on smaller screens
           >
 
-          <DatePicker 
-            defaultValue={dayjs()} 
-            label='Start Date' 
+          <DatePicker
+            label='Start Date'
             className='filter-time-input'
             value={startDate}
             onChange={setStartDate}
+            minDate={MIN_DATE}
+            maxDate={MAX_DATE}
             slotProps={slotProps}
-            
             />
-          <DatePicker 
-            defaultValue={dayjs()} 
-            label='End Date' 
+          <DatePicker
+            label='End Date'
             className='filter-time-input'
             value={endDate}
             onChange={setEndDate}
+            minDate={MIN_DATE}
+            maxDate={MAX_DATE}
             slotProps={slotProps}
-            
-            
-            
              />
             </Box>
         </LocalizationProvider>
@@ -231,16 +222,30 @@ export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDa
   
 
 
+// Moves `date` (or `fallback` when no valid date is set) to `year`, keeping its month and day,
+// and keeps the result inside MIN_DATE..MAX_DATE
+function withYear(date, fallback, year) {
+  const base = date?.isValid?.() ? date : fallback;
+  const moved = base.year(year);
+  if (moved.isBefore(MIN_DATE)) return MIN_DATE;
+  if (moved.isAfter(MAX_DATE)) return MAX_DATE;
+  return moved;
+}
+
+// Year range slider. Its position comes from startDate/endDate, so it follows the pickers and
+// shortcuts; dragging a thumb only changes the year of that date.
 export function RangeSlider({ startDate, endDate, setStartDate, setEndDate }) {
-  const currentYear = dayjs().year();
-  
-  // Independent state for the slider's range
-  const [value, setValue] = useState([1860, currentYear]);
+  const startYear = startDate?.isValid?.() ? startDate.year() : MIN_DATE.year();
+  const endYear = endDate?.isValid?.() ? endDate.year() : MAX_DATE.year();
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
-    setStartDate(dayjs().year(newValue[0]));
-    setEndDate(dayjs().year(newValue[1]));
+    const [newStartYear, newEndYear] = newValue;
+    if (newStartYear !== startYear) {
+      setStartDate(withYear(startDate, MIN_DATE, newStartYear));
+    }
+    if (newEndYear !== endYear) {
+      setEndDate(withYear(endDate, MAX_DATE, newEndYear));
+    }
   };
 
   return (
@@ -253,10 +258,10 @@ export function RangeSlider({ startDate, endDate, setStartDate, setEndDate }) {
         
       }}
         getAriaLabel={() => 'Year range'}
-        value={value}
+        value={[startYear, endYear]}
         onChange={handleChange}
-        min={1860}
-        max={currentYear}
+        min={MIN_DATE.year()}
+        max={MAX_DATE.year()}
         marks={[
           { value: 1880, label: '1880' },
           { value: 1950, label: '1950' },
