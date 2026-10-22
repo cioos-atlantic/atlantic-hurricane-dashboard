@@ -1,8 +1,10 @@
+import { memo } from "react";
 import {  handleStormButtonClick } from "./historical_storm_utils";
 import { Button, Stack, Typography, Box } from "@mui/material";
 
 
-export function RenderRecentStorms({stormList, router, drawerButtonClicked, setDrawerButtonClicked}){
+// Memoized: the parent re-renders on every filter change, but this list only needs to when its props change
+export const RenderRecentStorms = memo(function RenderRecentStorms({stormList, router, drawerButtonClicked, setDrawerButtonClicked}){
   return(
     
       <Stack
@@ -54,10 +56,10 @@ export function RenderRecentStorms({stormList, router, drawerButtonClicked, setD
         </Stack>
 
       </Stack>
-    
 
-    
-    
+
+
+
 
   )
-}
+});

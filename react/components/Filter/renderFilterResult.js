@@ -1,8 +1,10 @@
+import { memo } from "react";
 import {  Box, Typography, Paper, Stack, Button } from "@mui/material";
 import { handleStormButtonClick } from "../historical_storm/historical_storm_utils";
 
 
-export function RenderFilterResult({filterResult, router, drawerButtonClicked,  cancelFilters, setDrawerButtonClicked}){
+// Memoized: the parent re-renders on every filter change, but this list only needs to when its props change
+export const RenderFilterResult = memo(function RenderFilterResult({filterResult, router, drawerButtonClicked,  cancelFilters, setDrawerButtonClicked}){
  
   return( 
     
@@ -61,4 +63,4 @@ export function RenderFilterResult({filterResult, router, drawerButtonClicked,  
       >Clear Results</Button>
     </>
   )
-}
+});

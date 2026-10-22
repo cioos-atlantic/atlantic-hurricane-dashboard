@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getHistoricalStormList } from './historical_storm_utils.js';
 import { useRouter } from 'next/router';
 import {  Box, Button } from '@mui/material';
@@ -39,8 +39,10 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
   //const setDrawerButtonClicked = (clicked) => dispatch({ type: "SET_DRAWER_BUTTON_CLICKED", payload: clicked });
   const closeAllDashboards = () => dispatch(mapActions.closeAllDashboards());
 
-  const cancelFilters = () => filterDispatch(filterActions.cancelFilters());
-  const setDrawerButtonClicked = (buttonClicked) => dispatch(mapActions.setDrawerButtonClicked(buttonClicked));
+  // Stable callbacks so the memoized storm lists below don't re-render on every filter change
+  const cancelFilters = useCallback(() => filterDispatch(filterActions.cancelFilters()), [filterDispatch]);
+  const setDrawerButtonClicked = useCallback(
+    (buttonClicked) => dispatch(mapActions.setDrawerButtonClicked(buttonClicked)), [dispatch]);
 
 
    // Check query parameters on mount and trigger `handleClick`
