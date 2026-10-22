@@ -68,12 +68,8 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
     filterDispatch(filterActions.setReturnFilterResult(true));
     dispatch(mapActions.closeStormTracks())
     setStationPoints(empty_station_obj)
-    filterDispatch(filterActions.setStartDate(null));
-    filterDispatch(filterActions.setEndDate(null));
-    filterDispatch(filterActions.setPolyFilterCoords(''));
-    filterDispatch(filterActions.setStartCategory(null));
-    filterDispatch(filterActions.setEndCategory(null));
-    filterDispatch(filterActions.setFilterStormName([]));
+    // Filter values are kept after submitting so they can be adjusted and resubmitted;
+    // "Clear filter query" resets them
   }
 
 
