@@ -211,7 +211,6 @@ export function parseStationData(stationValues){
 	const dataIndx= [];
 	const data_dict=[]
 
-
 	standardNames.forEach((varName, index) => {
 			if (!excludeVars.includes(varName)) {
 				dataIndx.push(index)
