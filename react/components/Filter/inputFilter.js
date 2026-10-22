@@ -1,6 +1,7 @@
 import { Button, Paper, Autocomplete, TextField, Checkbox, Stack } from "@mui/material"
 import { useState } from 'react';
 import { FilterPanel } from "./FilterPanel";
+import { formatStormNamesSummary } from "./filter_utils";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import React from 'react';
@@ -48,7 +49,9 @@ export function InputFilter({input_filter, filterDispatch, filterStormName, setF
       name={input_filter.name}
       label={input_filter.display_name}
       Icon={input_filter.Icon}
-      isActive={filterStormName?.length > 0}>
+      isActive={filterStormName?.length > 0}
+      summary={formatStormNamesSummary(filterStormName)}
+      placeholder="Any storm">
       <Paper elevation={3}
         key={input_filter.name}
         className="input-filter"

@@ -2,6 +2,7 @@ import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import { Box, Button, Card, CardContent, CardActions, Slider } from "@mui/material";
 import {storm_cat} from "@/lib/storm_cat"
 import { FilterPanel } from './FilterPanel';
+import { formatCategorySummary } from './filter_utils';
 import { filterActions } from "@/components/Filter/filterReducer";
 export const storm_category_list = [
   { label: "C5", value: 6 },
@@ -144,7 +145,9 @@ export function RenderCategoryFilter({ filterDispatch, startCategory, endCategor
       name="category"
       label="Storm Category"
       Icon={CategoryOutlinedIcon}
-      isActive={hasValidCategory}>
+      isActive={hasValidCategory}
+      summary={formatCategorySummary(startCategory, endCategory)}
+      placeholder="Any category">
       <CategoryRangeSlider
         setStartCategory={(category) => filterDispatch(filterActions.setStartCategory(category))}
         setEndCategory={(category) => filterDispatch(filterActions.setEndCategory(category))}

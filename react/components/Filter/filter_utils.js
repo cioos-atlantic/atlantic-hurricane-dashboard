@@ -7,6 +7,32 @@ import { storm_cat } from "@/lib/storm_cat";
 export const MIN_DATE = dayjs('1851-06-23');
 export const MAX_DATE = dayjs().endOf('day');
 
+// Short text for a filter's current value, shown on the filter buttons and with the results.
+// Each returns '' when that filter is not set.
+export function formatStormNamesSummary(names = []) {
+  if (!names?.length) return '';
+  if (names.length <= 2) return names.join(', ');
+  return `${names.slice(0, 2).join(', ')} +${names.length - 2}`;
+}
+
+export function formatDateRangeSummary(startDate, endDate) {
+  const hasStart = Boolean(startDate) && dayjs(startDate).isValid();
+  const hasEnd = Boolean(endDate) && dayjs(endDate).isValid();
+  const format = (date) => dayjs(date).format('DD/MM/YYYY');
+
+  if (hasStart && hasEnd) return `${format(startDate)} – ${format(endDate)}`;
+  if (hasStart) return `From ${format(startDate)}`;
+  if (hasEnd) return `Until ${format(endDate)}`;
+  return '';
+}
+
+export function formatCategorySummary(startCategory, endCategory) {
+  if (startCategory == null || endCategory == null) return '';
+  const startName = storm_cat[startCategory]?.name?.en;
+  const endName = storm_cat[endCategory]?.name?.en;
+  return startCategory === endCategory ? startName : `${startName} – ${endName}`;
+}
+
 export function titleCase(str) {
     if ((str === null) || (str === ''))
         return false;

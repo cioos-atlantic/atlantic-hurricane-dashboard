@@ -1,27 +1,18 @@
 // FilterPanel.js
-// Header button shared by the filters in the historical drawer. Clicking it toggles this
-// panel in filterReducer's `openPanel`; `children` (the panel body) render only while it is open.
+// Header shared by the filters in the historical drawer, styled like a select field: a small
+// label on top and the filter's current value (or a grey placeholder) below. Clicking it toggles
+// this panel in filterReducer's `openPanel`; `children` (the panel body) render only while it is open.
 import { Button } from "@mui/material";
-import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
-import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
 import { filterActions } from "@/components/Filter/filterReducer";
 import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
 
 
-export function FilterPanel({ name, label, Icon, isActive, ariaLabel, children }) {
+export function FilterPanel({ name, label, Icon, isActive, ariaLabel, summary, placeholder, children }) {
   const { openPanel } = useFilters();
   const filterDispatch = useFilterDispatch();
   const isOpen = openPanel === name;
-
-  // Red when the filter has a value, white otherwise
-  const buttonStyle = {
-    backgroundColor: isActive ? '#e55162' : 'white',
-    color: isActive ? 'white' : '#e55162',
-    '&:hover': {
-      backgroundColor: isActive ? '#ffd1dc' : '#82ccdd',
-      color: 'black',
-    },
-  };
 
   function handleClick() {
     filterDispatch(filterActions.setShowFilterSelected(true));
@@ -31,13 +22,22 @@ export function FilterPanel({ name, label, Icon, isActive, ariaLabel, children }
   return (
     <>
       <Button
-        className="filter-badge"
+        className={`filter-field${isActive ? ' filter-field--active' : ''}`}
         aria-label={ariaLabel}
-        onClick={handleClick}
-        startIcon={Icon ? <Icon /> : null}
-        endIcon={isOpen ? <KeyboardDoubleArrowUpIcon /> : <KeyboardDoubleArrowDownIcon />}
-        sx={{ ...buttonStyle, display: "inline-flex" }}>
-        {label}
+        aria-expanded={isOpen}
+        onClick={handleClick}>
+        <span className="filter-field-label">
+          {Icon && <Icon fontSize="inherit" />}
+          {label}
+        </span>
+        <span className="filter-field-row">
+          <span
+            className={`filter-field-value${summary ? '' : ' filter-field-placeholder'}`}
+            title={summary || undefined}>
+            {summary || placeholder}
+          </span>
+          {isOpen ? <KeyboardArrowUpRoundedIcon /> : <KeyboardArrowDownRoundedIcon />}
+        </span>
       </Button>
 
       {isOpen && children}

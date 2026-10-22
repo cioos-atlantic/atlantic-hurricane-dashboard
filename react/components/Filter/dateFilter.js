@@ -7,7 +7,7 @@ import {  Box,  Button,  CardContent, Card, CardActions } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {Slider} from '@mui/material';
 import { FilterPanel } from './FilterPanel';
-import { MIN_DATE, MAX_DATE } from './filter_utils';
+import { MIN_DATE, MAX_DATE, formatDateRangeSummary } from './filter_utils';
 import { filterActions } from "@/components/Filter/filterReducer";
 
 
@@ -71,6 +71,8 @@ export function RenderDateFilter({ filterDispatch, startDate, endDate }) {
       label="Filter by Date"
       Icon={CalendarMonthOutlinedIcon}
       isActive={hasValidDates}
+      summary={formatDateRangeSummary(startDate, endDate)}
+      placeholder="Any date"
       ariaLabel="filter button for date selection">
       <DateDisplay
         startDate={startDate}

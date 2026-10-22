@@ -1,50 +1,11 @@
 import { Box, Stack } from "@mui/material";
-import dayjs from "dayjs";
 import { storm_cat } from "@/lib/storm_cat";
-import { hasActiveFilters } from "./filter_utils";
+import { formatDateRangeSummary } from "./filter_utils";
 
 // One summary line for the date filter; either date can be missing (open-ended range)
 function DateRangeLine({ startDate, endDate }) {
-  const format = (date) => dayjs(date).format('DD/MM/YYYY');
-
-  if (startDate && endDate) return <Box>Date Range: {format(startDate)} - {format(endDate)}</Box>;
-  if (startDate) return <Box>Date Range: From {format(startDate)}</Box>;
-  if (endDate) return <Box>Date Range: Until {format(endDate)}</Box>;
-  return null;
-}
-
-export function FiltersSelected({startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName}){
-
-  const isFiltered = hasActiveFilters({ filterStormName, startDate, endDate, startCategory, endCategory, polyFilterCoords });
-
-  return(
-
-      <Stack>
-        <Box className='view-filters-content'>
-           { isFiltered &&(<Box>
-            Filter(s) Selected:
-          </Box>)}
-          { !isFiltered &&(<Box>
-                No Filters Selected!
-              </Box>)}
-          {filterStormName.length > 0 && (<Box>
-            Storm Name(s): {filterStormName.join(", ")}
-          </Box>)}
-          <DateRangeLine startDate={startDate} endDate={endDate} />
-          {startCategory != null && endCategory != null ? (<Box>
-            Category Range: ({storm_cat[startCategory]?.name?.en} -{" "} {storm_cat[endCategory]?.name?.en})
-          </Box>): null}
-          {polyFilterCoords && (<Box>
-            Spatial Range: Range selected
-          </Box>)}
-
-        </Box>
-        
-
-      </Stack>
-   
-    
-  )
+  const summary = formatDateRangeSummary(startDate, endDate);
+  return summary ? <Box>Date Range: {summary}</Box> : null;
 }
 
 

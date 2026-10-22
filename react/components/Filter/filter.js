@@ -1,4 +1,6 @@
-import { Box, Button, Tooltip } from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import { useState } from 'react';
 import Stack from '@mui/material/Stack';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
@@ -12,7 +14,7 @@ import LoadingScreen from "../loading_screen";
 import { RenderCategoryFilter } from "./categorySlider";
 import { empty_station_obj } from "../point_defaults";
 import { formatFilterDate, formatStormCategory, formatStormName, formatCategoryRange, hasActiveFilters } from "./filter_utils";
-import { FiltersSelected, FiltersSubmitted } from "./viewFilters";
+import { FiltersSubmitted } from "./viewFilters";
 import { mapActions } from "@/components/mapReducer";
 import { filterActions } from "@/components/Filter/filterReducer";
 import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
@@ -20,7 +22,7 @@ import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext
 
 export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
   const { startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName,
-    showFilterSelected, filterQuery, returnFilterResult } = useFilters();
+    filterQuery, returnFilterResult } = useFilters();
   const filterDispatch = useFilterDispatch();
   const [loading, setLoading] = useState(false);
 
@@ -40,6 +42,12 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
     if (clearShapesRef && clearShapesRef.current) {
       clearShapesRef.current.clearShapes();
     }
+  }
+
+
+  function handleRemoveArea() {
+    clearShapesRef?.current?.clearShapes();
+    filterDispatch(filterActions.setPolyFilterCoords(''));
   }
 
 
@@ -123,6 +131,27 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
             />
           </div>
 
+          {/* The drawn polygon has no filter panel; show it styled like an active filter field,
+              with a way to remove it */}
+          {polyFilterCoords && (
+            <Box className="filter-field filter-field--active filter-area-field">
+              <span className="filter-field-label">
+                <MapOutlinedIcon fontSize="inherit" />
+                Map area
+              </span>
+              <span className="filter-field-row">
+                <span className="filter-field-value">Drawn on map</span>
+                <IconButton
+                  className="filter-field-clear"
+                  size="small"
+                  aria-label="Remove drawn area"
+                  onClick={handleRemoveArea}>
+                  <CloseRoundedIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Box>
+          )}
+
           {/* Disabled (not hidden) when nothing is selected, so the tour can still point at Submit.
               The span lets the tooltip work on a disabled button. */}
           <Tooltip title={filtersSelected ? "" : "Select a filter first"}>
@@ -148,19 +177,11 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
             </span>
           </Tooltip>
 
-          <div className="filter-group">
-            {showFilterSelected ? (
-              <FiltersSelected
-                startDate={startDate}
-                endDate={endDate}
-                startCategory={startCategory}
-                endCategory={endCategory}
-                polyFilterCoords={polyFilterCoords}
-                filterStormName={filterStormName} />
-            ) : (
+          {hasSubmittedQuery && (
+            <div className="filter-group">
               <FiltersSubmitted filterQuery={filterQuery} />
-            )}
-          </div>
+            </div>
+          )}
 
         </Stack>
       )}
