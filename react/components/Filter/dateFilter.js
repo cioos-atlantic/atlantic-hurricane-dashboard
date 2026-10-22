@@ -7,9 +7,7 @@ import {  useState } from 'react';
 import {  Box,  Button,  CardContent, Card, CardActions } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {Slider} from '@mui/material';
-import { smallScreenIconButton } from './filter_utils';
 import { ShowOptions, CloseOptions } from './filter';
-import Typography from "@mui/material/Typography";
 import { filterActions } from "@/components/Filter/filterReducer";
 
 
@@ -63,13 +61,7 @@ export const shortcutsItems = [
   
 ];
 
-const reset= { label: 'Reset', getValue: () => [null, null] };
-
-
-
-
 export function RenderDateFilter({ filterDispatch, setShowFilterOptions, startDate, endDate, showDateSelection }) {
-  //const [showDateSelection, setShowDateSelection] = useState(false); 
   const hasValidDates = startDate?.isValid?.() && endDate?.isValid?.();
   const buttonStyle = {
     backgroundColor: hasValidDates ? '#e55162' : 'white',
@@ -143,7 +135,6 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
       sx: { 
         color: '#e55162', // Change text color
         '& label': { color: '#e55162' }, // Change label color
-        //'& input': { color: '#e55162' }, // Change input text color
         '& .MuiOutlinedInput-root': {
           height:'40px !important',
           fontSize:'14px !important',
@@ -304,12 +295,10 @@ export function RangeSlider({ startDate, endDate, setStartDate, setEndDate }) {
         getAriaLabel={() => 'Year range'}
         value={value}
         onChange={handleChange}
-        //valueLabelDisplay="auto"
         min={1860}
         max={currentYear}
         marks={[
           { value: 1880, label: '1880' },
-          //{ value: 1900, label: '1900' },
           { value: 1950, label: '1950' },
           { value: 2020, label: '2020' },
           

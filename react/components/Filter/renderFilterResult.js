@@ -1,4 +1,3 @@
-//import { handleClick } from "./historical_storm_utils";
 import {  Box, Typography, Paper, Stack, Button } from "@mui/material";
 import { handleStormButtonClick } from "../historical_storm/historical_storm_utils";
 
@@ -35,8 +34,6 @@ export function RenderFilterResult({filterResult, router, drawerButtonClicked,  
                   onClick=
                     {(e) => { 
                     handleStormButtonClick(storm.name, storm.year, storm.storm_id, router);
-                    //setDrawerButtonClicked(storm.storm_id);
-                                    //triggerReload(); // Reload page when a storm is clicked
                             }}
                     sx={{color: isClicked ? 'white' : 'black', 
                                       backgroundColor: isClicked ? 'black' : 'white',

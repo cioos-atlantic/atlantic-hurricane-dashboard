@@ -1,10 +1,8 @@
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import { useEffect, useState } from 'react';
 import { Box, Button, Card, CardContent, CardActions, Slider } from "@mui/material";
-//import { storm_categories } from "@/lib/storm_class";
 import {storm_cat} from "@/lib/storm_cat"
 import { ShowOptions, CloseOptions } from './filter';
-import { smallScreenIconButton } from './filter_utils';
 import { filterActions } from "@/components/Filter/filterReducer";
 export const storm_category_list = [
   { label: "C5", value: 6 },
@@ -118,7 +116,6 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
                 getAriaLabel={() => 'Category range'}
                 value={value}
                 onChange={handleChange}
-                //valueLabelDisplay="auto"
                 min={minCategory}
                 max={maxCategory}
                 marks={ [...storm_category_list].sort((a, b) => a.value - b.value) }
@@ -159,8 +156,6 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
 }
 
 export function RenderCategoryFilter({ filterDispatch, setShowFilterOptions, startCategory, endCategory, showCatSelection }){
-  
-  //const [showCatSelection, setShowCatSelection] = useState(false); 
   const hasValidCategory = startCategory && endCategory;
   const buttonStyle = {
     backgroundColor: hasValidCategory  ? '#e55162' : 'white',
@@ -173,7 +168,6 @@ export function RenderCategoryFilter({ filterDispatch, setShowFilterOptions, sta
   };
 
   function handleIconClick(){
-    //setShowCatSelection(prev => !prev);
     filterDispatch(filterActions.setShowFilterSelected(true))
     filterDispatch(filterActions.toggleCatSelection());
     filterDispatch(filterActions.setDateSelection(false));

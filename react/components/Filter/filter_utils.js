@@ -1,37 +1,5 @@
-import { IconButton, Tooltip } from "@mui/material";
 import { basePath } from "@/next.config";
 
-export function smallScreenIconButton(toolTipTitle, handleIconClick, buttonStyle, Icon){
-  return (
-    <Tooltip title={toolTipTitle} placement="left">
-    <IconButton
-    //className="filter-badge"
-    onClick={(e) => {
-      e.stopPropagation(); // Prevent closing
-      handleIconClick();
-    }}
-    
-    sx={{...buttonStyle,
-      display: { xs: "flex", md: "none" },
-      textDecoration: 'none',
-      alignItems: 'center',
-      width: '40px',
-      height: '40px',
-      margin: '8px',
-      transition: 'transform 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,opacity 0.8s',
-      opacity: '1',
-      cursor: 'pointer',
-      transitionDelay: '30ms',
-      boxShadow: '0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12)',
-      //border:'solid red 1px',
-    }
-      
-
-    }><Icon/>
-    </IconButton> </Tooltip>
-  )
-
-}
 export function titleCase(str) {
     if ((str === null) || (str === ''))
         return false;
@@ -77,7 +45,6 @@ export function makeStormNameList(storm_data){
 export async function queryStormName(startDate = null, endDate = null, polyCoords= '', startCategory = '', endCategory= '') {
 
   const updatedParams = {
-      //...selectedOptions, // Spread selected options correctly
       startDate: startDate, // Ensure start and end dates are included
       endDate: endDate,
       polyCoords: polyCoords,
@@ -105,7 +72,6 @@ export async function queryStormName(startDate = null, endDate = null, polyCoord
   }).toString();
   let uniqueList;
   try {
-    //const resource = await fetch_retry(`${basePath}/api/storm_names?`, 3)
     const resource = await fetch(`${basePath}/api/filter_storms?${query}`);
     const storm_data = await resource.json();
     
@@ -131,38 +97,6 @@ export async function queryStormName(startDate = null, endDate = null, polyCoord
 }
 
 
-const fetch_retry = async (url, n, baseDelay = 100) => {
-  let error;
-  for (let i = 0; i < n; i++) {
-    try {
-      const res = await fetch(url);
-
-      if (res.status === 404) {
-        throw new Error(`Non-retryable error: ${res.status} Not Found`);
-      }
-
-      if (!res.ok) {
-        error = new Error(`HTTP error: ${res.status}`);
-      } else {
-        return res; // ✅ success
-      }
-    } catch (err) {
-      error = err;
-    }
-
-    if (i < n - 1) {
-      const delay = baseDelay * (2 ** i); // exponential backoff
-      console.warn(
-        `Attempt ${i + 1} failed (${error.message}). Retrying in ${delay}ms...`
-      );
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-
-  throw error; // after all retries fail
-};
-
-
 export function formatFilterDate(date) {
   if (!date) {
     return ""; // Return an empty string if no date is provided
@@ -177,9 +111,6 @@ export function formatStormCategory(category_list = []) {
 }
 
 export function formatStormName(storm_list = []) {
-  //storm_names = storm_names.replace(/\s+/g, ''); // Remove all spaces
-  //const storm_list = storm_names.split(",");
-
   const formattedStormList = [];
   if (storm_list.length > 0) {
     formattedStormList.push(storm_list.join("_"));

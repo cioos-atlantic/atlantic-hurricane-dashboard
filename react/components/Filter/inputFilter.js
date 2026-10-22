@@ -1,81 +1,34 @@
-import { Button, Box,  Paper,  OutlinedInput,  FormControl, InputLabel, Autocomplete, TextField, Checkbox, Stack, Select, MenuItem, ListItemText, Popper  } from "@mui/material"
-import {  useState } from 'react';
-import { smallScreenIconButton } from "./filter_utils";
+import { Button, Paper, Autocomplete, TextField, Checkbox, Stack } from "@mui/material"
+import { useState } from 'react';
 import { CloseOptions, ShowOptions } from "./filter";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import React, { forwardRef } from 'react';
+import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { filterActions } from "@/components/Filter/filterReducer";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-function sleep(duration) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, duration);
-  });
-}
-
 
 export function InputFilter({input_filter, showFilterOptions, setShowFilterOptions, filterDispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
-  //console.log(startDate, endDate, polyCoords, startCategory, endCategory)
-  const [inputValue, setInputValue] = useState(""); // Controlled input field
   const [stormNameList, setStormNameList] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  
-
   const validStormList = filterStormName;
-  
+
   const buttonStyle = {
     backgroundColor: validStormList?.length > 0 ? '#e55162' : 'white',
     color: validStormList?.length > 0 ? 'white' : '#e55162',
     '&:hover': {
-      backgroundColor: validStormList?.length > 0 ? '#ffd1dc' : '#82ccdd', 
+      backgroundColor: validStormList?.length > 0 ? '#ffd1dc' : '#82ccdd',
       color: validStormList?.length > 0 ? 'black' : 'black',
     },
   };
-  const ITEM_HEIGHT = 48;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      sx: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        //overflow: 'hidden',
-        
-        
-      },
-    },
-  };
-  
 
-
-
-  
-  const handleSelectAll = () => {
-    if (filterStormName.length === stormNameList.length) {
-      setFilterStormName([]); // Unselect all
-    } else {
-      setFilterStormName(stormNameList); // Select all
-    }
-  };
-  
-    const handleClearAll = () => {
-      setFilterStormName([]);
-    };
-    const toggleStorm = (name) => {
-    setFilterStormName(prev =>
-      prev.includes(name) ? prev.filter(s => s !== name) : [...prev, name]
-    );
-    };
-    const getDisplayValue = () => {
-    if (filterStormName.length === 0) return '';
-    if (filterStormName.length <= 2) return filterStormName.join(', ');
-    return `${filterStormName.length} selected`;
+  const handleClearAll = () => {
+    setFilterStormName([]);
   };
 
 
@@ -110,7 +63,6 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
 
   const handleClose = () => {
     setOpen(false);
-    //setStormNameList([]);
   };
 
   return(
@@ -155,11 +107,9 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
 
       <Autocomplete
         multiple
-        //limitTags={1}
         fullWidth
         disableCloseOnSelect
         autoComplete
-        //disablePortal
         options={stormNameList}
         value={filterStormName}
         disabled={false}
@@ -169,8 +119,7 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
         onOpen={handleOpen}
         onClose={handleClose}
         loading={loading}
-        
-        //getLimitTagsText={(more) => `+${more} names`}
+
         getOptionLabel={(option) => option}
         renderTags={(value, getTagProps) => {
     if (value.length === 0) return null;
@@ -209,7 +158,6 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
         renderInput={(params) => (
           <TextField
             {...params}
-            //label={input_filter.display_name}
             placeholder="Search storms"
             slotProps={{
               input: {
