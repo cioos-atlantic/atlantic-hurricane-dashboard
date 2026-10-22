@@ -1,4 +1,4 @@
-import { Button, Paper, Autocomplete, TextField, Checkbox, Stack } from "@mui/material"
+import { Paper, Autocomplete, TextField, Checkbox } from "@mui/material"
 import { useState } from 'react';
 import { FilterPanel } from "./FilterPanel";
 import { formatStormNamesSummary } from "./filter_utils";
@@ -6,13 +6,12 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
-import { filterActions } from "@/components/Filter/filterReducer";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 
-export function InputFilter({input_filter, filterDispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
+export function InputFilter({input_filter, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
   const [stormNameList, setStormNameList] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -51,7 +50,8 @@ export function InputFilter({input_filter, filterDispatch, filterStormName, setF
       Icon={input_filter.Icon}
       isActive={filterStormName?.length > 0}
       summary={formatStormNamesSummary(filterStormName)}
-      placeholder="Any storm">
+      placeholder="Any storm"
+      onClear={handleClearAll}>
       <Paper elevation={3}
         key={input_filter.name}
         className="input-filter"
@@ -60,18 +60,6 @@ export function InputFilter({input_filter, filterDispatch, filterStormName, setF
         
         
         }}>
-          <Stack direction="row"  spacing={4} sx={{ mt: 0.5, mb: 1, justifyContent: 'center' }}>
-                      
-        
-           
-            <Button size="small" className="shortcut-button" onClick={handleClearAll}>Clear</Button>
-            <Button size="small" className="shortcut-button" onClick={() => filterDispatch(filterActions.closePanel())}>
-              Close
-            </Button>
-    
-      </Stack>
-
-
       <Autocomplete
         multiple
         fullWidth

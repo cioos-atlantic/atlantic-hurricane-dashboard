@@ -102,7 +102,6 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
                 <div className="filter-group" key={index}>
                   <InputFilter
                     input_filter={input_filter}
-                    filterDispatch={filterDispatch}
                     filterStormName={filterStormName}
                     setFilterStormName={setFilterStormName}
                     startDate={startDate}
@@ -134,21 +133,22 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
           {/* The drawn polygon has no filter panel; show it styled like an active filter field,
               with a way to remove it */}
           {polyFilterCoords && (
-            <Box className="filter-field filter-field--active filter-area-field">
-              <span className="filter-field-label">
-                <MapOutlinedIcon fontSize="inherit" />
-                Map area
-              </span>
-              <span className="filter-field-row">
-                <span className="filter-field-value">Drawn on map</span>
-                <IconButton
-                  className="filter-field-clear"
-                  size="small"
-                  aria-label="Remove drawn area"
-                  onClick={handleRemoveArea}>
-                  <CloseRoundedIcon fontSize="small" />
-                </IconButton>
-              </span>
+            <Box className="filter-field-wrap filter-field-wrap--active">
+              <Box className="filter-field">
+                <span className="filter-field-text">
+                  <span className="filter-field-label">
+                    <MapOutlinedIcon fontSize="inherit" />
+                    Map area
+                  </span>
+                  <span className="filter-field-value">Drawn on map</span>
+                </span>
+              </Box>
+              <IconButton
+                className="filter-field-clear"
+                aria-label="Remove drawn area"
+                onClick={handleRemoveArea}>
+                <CloseRoundedIcon fontSize="small" />
+              </IconButton>
             </Box>
           )}
 

@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import {  Box,  Button,  CardContent, Card, CardActions } from "@mui/material";
+import {  Box,  Button,  CardContent, Card } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {Slider} from '@mui/material';
 import { FilterPanel } from './FilterPanel';
@@ -73,13 +73,16 @@ export function RenderDateFilter({ filterDispatch, startDate, endDate }) {
       isActive={hasValidDates}
       summary={formatDateRangeSummary(startDate, endDate)}
       placeholder="Any date"
-      ariaLabel="filter button for date selection">
+      ariaLabel="filter button for date selection"
+      onClear={() => {
+        filterDispatch(filterActions.setStartDate(null));
+        filterDispatch(filterActions.setEndDate(null));
+      }}>
       <DateDisplay
         startDate={startDate}
         endDate={endDate}
         setStartDate={(date) => filterDispatch(filterActions.setStartDate(date))}
         setEndDate={(date) => filterDispatch(filterActions.setEndDate(date))}
-        onClose={() => filterDispatch(filterActions.closePanel())}
       />
     </FilterPanel>
   );
@@ -88,7 +91,7 @@ export function RenderDateFilter({ filterDispatch, startDate, endDate }) {
 
 
 
-export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDate}){
+export function DateDisplay({setStartDate, setEndDate, startDate, endDate}){
    
 
   const slotProps={
@@ -200,28 +203,6 @@ export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDa
           setEndDate={setEndDate}/>
       </CardContent>
 
-      <CardActions
-      className='date-card-content'>
-        <Box 
-          sx={{ display: 'flex', justifyContent: 'center', gap: '2px', width: '100%' }}>
-            <Button 
-              size="small"
-              className='shortcut-button'
-              onClick={() => {
-                setStartDate(null); // Reset to empty string
-                setEndDate(null);   // Reset to empty string
-              }}>Clear</Button>
-            <Button 
-              size="small" 
-              className='shortcut-button' 
-              onClick={onClose}>Close</Button>
-
-
-        </Box>
-        
-        
-
-      </CardActions>
 
       
 

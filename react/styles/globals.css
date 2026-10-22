@@ -769,34 +769,57 @@ footer {
   cursor: not-allowed !important;
 }
 
-/* Filter buttons (FilterPanel), styled like a select field: small label on top, value below.
-   Own class instead of .filter-badge, whose !important colours would hide the active state. */
+/* Filter fields (FilterPanel, and the map area box in filter.js), styled like a select field.
+   The wrapper draws the box; inside it, the field body (label on top, value below, ⌄ on its right)
+   and, when the filter has a value, a full-height ✕ section on the far right.
+   Own classes instead of .filter-badge, whose !important colours would hide the active state. */
+.filter-field-wrap{
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  overflow: hidden; /* clip the ✕ section to the rounded corners */
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+
+.filter-field-wrap--active{
+  background-color: #fdecef;
+  border: 2px solid #e55162;
+}
+
+/* Field body: the toggle button (or a plain div for the map area) */
 .filter-field{
   box-sizing: border-box;
+  flex: 1;
+  min-width: 0;
   display: flex !important;
-  flex-direction: column;
-  align-items: stretch !important;
-  width: 100%;
-  padding: 6px 10px 6px 12px !important;
-  background-color: white !important;
-  border: 1px solid #e0e0e0 !important;
-  border-radius: 6px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 4px;
+  padding: 6px 8px 6px 12px !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
   text-transform: none !important;
   text-align: left;
+  color: #e55162 !important;
 }
 
-.filter-field:hover{
-  background-color: #f7f7f7 !important;
+/* Active wrapper has a 2px border; trim padding so the field keeps the same size */
+.filter-field-wrap--active .filter-field{
+  padding: 5px 7px 5px 11px !important;
 }
 
-.filter-field--active{
-  background-color: #fdecef !important;
-  border: 2px solid #e55162 !important;
-  padding: 5px 9px 5px 11px !important; /* keep the same size as the 1px border */
+button.filter-field:hover{
+  background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
-.filter-field--active:hover{
-  background-color: #fbdde2 !important;
+.filter-field-text{
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .filter-field-label{
@@ -809,15 +832,6 @@ footer {
   text-transform: uppercase;
   color: #e55162;
   line-height: 1.4;
-}
-
-.filter-field-row{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-  min-width: 0;
-  color: #e55162;
 }
 
 .filter-field-value{
@@ -836,15 +850,20 @@ footer {
   font-weight: normal;
 }
 
-/* "Map area: Drawn on map ✕" (filter.js): same look as an active filter field, but not clickable */
-.filter-area-field:hover{
-  background-color: #fdecef !important;
+/* ✕ section on the far right: full height, slightly darker than the active fill */
+.filter-field-clear{
+  flex: 0 0 40px;
+  border-radius: 0 !important;
+  border-left: 1px solid rgba(229, 81, 98, 0.35) !important;
+  background-color: #f6d2d8 !important;
+  color: #c62f45 !important;
+  transition: background-color 150ms, color 150ms;
 }
 
-/* ✕ that clears a filter, sized to fit the field's value row */
-.filter-field-clear{
-  padding: 2px !important;
-  color: #e55162 !important;
+.filter-field-clear:hover,
+.filter-field-clear:focus-visible{
+  background-color: #e55162 !important;
+  color: white !important;
 }
 
 

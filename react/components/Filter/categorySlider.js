@@ -1,5 +1,5 @@
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
-import { Box, Button, Card, CardContent, CardActions, Slider } from "@mui/material";
+import { Box, Card, CardContent, Slider } from "@mui/material";
 import {storm_cat} from "@/lib/storm_cat"
 import { FilterPanel } from './FilterPanel';
 import { formatCategorySummary } from './filter_utils';
@@ -23,7 +23,7 @@ const labelToValue = (label) => storm_category_list.find(item => item.label === 
 const valueToLabel = (value) => storm_category_list.find(item => item.value === value)?.label;
 
 // startCategory / endCategory are category labels ('TD' ... 'C5'), or null when not set
-export function CategoryRangeSlider({ setStartCategory, setEndCategory, onClose, startCategory, endCategory }) {
+export function CategoryRangeSlider({ setStartCategory, setEndCategory, startCategory, endCategory }) {
   const stormCategoryLink = "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html";
   const startLabel = startCategory;
   const endLabel = endCategory;
@@ -109,28 +109,6 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, onClose,
             </Box>
 
         </CardContent>
-        <CardActions
-              className='date-card-content'>
-                <Box 
-                  sx={{ display: 'flex', justifyContent: 'center', gap: '2px', width: '100%' }}>
-                    <Button 
-                      size="small"
-                      className='shortcut-button'
-                      onClick={() => {
-                        setStartCategory(null);
-                        setEndCategory(null);
-                      }}>Clear</Button>
-                    <Button 
-                      size="small" 
-                      className='shortcut-button' 
-                      onClick={onClose}>Close</Button>
-        
-        
-                </Box>
-                
-                
-        
-              </CardActions>
 
     </Card>
     
@@ -147,11 +125,14 @@ export function RenderCategoryFilter({ filterDispatch, startCategory, endCategor
       Icon={CategoryOutlinedIcon}
       isActive={hasValidCategory}
       summary={formatCategorySummary(startCategory, endCategory)}
-      placeholder="Any category">
+      placeholder="Any category"
+      onClear={() => {
+        filterDispatch(filterActions.setStartCategory(null));
+        filterDispatch(filterActions.setEndCategory(null));
+      }}>
       <CategoryRangeSlider
         setStartCategory={(category) => filterDispatch(filterActions.setStartCategory(category))}
         setEndCategory={(category) => filterDispatch(filterActions.setEndCategory(category))}
-        onClose={() => filterDispatch(filterActions.closePanel())}
         startCategory={startCategory}
         endCategory={endCategory} />
     </FilterPanel>
