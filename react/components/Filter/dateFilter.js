@@ -117,6 +117,20 @@ export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDa
     setStartDate(newStartDate);
     // "This Week" / "Current Month" end in the future; keep them within the allowed range
     setEndDate(newEndDate.isAfter(MAX_DATE) ? MAX_DATE : newEndDate);}
+
+  // Each picker is limited by the other date, so end can never be before start
+  const isValidDate = (date) => date?.isValid?.();
+  const startMaxDate = isValidDate(endDate) ? endDate : MAX_DATE;
+  const endMinDate = isValidDate(startDate) ? startDate : MIN_DATE;
+
+  // Keyboard entry can still produce an out-of-range or incomplete date: MUI shows the field as
+  // invalid and we keep the last valid value instead of storing it
+  const handlePickerChange = (setDate) => (date, context) => {
+    if (date === null || (isValidDate(date) && !context?.validationError)) {
+      setDate(date);
+    }
+  };
+
   return(
     <Card
      className='input-filter'
@@ -154,17 +168,17 @@ export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDa
             label='Start Date'
             className='filter-time-input'
             value={startDate}
-            onChange={setStartDate}
+            onChange={handlePickerChange(setStartDate)}
             minDate={MIN_DATE}
-            maxDate={MAX_DATE}
+            maxDate={startMaxDate}
             slotProps={slotProps}
             />
           <DatePicker
             label='End Date'
             className='filter-time-input'
             value={endDate}
-            onChange={setEndDate}
-            minDate={MIN_DATE}
+            onChange={handlePickerChange(setEndDate)}
+            minDate={endMinDate}
             maxDate={MAX_DATE}
             slotProps={slotProps}
              />
@@ -240,12 +254,16 @@ export function RangeSlider({ startDate, endDate, setStartDate, setEndDate }) {
 
   const handleChange = (event, newValue) => {
     const [newStartYear, newEndYear] = newValue;
-    if (newStartYear !== startYear) {
-      setStartDate(withYear(startDate, MIN_DATE, newStartYear));
+    const newStartDate = newStartYear !== startYear ? withYear(startDate, MIN_DATE, newStartYear) : startDate;
+    let newEndDate = newEndYear !== endYear ? withYear(endDate, MAX_DATE, newEndYear) : endDate;
+
+    // Both thumbs in the same year can put end before start (e.g. 10 Dec -> 5 Jan); clamp end to start
+    if (newStartDate?.isValid?.() && newEndDate?.isValid?.() && newEndDate.isBefore(newStartDate)) {
+      newEndDate = newStartDate;
     }
-    if (newEndYear !== endYear) {
-      setEndDate(withYear(endDate, MAX_DATE, newEndYear));
-    }
+
+    if (newStartDate !== startDate) setStartDate(newStartDate);
+    if (newEndDate !== endDate) setEndDate(newEndDate);
   };
 
   return (
