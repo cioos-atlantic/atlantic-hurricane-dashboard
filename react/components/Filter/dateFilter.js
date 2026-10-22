@@ -7,7 +7,7 @@ import {  useState } from 'react';
 import {  Box,  Button,  CardContent, Card, CardActions } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {Slider} from '@mui/material';
-import { ShowOptions, CloseOptions } from './filter';
+import { FilterPanel } from './FilterPanel';
 import { filterActions } from "@/components/Filter/filterReducer";
 
 
@@ -61,59 +61,24 @@ export const shortcutsItems = [
   
 ];
 
-export function RenderDateFilter({ filterDispatch, startDate, endDate, isOpen }) {
+export function RenderDateFilter({ filterDispatch, startDate, endDate }) {
   const hasValidDates = startDate?.isValid?.() && endDate?.isValid?.();
-  const buttonStyle = {
-    backgroundColor: hasValidDates ? '#e55162' : 'white',
-    color: hasValidDates ? 'white' : '#e55162',
-    '&:hover': {
-      backgroundColor: hasValidDates ? '#ffd1dc' : '#82ccdd',
-      color: hasValidDates ? 'black' : 'black',
-    },
-  };
-
-  function handleIconClick(){
-    filterDispatch(filterActions.setShowFilterSelected(true))
-    filterDispatch(filterActions.togglePanel('date'));
-  }
-  
-
-
 
   return (
-    <>
-    <Button
-    className="filter-badge"
-    aria-label="filter button for date selection"
-    onClick= {handleIconClick}
-    startIcon={<CalendarMonthOutlinedIcon/>}
-    endIcon={ !isOpen ? (<ShowOptions/>):(<CloseOptions/>)}
-    sx={{...buttonStyle,
-      display: "inline-flex" }
-    }>
-      
-      Filter by Date
-      
-      
-
-    </Button>
-    
-    
-
-    {isOpen &&
-      (<DateDisplay
+    <FilterPanel
+      name="date"
+      label="Filter by Date"
+      Icon={CalendarMonthOutlinedIcon}
+      isActive={hasValidDates}
+      ariaLabel="filter button for date selection">
+      <DateDisplay
         startDate={startDate}
         endDate={endDate}
-        setStartDate = {(date) => filterDispatch(filterActions.setStartDate(date))}
-        setEndDate = {(date) => filterDispatch(filterActions.setEndDate(date))}
-        onClose = {() => filterDispatch(filterActions.closePanel())}
-         />)}
-
-    
-    </>
-
-
-    
+        setStartDate={(date) => filterDispatch(filterActions.setStartDate(date))}
+        setEndDate={(date) => filterDispatch(filterActions.setEndDate(date))}
+        onClose={() => filterDispatch(filterActions.closePanel())}
+      />
+    </FilterPanel>
   );
 };
 

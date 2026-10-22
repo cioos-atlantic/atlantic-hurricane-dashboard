@@ -1,8 +1,6 @@
 import { Box, Button } from "@mui/material";
 import { useState } from 'react';
 import Stack from '@mui/material/Stack';
-import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
-import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
 import { useRouter } from 'next/router';
 import { RenderDateFilter } from "./dateFilter";
@@ -20,13 +18,9 @@ import { filterActions } from "@/components/Filter/filterReducer";
 import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
 
 
-export const ShowOptions = KeyboardDoubleArrowDownIcon;
-export const CloseOptions = KeyboardDoubleArrowUpIcon;
-
-
 export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
   const { startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName,
-    openPanel, showFilterSelected, filterQuery } = useFilters();
+    showFilterSelected, filterQuery } = useFilters();
   const filterDispatch = useFilterDispatch();
   const [loading, setLoading] = useState(false);
 
@@ -100,7 +94,6 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
                 <div className="filter-group" key={index}>
                   <InputFilter
                     input_filter={input_filter}
-                    isOpen={openPanel === input_filter.name}
                     filterDispatch={filterDispatch}
                     filterStormName={filterStormName}
                     setFilterStormName={setFilterStormName}
@@ -120,7 +113,6 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
               filterDispatch={filterDispatch}
               startDate={startDate}
               endDate={endDate}
-              isOpen={openPanel === 'date'}
             />
           </div>
           <div className="filter-group">
@@ -128,7 +120,6 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
               filterDispatch={filterDispatch}
               startCategory={startCategory}
               endCategory={endCategory}
-              isOpen={openPanel === 'category'}
             />
           </div>
 

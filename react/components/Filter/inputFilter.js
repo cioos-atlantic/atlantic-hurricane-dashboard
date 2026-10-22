@@ -1,6 +1,6 @@
 import { Button, Paper, Autocomplete, TextField, Checkbox, Stack } from "@mui/material"
 import { useState } from 'react';
-import { CloseOptions, ShowOptions } from "./filter";
+import { FilterPanel } from "./FilterPanel";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import React from 'react';
@@ -11,32 +11,15 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 
-export function InputFilter({input_filter, isOpen, filterDispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
+export function InputFilter({input_filter, filterDispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
   const [stormNameList, setStormNameList] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const validStormList = filterStormName;
-
-  const buttonStyle = {
-    backgroundColor: validStormList?.length > 0 ? '#e55162' : 'white',
-    color: validStormList?.length > 0 ? 'white' : '#e55162',
-    '&:hover': {
-      backgroundColor: validStormList?.length > 0 ? '#ffd1dc' : '#82ccdd',
-      color: validStormList?.length > 0 ? 'black' : 'black',
-    },
-  };
 
   const handleClearAll = () => {
     setFilterStormName([]);
   };
 
-
- function handleIconClick(){
-
-    filterDispatch(filterActions.setShowFilterSelected(true))
-    filterDispatch(filterActions.togglePanel(input_filter.name));
-  }
   const handleOpen = () => {
     setOpen(true);
     (async () => {
@@ -61,26 +44,12 @@ export function InputFilter({input_filter, isOpen, filterDispatch, filterStormNa
   };
 
   return(
-    <>
-    <Button
-      className="filter-badge"
-      onClick= {handleIconClick}
-      startIcon={input_filter.Icon ? <input_filter.Icon /> : null}
-      endIcon={ !isOpen ? (<ShowOptions/>):(<CloseOptions/>)}
-      sx={{...buttonStyle,
-        display: "inline-flex",}
-      }
-    >{input_filter.display_name}
-
-    </Button>
-
-    
-
-    
-    
-    {/* Filter Input Popup */}
-    {isOpen && (
-      <Paper elevation={3} 
+    <FilterPanel
+      name={input_filter.name}
+      label={input_filter.display_name}
+      Icon={input_filter.Icon}
+      isActive={filterStormName?.length > 0}>
+      <Paper elevation={3}
         key={input_filter.name}
         className="input-filter"
         sx={{top:'1px',
@@ -189,13 +158,8 @@ export function InputFilter({input_filter, isOpen, filterDispatch, filterStormNa
     
         
       />
-      {/* Action buttons OUTSIDE popper */}
-      
     </Paper>
-
-    
-)}
-    </>
+    </FilterPanel>
   )
 }
 

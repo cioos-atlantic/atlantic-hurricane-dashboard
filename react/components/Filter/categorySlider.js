@@ -2,7 +2,7 @@ import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import { useEffect, useState } from 'react';
 import { Box, Button, Card, CardContent, CardActions, Slider } from "@mui/material";
 import {storm_cat} from "@/lib/storm_cat"
-import { ShowOptions, CloseOptions } from './filter';
+import { FilterPanel } from './FilterPanel';
 import { filterActions } from "@/components/Filter/filterReducer";
 export const storm_category_list = [
   { label: "C5", value: 6 },
@@ -155,59 +155,22 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, onClose,
   );
 }
 
-export function RenderCategoryFilter({ filterDispatch, startCategory, endCategory, isOpen }){
+export function RenderCategoryFilter({ filterDispatch, startCategory, endCategory }){
   const hasValidCategory = startCategory && endCategory;
-  const buttonStyle = {
-    backgroundColor: hasValidCategory  ? '#e55162' : 'white',
-    color: hasValidCategory ? 'white' : '#e55162',
-    
-    '&:hover': {
-      backgroundColor: hasValidCategory ? '#ffd1dc' : '#82ccdd',
-      color: hasValidCategory ? 'black' : 'black',
-    },
-  };
-
-  function handleIconClick(){
-    filterDispatch(filterActions.setShowFilterSelected(true))
-    filterDispatch(filterActions.togglePanel('category'));
-  }
-  
-
-
 
   return (
-    <>
-    <Button
-    className="filter-badge"
-    onClick= {handleIconClick}
-    startIcon={<CategoryOutlinedIcon />}
-    endIcon={ !isOpen ? (<ShowOptions/>):(<CloseOptions/>)}
-    sx={{...buttonStyle,
-      display: "inline-flex",
-       }
-    }>
-      
-      Storm Category
-      
-      
-
-    </Button>
-    
-    
-
-    {isOpen &&
-      (<CategoryRangeSlider
-        setStartCategory = {(category) => filterDispatch(filterActions.setStartCategory(category))}
-        setEndCategory = {(category) => filterDispatch(filterActions.setEndCategory(category))}
+    <FilterPanel
+      name="category"
+      label="Storm Category"
+      Icon={CategoryOutlinedIcon}
+      isActive={hasValidCategory}>
+      <CategoryRangeSlider
+        setStartCategory={(category) => filterDispatch(filterActions.setStartCategory(category))}
+        setEndCategory={(category) => filterDispatch(filterActions.setEndCategory(category))}
         onClose={() => filterDispatch(filterActions.closePanel())}
         startCategory={startCategory}
-        endCategory={endCategory}/>)}
-
-
-    </>
-
-
-    
+        endCategory={endCategory} />
+    </FilterPanel>
   );
 };
 
