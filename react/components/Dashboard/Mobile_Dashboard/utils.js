@@ -203,12 +203,11 @@ export function parseStationData(stationValues, stationData){
 		'wind_from_direction'
   ];
 
-	const standardNames = stationValues?.properties?.station_data?.column_std_names || [];
+	const standardNames = stationData?.column_std_names || [];
 	//const stationData = stationValues?.properties?.station_data || [];
 
 	const dataIndx= [];
 	const data_dict=[]
-
 	standardNames.forEach((varName, index) => {
 			if (!excludeVars.includes(varName)) {
 				dataIndx.push(index)
