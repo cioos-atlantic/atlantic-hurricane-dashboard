@@ -1,7 +1,17 @@
 import { createVarPresenceDict, alignMergedData, mergeData, parseStationData, parseStormData, getStationInfo } from "./utils";
+import { getStationDataText, getMatchedStation, get_station_field_data } from "../../utils/station_data_format_util";
 import { fetch_value } from "@/lib/storm_utils";
+import RenderCombinedChart from './combined_graph'
+import RenderStormChart from "../../storm_dashboard/storm_graph";
+import StormTypeChart from "@/components/storm_dashboard/storm_type_chart";
+import StormCategoryChart from "@/components/storm_dashboard/storm_cat_chart";
+import { RenderWindRose } from "@/components/station_dashboard/wind_rose";
+import { RenderPlotlyRose } from "@/components/station_dashboard/plotly_rose";
+import { processWindSpeeds } from "@/components/station_dashboard/wind_rose_utils";
+import { convert_unit_data } from "../../utils/unit_conversion";
+import { Box } from "@mui/material";
 
-export default function CombinedStationStormDash({stationData, storm_points, hover_point}){
+export default function CombinedStationStormDash({stationData, stationValues, storm_points, hover_point}){
 
 	function generateGraph(selectedVar){
 				return (
@@ -21,28 +31,27 @@ export default function CombinedStationStormDash({stationData, storm_points, hov
 			 </div>
 				)
 		}
-
 	if (stationData === undefined) {
 		return
 	}
 
-	const stationDataDict = parseStationData(stationData)//parseStationData(stationValues)
+	const stationDataDict = parseStationData(stationValues, stationData)//parseStationData(stationValues)
 	const [stormName, stormTimes, stormType, stormDataDict, stormCategory] = parseStormData(storm_points);
 	const mergedData = mergeData(stationDataDict, stormDataDict);
 
 	const hoverPointTime = fetch_value(hover_point, ["TIMESTAMP", "ISO_TIME"]);
-	const stationTimes = get_station_field_data(stationValues?.properties?.station_data,"time", "column_std_names")?.data
+	const stationTimes = get_station_field_data(stationData,"time", "column_std_names")?.data
 
 	const convertedStormTimes = stormTimes.map(time =>  Date.parse(time));
 
 	const { unifiedTimes, alignedMergedData } = alignMergedData(mergedData, convertedStormTimes, stationTimes);
 
 
-	const variablePresence = createVarPresenceDict(alignedMergedData, stormCategory, stormType, stationValues );
-	const allStationData =stationValues?.properties?.station_data;
-	const timeData = get_station_field_data(allStationData, "time", "column_std_names").data;
-	const directionData = get_station_field_data(allStationData, 'wind_from_direction', "column_std_names").data;
-	const windSpeedData = processWindSpeeds(allStationData);
+	const variablePresence = createVarPresenceDict(alignedMergedData, stormCategory, stormType, stationData );
+	//const allStationData =stationValues?.properties?.station_data;
+	const timeData = get_station_field_data(stationData, "time", "column_std_names").data;
+	const directionData = get_station_field_data(stationData, 'wind_from_direction', "column_std_names").data;
+	const windSpeedData = processWindSpeeds(stationData);
 	
  	return <Box
 				className="dash-body"
@@ -126,6 +135,8 @@ export default function CombinedStationStormDash({stationData, storm_points, hov
 
 			
 }
+
+
 
 
 	

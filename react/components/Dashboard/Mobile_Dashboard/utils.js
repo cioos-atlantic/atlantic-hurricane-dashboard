@@ -5,13 +5,13 @@ import { fetch_value } from "@/lib/storm_utils";
 
 
 
-function createWindDirVarPresence(stationValues, variablePresence){
+function createWindDirVarPresence(stationData, variablePresence){
 	let WindDirIndx = ''
-	const standardNames = stationValues?.properties?.station_data?.column_std_names || [];
+	const standardNames = stationData?.column_std_names || [];
 	standardNames.forEach((std_name, indx) => {
 		if (std_name === "wind_from_direction") { WindDirIndx =indx}
 	})
-	const rowData = stationValues?.properties?.station_data?.rows;
+	const rowData = stationData?.rows;
 
 	variablePresence.wind_from_direction = rowData.some(
 		d => d[WindDirIndx] != null && !Number.isNaN(d[WindDirIndx])
@@ -20,7 +20,7 @@ function createWindDirVarPresence(stationValues, variablePresence){
 	
 }
 
-export function createVarPresenceDict(mergedData, stormCategory, stormType, stationValues){
+export function createVarPresenceDict(mergedData, stormCategory, stormType, stationData){
 	const variablePresence={};
 
 	
@@ -39,7 +39,7 @@ export function createVarPresenceDict(mergedData, stormCategory, stormType, stat
 		stormCategory['data'].length > 0 && 
 		stormCategory['data'].some(item => item !== undefined);
 
-	createWindDirVarPresence(stationValues, variablePresence);
+	createWindDirVarPresence(stationData, variablePresence);
 
 
 	Object.entries(mergedData).forEach(([key, value]) => {
@@ -134,8 +134,6 @@ export function mergeData(station_data, storm_data){
 
 export function parseStormData(storm_points){
 	const stormPoints = storm_points.pts.features;
-	
-
 	const stormNameList = [];
 	const stormTime = [];
 	const stormType={
@@ -194,7 +192,7 @@ export function parseStormData(storm_points){
 }
 
 
-export function parseStationData(stationValues){
+export function parseStationData(stationValues, stationData){
 	const excludeVars = [
     "time",
     "latitude",
@@ -206,7 +204,7 @@ export function parseStationData(stationValues){
   ];
 
 	const standardNames = stationValues?.properties?.station_data?.column_std_names || [];
-	const stationData = stationValues?.properties?.station_data || [];
+	//const stationData = stationValues?.properties?.station_data || [];
 
 	const dataIndx= [];
 	const data_dict=[]
