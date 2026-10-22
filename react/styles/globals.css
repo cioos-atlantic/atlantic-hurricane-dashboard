@@ -769,6 +769,57 @@ footer {
   cursor: not-allowed !important;
 }
 
+/* "Filter storms (2)   Clear all" title row at the top of the filter section (red panel) */
+.filter-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px 6px;
+  color: white;
+}
+
+.filter-header-title{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+}
+
+/* Number of active filters, as a small white pill */
+.filter-header-count{
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background-color: white;
+  color: #e55162;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.filter-header-clear{
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.filter-header-clear:hover,
+.filter-header-clear:focus-visible{
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
 /* Filter fields (FilterPanel, and the map area box in filter.js), styled like a select field.
    The wrapper draws the box; inside it, the field body (label on top, value below, ⌄ on its right)
    and, when the filter has a value, a full-height ✕ section on the far right.

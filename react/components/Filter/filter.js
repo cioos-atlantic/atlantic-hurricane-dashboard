@@ -1,6 +1,7 @@
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import { useState } from 'react';
 import Stack from '@mui/material/Stack';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
@@ -13,7 +14,7 @@ import { basePath } from "@/next.config";
 import LoadingScreen from "../loading_screen";
 import { RenderCategoryFilter } from "./categorySlider";
 import { empty_station_obj } from "../point_defaults";
-import { formatFilterDate, formatStormCategory, formatStormName, formatCategoryRange, hasActiveFilters } from "./filter_utils";
+import { formatFilterDate, formatStormCategory, formatStormName, formatCategoryRange, countActiveFilters } from "./filter_utils";
 import { FiltersSubmitted } from "./viewFilters";
 import { mapActions } from "@/components/mapReducer";
 import { filterActions } from "@/components/Filter/filterReducer";
@@ -27,8 +28,9 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
   const [loading, setLoading] = useState(false);
 
   const setFilterStormName = (state) => filterDispatch(filterActions.setFilterStormName(state));
-  // Submit needs a filter value; Clear also has work to do while a submitted query or its results are shown
-  const filtersSelected = hasActiveFilters({ filterStormName, startDate, endDate, startCategory, endCategory, polyFilterCoords });
+  // Apply needs a filter value; "Clear all" also has work to do while a submitted query or its results are shown
+  const activeFilterCount = countActiveFilters({ filterStormName, startDate, endDate, startCategory, endCategory, polyFilterCoords });
+  const filtersSelected = activeFilterCount > 0;
   const hasSubmittedQuery = returnFilterResult || Object.keys(filterQuery).length > 0;
   const canClear = filtersSelected || hasSubmittedQuery;
 
@@ -92,9 +94,22 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
           sx={{ display: 'flex' }}
           className='filter-icons-list'>
 
-          <Box className='historical_page_drawer_subheader'
-            sx={{ fontSize: '14px' }}
-          >Filter Storms</Box>
+          <Box className="filter-header">
+            <span className="filter-header-title">
+              <FilterAltOutlinedIcon fontSize="small" />
+              Filter storms
+              {activeFilterCount > 0 && (
+                <span className="filter-header-count" aria-label={`${activeFilterCount} active`}>
+                  {activeFilterCount}
+                </span>
+              )}
+            </span>
+            {canClear && (
+              <button type="button" className="filter-header-clear" onClick={handleClearAllFilters}>
+                Clear all
+              </button>
+            )}
+          </Box>
 
           {
             input_filters.map((input_filter, index) => {
@@ -162,17 +177,7 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
                 disabled={!filtersSelected}
                 onClick={handleFilterSubmit}
                 startIcon={<PublishRoundedIcon />}>
-                Submit FILTER QUERY
-              </Button>
-            </span>
-          </Tooltip>
-          <Tooltip title={canClear ? "" : "Nothing to clear"}>
-            <span className="filter-group">
-              <Button
-                className="filter-badge"
-                disabled={!canClear}
-                onClick={handleClearAllFilters}>
-                CLEAR FILTER QUERY
+                Apply filters
               </Button>
             </span>
           </Tooltip>
