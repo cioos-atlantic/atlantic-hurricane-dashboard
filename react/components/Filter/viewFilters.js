@@ -1,6 +1,7 @@
 import { Box, Stack } from "@mui/material";
 import dayjs from "dayjs";
 import { storm_cat } from "@/lib/storm_cat";
+import { hasActiveFilters } from "./filter_utils";
 
 // One summary line for the date filter; either date can be missing (open-ended range)
 function DateRangeLine({ startDate, endDate }) {
@@ -14,7 +15,7 @@ function DateRangeLine({ startDate, endDate }) {
 
 export function FiltersSelected({startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName}){
 
-  const isFiltered = Boolean(startDate || endDate || startCategory || endCategory || polyFilterCoords || filterStormName.length);
+  const isFiltered = hasActiveFilters({ filterStormName, startDate, endDate, startCategory, endCategory, polyFilterCoords });
 
   return(
 

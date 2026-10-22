@@ -763,6 +763,12 @@ footer {
   text-transform: none !important;*/
 }
 
+/* Submit / Clear when no filter is selected */
+.filter-badge.Mui-disabled{
+  color: #bdbdbd !important;
+  cursor: not-allowed !important;
+}
+
 
 .filter-badge-icon{
   color:#e55162

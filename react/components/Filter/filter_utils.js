@@ -49,6 +49,18 @@ export function makeStormNameList(storm_data){
   return editedStormList;
 }
 
+// True when at least one filter has a value: a storm name, either date (open-ended ranges are
+// allowed), a full category range, or a drawn polygon
+export function hasActiveFilters({ filterStormName, startDate, endDate, startCategory, endCategory, polyFilterCoords }) {
+  return Boolean(
+    filterStormName?.length > 0 ||
+    startDate?.isValid?.() ||
+    endDate?.isValid?.() ||
+    (startCategory != null && endCategory != null) ||
+    polyFilterCoords
+  );
+}
+
 // Converts the category labels kept in filterReducer ('TD' ... 'C5') to the wind-speed range
 // the filter API expects. TD's min is 0, so check for null instead of truthiness.
 export function formatCategoryRange(startCategory, endCategory) {

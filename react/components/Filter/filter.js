@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Tooltip } from "@mui/material";
 import { useState } from 'react';
 import Stack from '@mui/material/Stack';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
@@ -11,7 +11,7 @@ import { basePath } from "@/next.config";
 import LoadingScreen from "../loading_screen";
 import { RenderCategoryFilter } from "./categorySlider";
 import { empty_station_obj } from "../point_defaults";
-import { formatFilterDate, formatStormCategory, formatStormName, formatCategoryRange } from "./filter_utils";
+import { formatFilterDate, formatStormCategory, formatStormName, formatCategoryRange, hasActiveFilters } from "./filter_utils";
 import { FiltersSelected, FiltersSubmitted } from "./viewFilters";
 import { mapActions } from "@/components/mapReducer";
 import { filterActions } from "@/components/Filter/filterReducer";
@@ -25,6 +25,7 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
   const [loading, setLoading] = useState(false);
 
   const setFilterStormName = (state) => filterDispatch(filterActions.setFilterStormName(state));
+  const filtersSelected = hasActiveFilters({ filterStormName, startDate, endDate, startCategory, endCategory, polyFilterCoords });
 
   const router = useRouter(); // Next.js useRouter
 
@@ -123,18 +124,30 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
             />
           </div>
 
-          <Button
-            id="filter-submit-button"
-            className="filter-badge"
-            onClick={handleFilterSubmit}
-            startIcon={<PublishRoundedIcon />}>
-            Submit FILTER QUERY
-          </Button>
-          <Button
-            className="filter-badge"
-            onClick={handleClearAllFilters}>
-            CLEAR FILTER QUERY
-          </Button>
+          {/* Disabled (not hidden) when nothing is selected, so the tour can still point at Submit.
+              The span lets the tooltip work on a disabled button. */}
+          <Tooltip title={filtersSelected ? "" : "Select a filter first"}>
+            <span className="filter-group">
+              <Button
+                id="filter-submit-button"
+                className="filter-badge"
+                disabled={!filtersSelected}
+                onClick={handleFilterSubmit}
+                startIcon={<PublishRoundedIcon />}>
+                Submit FILTER QUERY
+              </Button>
+            </span>
+          </Tooltip>
+          <Tooltip title={filtersSelected ? "" : "Select a filter first"}>
+            <span className="filter-group">
+              <Button
+                className="filter-badge"
+                disabled={!filtersSelected}
+                onClick={handleClearAllFilters}>
+                CLEAR FILTER QUERY
+              </Button>
+            </span>
+          </Tooltip>
 
           <div className="filter-group">
             {showFilterSelected ? (
