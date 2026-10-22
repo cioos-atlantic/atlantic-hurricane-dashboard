@@ -1,5 +1,4 @@
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
-import { useEffect, useState } from 'react';
 import { Box, Button, Card, CardContent, CardActions, Slider } from "@mui/material";
 import {storm_cat} from "@/lib/storm_cat"
 import { FilterPanel } from './FilterPanel';
@@ -15,58 +14,49 @@ export const storm_category_list = [
 
 ]
 
+const values = storm_category_list.map(item => item.value);
+const minCategory = Math.min(...values);
+const maxCategory = Math.max(...values);
+
+const labelToValue = (label) => storm_category_list.find(item => item.label === label)?.value;
+const valueToLabel = (value) => storm_category_list.find(item => item.value === value)?.label;
+
+// startCategory / endCategory are category labels ('TD' ... 'C5'), or null when not set
 export function CategoryRangeSlider({ setStartCategory, setEndCategory, onClose, startCategory, endCategory }) {
   const stormCategoryLink = "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html";
-  const defaultText = <>
-  Adjust the slider to filter storms by category, from Tropical Depression (TD)  to Category 5. <br />
-  Learn more about {" "}
-  <a href={stormCategoryLink}
-     target="_blank"
-     rel="noopener noreferrer">
-    storm categories
-  </a>.
-</>;
+  const startLabel = startCategory;
+  const endLabel = endCategory;
+  const hasSelection = startLabel != null && endLabel != null;
 
-  const [sliderText, setSliderText] = useState(defaultText);
-  
-  const values = storm_category_list.map(item => item.value);
-  const minCategory = Math.min(...values);
-  const maxCategory = Math.max(...values);
- 
-  
-  // Independent state for the slider's range
-  const [value, setValue] = useState([minCategory, maxCategory]);
-  const [startLabel, setStartLabel] = useState("");
-  const [endLabel, setEndLabel] = useState("");
+  // Slider position comes from the reducer, so it is restored when the panel reopens
+  const value = hasSelection
+    ? [labelToValue(startLabel), labelToValue(endLabel)]
+    : [minCategory, maxCategory];
 
   const handleChange = (_, newValue) => {
     if (!Array.isArray(newValue)) return;
 
     const [start, end] = newValue;
+    const newStartLabel = valueToLabel(start);
+    const newEndLabel = valueToLabel(end);
 
-    setValue(newValue);
-    
-    const newStartLabel = storm_category_list.find(v => v.value === start)?.label;
+    if (!newStartLabel || !newEndLabel) return;
 
-    const newEndLabel = storm_category_list.find(v => v.value === end)?.label;
-
-    setStartLabel(newStartLabel);
-    setEndLabel(newEndLabel);
-
-    const startRange = newStartLabel ? storm_cat[newStartLabel] : null;
-    const endRange = newEndLabel ? storm_cat[newEndLabel] : null;
-
-    if (!startRange || !endRange) return;
-
-    setStartCategory(startRange.min);
-    setEndCategory(endRange.max);
+    setStartCategory(newStartLabel);
+    setEndCategory(newEndLabel);
   };
 
-  useEffect(() => {
-    if (startLabel != "" && endLabel != "") {
-      
-  
-      setSliderText(
+  const sliderText = !hasSelection ? (
+    <>
+      Adjust the slider to filter storms by category, from Tropical Depression (TD)  to Category 5. <br />
+      Learn more about {" "}
+      <a href={stormCategoryLink}
+         target="_blank"
+         rel="noopener noreferrer">
+        storm categories
+      </a>.
+    </>
+  ) : (
         <>
           You&apos;ve selected storms from <strong>{storm_cat[startLabel]?.name.en}</strong> to <strong>{storm_cat[endLabel]?.name.en}</strong>. <br />
           {' '}
@@ -91,12 +81,7 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, onClose,
             here
           </a>.]
         </>
-      );
-    } else {
-      setSliderText(defaultText
-      );
-    }
-  }, [startLabel, endLabel]);
+  );
 
   return (
     <Card
@@ -131,12 +116,8 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, onClose,
                       size="small"
                       className='shortcut-button'
                       onClick={() => {
-                        setValue([minCategory, maxCategory]); // Reset slider range
-                        setSliderText(defaultText); 
-                        setStartCategory(""); 
-                        setEndCategory(""); 
-                        setStartLabel("");
-                        setEndLabel("");  
+                        setStartCategory(null);
+                        setEndCategory(null);
                       }}>Clear</Button>
                     <Button 
                       size="small" 
@@ -156,7 +137,7 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, onClose,
 }
 
 export function RenderCategoryFilter({ filterDispatch, startCategory, endCategory }){
-  const hasValidCategory = startCategory && endCategory;
+  const hasValidCategory = startCategory != null && endCategory != null;
 
   return (
     <FilterPanel

@@ -4,13 +4,13 @@ import { storm_cat } from "@/lib/storm_cat";
 
 export function FiltersSelected({startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName}){
 
-  const isFiltered = startDate || endDate || startCategory || endCategory || polyFilterCoords || filterStormName.length;
-  
-  return( 
-    
+  const isFiltered = Boolean(startDate || endDate || startCategory || endCategory || polyFilterCoords || filterStormName.length);
+
+  return(
+
       <Stack>
         <Box className='view-filters-content'>
-           { isFiltered > 0 &&(<Box>
+           { isFiltered &&(<Box>
             Filter(s) Selected:
           </Box>)}
           { !isFiltered &&(<Box>
@@ -23,7 +23,7 @@ export function FiltersSelected({startDate, endDate, startCategory, endCategory,
             Date Range: {dayjs(startDate).format('DD/MM/YYYY') } - {dayjs(endDate).format('DD/MM/YYYY') }
           </Box>)}
           {startCategory != null && endCategory != null ? (<Box>
-            Category Range: ({getByField(startCategory, storm_cat, 'min')[1]?.name?.en} -{" "} {getByField(endCategory, storm_cat, 'max')[1]?.name?.en}) 
+            Category Range: ({storm_cat[startCategory]?.name?.en} -{" "} {storm_cat[endCategory]?.name?.en})
           </Box>): null}
           {polyFilterCoords && (<Box>
             Spatial Range: Range selected
@@ -67,7 +67,7 @@ export function FiltersSubmitted({filterQuery}){
             Date Range: {dayjs(filterQuery.startDate).format('DD/MM/YYYY') } - {dayjs(filterQuery.endDate).format('DD/MM/YYYY') }
           </Box>)}
           {filterQuery?.startCategory != null && filterQuery?.endCategory != null ? (<Box>
-            Category Range: ({getByField(filterQuery?.startCategory, storm_cat, 'min')?.[1]?.name?.en} -{" "} {getByField(filterQuery?.endCategory, storm_cat, 'max')?.[1]?.name?.en}) 
+            Category Range: ({storm_cat[filterQuery.startCategory]?.name?.en} -{" "} {storm_cat[filterQuery.endCategory]?.name?.en})
           </Box>): null}
           {filterQuery?.polyCoords && (<Box>
             Spatial Range: Range selected
@@ -80,12 +80,4 @@ export function FiltersSubmitted({filterQuery}){
     
     
   )
-}
-
-
-
-function getByField(value, categories, field) {
-  return Object.entries(categories).find(([_, cat]) =>
-    cat[field] === value
-  );
 }

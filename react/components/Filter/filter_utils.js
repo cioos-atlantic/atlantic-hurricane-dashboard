@@ -1,4 +1,5 @@
 import { basePath } from "@/next.config";
+import { storm_cat } from "@/lib/storm_cat";
 
 export function titleCase(str) {
     if ((str === null) || (str === ''))
@@ -42,7 +43,19 @@ export function makeStormNameList(storm_data){
   return editedStormList;
 }
 
-export async function queryStormName(startDate = null, endDate = null, polyCoords= '', startCategory = '', endCategory= '') {
+// Converts the category labels kept in filterReducer ('TD' ... 'C5') to the wind-speed range
+// the filter API expects. TD's min is 0, so check for null instead of truthiness.
+export function formatCategoryRange(startCategory, endCategory) {
+  const startRange = startCategory != null ? storm_cat[startCategory] : null;
+  const endRange = endCategory != null ? storm_cat[endCategory] : null;
+
+  if (!startRange || !endRange) {
+    return { start_category: '', end_category: '' };
+  }
+  return { start_category: String(startRange.min), end_category: String(endRange.max) };
+}
+
+export async function queryStormName(startDate = null, endDate = null, polyCoords= '', startCategory = null, endCategory= null) {
 
   const updatedParams = {
       startDate: startDate, // Ensure start and end dates are included
@@ -59,8 +72,7 @@ export async function queryStormName(startDate = null, endDate = null, polyCoord
   const end_date = formatFilterDate(updatedParams['endDate']);
   
   const storm_poly = updatedParams['polyCoords'];                       
-  const start_category= (updatedParams['startCategory']) ? updatedParams['startCategory'] : '';
-  const end_category = (updatedParams['endCategory']) ? updatedParams['endCategory'] : '';
+  const { start_category, end_category } = formatCategoryRange(updatedParams['startCategory'], updatedParams['endCategory']);
 
   const query = new URLSearchParams({
     start_date: start_date,

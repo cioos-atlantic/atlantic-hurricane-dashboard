@@ -11,7 +11,7 @@ import { basePath } from "@/next.config";
 import LoadingScreen from "../loading_screen";
 import { RenderCategoryFilter } from "./categorySlider";
 import { empty_station_obj } from "../point_defaults";
-import { formatFilterDate, formatStormCategory, formatStormName } from "./filter_utils";
+import { formatFilterDate, formatStormCategory, formatStormName, formatCategoryRange } from "./filter_utils";
 import { FiltersSelected, FiltersSubmitted } from "./viewFilters";
 import { mapActions } from "@/components/mapReducer";
 import { filterActions } from "@/components/Filter/filterReducer";
@@ -166,8 +166,8 @@ export async function processFilterRequest(filterParameters, setLoading) {
   const endDate = formatFilterDate(filterParameters['endDate']);
 
   const stormPoly = filterParameters['polyCoords'];
-  const startCategory = (filterParameters['startCategory']) ? filterParameters['startCategory'] : '';
-  const endCategory = (filterParameters['endCategory']) ? filterParameters['endCategory'] : '';
+  const { start_category: startCategory, end_category: endCategory } =
+    formatCategoryRange(filterParameters['startCategory'], filterParameters['endCategory']);
 
   const query = new URLSearchParams({
     storm_category: stormCategory,
