@@ -26,9 +26,8 @@ export const CloseOptions = KeyboardDoubleArrowUpIcon;
 
 export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
   const { startDate, endDate, startCategory, endCategory, polyFilterCoords, filterStormName,
-    showDateSelection, showCatSelection, showFilterSelected, filterQuery } = useFilters();
+    openPanel, showFilterSelected, filterQuery } = useFilters();
   const filterDispatch = useFilterDispatch();
-  const [showFilterOptions, setShowFilterOptions] = useState({});
   const [loading, setLoading] = useState(false);
 
   const setFilterStormName = (state) => filterDispatch(filterActions.setFilterStormName(state));
@@ -49,12 +48,7 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
   async function handleFilterSubmit() {
     filterDispatch(filterActions.setShowFilterSelected(false));
     dispatch(mapActions.setDrawerButtonClicked(''));
-    filterDispatch(filterActions.setCatSelection(false));
-    filterDispatch(filterActions.setDateSelection(false));
-    setShowFilterOptions(prev => ({
-      ...prev,
-      stormName: false, // stormName must be defined here
-    }));
+    filterDispatch(filterActions.closePanel());
 
     const updatedParams = {
       startDate: startDate, // Ensure start and end dates are included
@@ -106,8 +100,7 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
                 <div className="filter-group" key={index}>
                   <InputFilter
                     input_filter={input_filter}
-                    showFilterOptions={showFilterOptions}
-                    setShowFilterOptions={setShowFilterOptions}
+                    isOpen={openPanel === input_filter.name}
                     filterDispatch={filterDispatch}
                     filterStormName={filterStormName}
                     setFilterStormName={setFilterStormName}
@@ -125,19 +118,17 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
           <div className="filter-group">
             <RenderDateFilter
               filterDispatch={filterDispatch}
-              setShowFilterOptions={setShowFilterOptions}
               startDate={startDate}
               endDate={endDate}
-              showDateSelection={showDateSelection}
+              isOpen={openPanel === 'date'}
             />
           </div>
           <div className="filter-group">
             <RenderCategoryFilter
               filterDispatch={filterDispatch}
-              setShowFilterOptions={setShowFilterOptions}
               startCategory={startCategory}
               endCategory={endCategory}
-              showCatSelection={showCatSelection}
+              isOpen={openPanel === 'category'}
             />
           </div>
 

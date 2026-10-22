@@ -12,8 +12,7 @@ export const initialFilterState = {
   filterStormName: [],
 
   // Filter UI
-  showCatSelection: false,
-  showDateSelection: false,
+  openPanel: null, // 'stormName' | 'date' | 'category' | null; only one panel is open at a time
   showFilterSelected: true,
 
   // Submitted query and its results
@@ -36,10 +35,8 @@ export const filterActions = {
   cancelFilters: () => ({ type: 'CANCEL_FILTERS' }),
 
   // Filter UI
-  setCatSelection: (isOpen) => ({ type: 'SET_CAT_SELECTION', payload: isOpen }),
-  toggleCatSelection: () => ({ type: 'TOGGLE_CAT_SELECTION' }),
-  setDateSelection: (isOpen) => ({ type: 'SET_DATE_SELECTION', payload: isOpen }),
-  toggleDateSelection: () => ({ type: 'TOGGLE_DATE_SELECTION' }),
+  togglePanel: (panel) => ({ type: 'TOGGLE_PANEL', payload: panel }),
+  closePanel: () => ({ type: 'CLOSE_PANEL' }),
   setShowFilterSelected: (show) => ({ type: 'SHOW_FILTER_SELECTED', payload: show }),
 
   // Filter results
@@ -62,14 +59,10 @@ export function filterReducer(state, action) {
       return { ...state, polyFilterCoords: action.payload };
     case 'SET_FILTER_STORM_NAME':
       return { ...state, filterStormName: action.payload };
-    case 'TOGGLE_CAT_SELECTION':
-      return { ...state, showCatSelection: !state.showCatSelection };
-    case 'SET_CAT_SELECTION':
-      return { ...state, showCatSelection: action.payload };
-    case 'TOGGLE_DATE_SELECTION':
-      return { ...state, showDateSelection: !state.showDateSelection };
-    case 'SET_DATE_SELECTION':
-      return { ...state, showDateSelection: action.payload };
+    case 'TOGGLE_PANEL':
+      return { ...state, openPanel: state.openPanel === action.payload ? null : action.payload };
+    case 'CLOSE_PANEL':
+      return { ...state, openPanel: null };
     case 'SHOW_FILTER_SELECTED':
       return { ...state, showFilterSelected: action.payload };
     case 'SET_FILTER_QUERY':

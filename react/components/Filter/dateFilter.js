@@ -61,7 +61,7 @@ export const shortcutsItems = [
   
 ];
 
-export function RenderDateFilter({ filterDispatch, setShowFilterOptions, startDate, endDate, showDateSelection }) {
+export function RenderDateFilter({ filterDispatch, startDate, endDate, isOpen }) {
   const hasValidDates = startDate?.isValid?.() && endDate?.isValid?.();
   const buttonStyle = {
     backgroundColor: hasValidDates ? '#e55162' : 'white',
@@ -74,12 +74,7 @@ export function RenderDateFilter({ filterDispatch, setShowFilterOptions, startDa
 
   function handleIconClick(){
     filterDispatch(filterActions.setShowFilterSelected(true))
-    filterDispatch(filterActions.toggleDateSelection());
-    filterDispatch(filterActions.setCatSelection(false));
-    setShowFilterOptions(prev => ({
-      ...prev,
-      stormName: false, // stormName must be defined here
-    }));
+    filterDispatch(filterActions.togglePanel('date'));
   }
   
 
@@ -92,7 +87,7 @@ export function RenderDateFilter({ filterDispatch, setShowFilterOptions, startDa
     aria-label="filter button for date selection"
     onClick= {handleIconClick}
     startIcon={<CalendarMonthOutlinedIcon/>}
-    endIcon={ !showDateSelection ? (<ShowOptions/>):(<CloseOptions/>)}
+    endIcon={ !isOpen ? (<ShowOptions/>):(<CloseOptions/>)}
     sx={{...buttonStyle,
       display: "inline-flex" }
     }>
@@ -105,13 +100,13 @@ export function RenderDateFilter({ filterDispatch, setShowFilterOptions, startDa
     
     
 
-    {showDateSelection && 
-      (<DateDisplay 
+    {isOpen &&
+      (<DateDisplay
         startDate={startDate}
         endDate={endDate}
         setStartDate = {(date) => filterDispatch(filterActions.setStartDate(date))}
         setEndDate = {(date) => filterDispatch(filterActions.setEndDate(date))}
-        setShowDateSelection = {(date) => filterDispatch(filterActions.setDateSelection(date))}
+        onClose = {() => filterDispatch(filterActions.closePanel())}
          />)}
 
     
@@ -125,7 +120,7 @@ export function RenderDateFilter({ filterDispatch, setShowFilterOptions, startDa
 
 
 
-export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, startDate, endDate}){
+export function DateDisplay({setStartDate, setEndDate, onClose, startDate, endDate}){
    
 
   const slotProps={
@@ -245,7 +240,7 @@ export function DateDisplay({setStartDate, setEndDate, setShowDateSelection, sta
             <Button 
               size="small" 
               className='shortcut-button' 
-              onClick={()=> {setShowDateSelection(false)}}>Close</Button>
+              onClick={onClose}>Close</Button>
 
 
         </Box>

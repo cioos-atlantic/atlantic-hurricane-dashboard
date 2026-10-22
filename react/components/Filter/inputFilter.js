@@ -11,7 +11,7 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 
-export function InputFilter({input_filter, showFilterOptions, setShowFilterOptions, filterDispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
+export function InputFilter({input_filter, isOpen, filterDispatch, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
   const [stormNameList, setStormNameList] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,12 +35,7 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
  function handleIconClick(){
 
     filterDispatch(filterActions.setShowFilterSelected(true))
-    filterDispatch(filterActions.setCatSelection(false));
-    filterDispatch(filterActions.setDateSelection(false));
-    setShowFilterOptions((prev) => ({
-      ...prev,
-      [input_filter.name]: !prev[input_filter.name],
-    }));
+    filterDispatch(filterActions.togglePanel(input_filter.name));
   }
   const handleOpen = () => {
     setOpen(true);
@@ -71,7 +66,7 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
       className="filter-badge"
       onClick= {handleIconClick}
       startIcon={input_filter.Icon ? <input_filter.Icon /> : null}
-      endIcon={ !showFilterOptions[input_filter.name] ? (<ShowOptions/>):(<CloseOptions/>)}
+      endIcon={ !isOpen ? (<ShowOptions/>):(<CloseOptions/>)}
       sx={{...buttonStyle,
         display: "inline-flex",}
       }
@@ -84,7 +79,7 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
     
     
     {/* Filter Input Popup */}
-    {showFilterOptions[input_filter.name] && (
+    {isOpen && (
       <Paper elevation={3} 
         key={input_filter.name}
         className="input-filter"
@@ -98,7 +93,7 @@ export function InputFilter({input_filter, showFilterOptions, setShowFilterOptio
         
            
             <Button size="small" className="shortcut-button" onClick={handleClearAll}>Clear</Button>
-            <Button size="small" className="shortcut-button" onClick={() => setShowFilterOptions({ ...showFilterOptions, [input_filter.name]: false })}>
+            <Button size="small" className="shortcut-button" onClick={() => filterDispatch(filterActions.closePanel())}>
               Close
             </Button>
     

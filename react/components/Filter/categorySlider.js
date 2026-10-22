@@ -15,7 +15,7 @@ export const storm_category_list = [
 
 ]
 
-export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowCatSelection, startCategory, endCategory }) {
+export function CategoryRangeSlider({ setStartCategory, setEndCategory, onClose, startCategory, endCategory }) {
   const stormCategoryLink = "https://www.canada.ca/en/environment-climate-change/services/archive/hurricanes/extratropical-transition/classification.html";
   const defaultText = <>
   Adjust the slider to filter storms by category, from Tropical Depression (TD)  to Category 5. <br />
@@ -141,7 +141,7 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
                     <Button 
                       size="small" 
                       className='shortcut-button' 
-                      onClick={()=> {setShowCatSelection(false)}}>Close</Button>
+                      onClick={onClose}>Close</Button>
         
         
                 </Box>
@@ -155,7 +155,7 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, setShowC
   );
 }
 
-export function RenderCategoryFilter({ filterDispatch, setShowFilterOptions, startCategory, endCategory, showCatSelection }){
+export function RenderCategoryFilter({ filterDispatch, startCategory, endCategory, isOpen }){
   const hasValidCategory = startCategory && endCategory;
   const buttonStyle = {
     backgroundColor: hasValidCategory  ? '#e55162' : 'white',
@@ -169,12 +169,7 @@ export function RenderCategoryFilter({ filterDispatch, setShowFilterOptions, sta
 
   function handleIconClick(){
     filterDispatch(filterActions.setShowFilterSelected(true))
-    filterDispatch(filterActions.toggleCatSelection());
-    filterDispatch(filterActions.setDateSelection(false));
-    setShowFilterOptions(prev => ({
-      ...prev,
-      stormName: false, // stormName must be defined here
-    }));
+    filterDispatch(filterActions.togglePanel('category'));
   }
   
 
@@ -186,7 +181,7 @@ export function RenderCategoryFilter({ filterDispatch, setShowFilterOptions, sta
     className="filter-badge"
     onClick= {handleIconClick}
     startIcon={<CategoryOutlinedIcon />}
-    endIcon={ !showCatSelection ? (<ShowOptions/>):(<CloseOptions/>)}
+    endIcon={ !isOpen ? (<ShowOptions/>):(<CloseOptions/>)}
     sx={{...buttonStyle,
       display: "inline-flex",
        }
@@ -200,11 +195,11 @@ export function RenderCategoryFilter({ filterDispatch, setShowFilterOptions, sta
     
     
 
-    {showCatSelection && 
-      (<CategoryRangeSlider 
+    {isOpen &&
+      (<CategoryRangeSlider
         setStartCategory = {(category) => filterDispatch(filterActions.setStartCategory(category))}
         setEndCategory = {(category) => filterDispatch(filterActions.setEndCategory(category))}
-        setShowCatSelection={(status) => filterDispatch(filterActions.setCatSelection(status))}
+        onClose={() => filterDispatch(filterActions.closePanel())}
         startCategory={startCategory}
         endCategory={endCategory}/>)}
 
