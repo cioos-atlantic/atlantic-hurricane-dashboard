@@ -125,20 +125,13 @@ export async function queryStormName(startDate = null, endDate = null, polyCoord
     end_category: end_category,
 
   }).toString();
-  let uniqueList;
+  let uniqueList; // stays undefined when the request fails; an empty list just means no matching storms
   try {
     const resource = await fetch(`${basePath}/api/filter_storms?${query}`);
+    if (!resource.ok) throw new Error(`filter_storms returned ${resource.status}`);
     const storm_data = await resource.json();
-    
+
     uniqueList = makeStormNameList(storm_data)
-    // Create a set to track unique IDs and add objects to the result list
-    
-    if (uniqueList.length === 0) {
-      alert("No result found for this search, please try again...")
-    }
-
-    
-
 
   } catch (error) {
     

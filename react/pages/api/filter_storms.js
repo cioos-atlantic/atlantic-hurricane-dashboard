@@ -1,15 +1,18 @@
 import { wfs_query } from "./wfs_query"
 
 // Every value below goes straight into the CQL filter, so only accept the formats the filter UI sends
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/; // formatFilterDate: YYYY-MM-DD
+// formatFilterDate sends YYYY-MM-DD; the recent storms list (getHistoricalStormList) sends YYYY-MM-DDTHH:MM:SSZ
+const DATE_PATTERN = /^(\d{4}-\d{2}-\d{2})(T\d{2}:\d{2}:\d{2}Z)?$/;
 const INTEGER_PATTERN = /^\d+$/; // wind speeds (knots)
 const NUMBER = "-?\\d+(\\.\\d+)?";
 const POLYGON_POINT_PATTERN = new RegExp(`^${NUMBER} ${NUMBER}$`); // processPolygon: "lat lng" pairs joined by ","
 
 function isValidDate(value) {
-    if (!DATE_PATTERN.test(value)) return false;
-    const date = new Date(`${value}T00:00:00Z`);
-    return !isNaN(date) && date.toISOString().startsWith(value); // rejects e.g. 2020-02-31
+    const match = DATE_PATTERN.exec(value);
+    if (!match) return false;
+    const day = match[1];
+    const date = new Date(`${day}T00:00:00Z`);
+    return !isNaN(date) && date.toISOString().startsWith(day) && !isNaN(new Date(value)); // rejects e.g. 2020-02-31, 25:00:00
 }
 
 function isValidPolygon(value) {

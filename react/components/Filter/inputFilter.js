@@ -53,6 +53,7 @@ function InlineOptionList(props) {
 function StormNamePicker({input_filter, filterStormName, setFilterStormName, startDate, endDate, polyCoords, startCategory, endCategory}){
   const [stormNameList, setStormNameList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
     let ignore = false; // a response that arrives after the panel closed or the filters changed is dropped
@@ -62,12 +63,10 @@ function StormNamePicker({input_filter, filterStormName, setFilterStormName, sta
       const stormNames = await input_filter.query(startDate, endDate, polyCoords, startCategory, endCategory);
       if (ignore) return;
 
-      if (!stormNames || !Array.isArray(stormNames)) {
-        alert("No storm name data available...")
-        setStormNameList(["No storm name data available... "]);
-      } else {
-        setStormNameList([...stormNames]);
-      }
+      // A failed request returns no list; the message shows in the list instead of a pop-up
+      const failed = !Array.isArray(stormNames);
+      setLoadFailed(failed);
+      setStormNameList(failed ? [] : [...stormNames]);
       setLoading(false);
     }
 
@@ -92,7 +91,7 @@ function StormNamePicker({input_filter, filterStormName, setFilterStormName, sta
         onChange={(event, newValue) => setFilterStormName(newValue)}
         loading={loading}
         loadingText="Loading storm names…"
-        noOptionsText="No storms match"
+        noOptionsText={loadFailed ? "Couldn't load storm names. Close and reopen to try again." : "No storms match"}
         getOptionLabel={(option) => option}
         // Picked names are shown on the Storm Name field above, so the search box only holds the search text
         renderTags={() => null}

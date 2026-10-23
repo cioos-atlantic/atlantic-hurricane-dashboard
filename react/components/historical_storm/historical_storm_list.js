@@ -109,12 +109,6 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
   }, []); // Empty dependency array ensures it runs only once on mount
 
 
-  useEffect(() => {
-    if (filterResult.length <= 0 && returnFilterResult) {
-      filterDispatch(filterActions.setReturnFilterResult(false));
-    }
-  }, [filterResult.length, returnFilterResult, filterDispatch]);
-
   // const [selected_storm, setSelectedStorm] = useState("");
   return (
     <>

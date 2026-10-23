@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import { Alert, Box, Button, IconButton, Tooltip } from "@mui/material";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
@@ -25,6 +25,7 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
     filterQuery, returnFilterResult } = useFilters();
   const filterDispatch = useFilterDispatch();
   const [loading, setLoading] = useState(false);
+  const [applyFailed, setApplyFailed] = useState(false);
 
   const setFilterStormName = (state) => filterDispatch(filterActions.setFilterStormName(state));
   // Apply needs a filter value; "Clear all" also has work to do while a submitted query or its results are shown
@@ -38,6 +39,7 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
 
   function handleClearAllFilters() {
     filterDispatch(filterActions.clearAll())
+    setApplyFailed(false);
 
     // Clear shapes via reference
     if (clearShapesRef && clearShapesRef.current) {
@@ -65,11 +67,18 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
       stormName: filterStormName
     };
 
+    setApplyFailed(false);
+    const { storms, error } = await processFilterRequest(updatedParams, setLoading);
+
+    // On a failed request keep whatever was showing and report it under Apply
+    if (error) {
+      setApplyFailed(true);
+      return;
+    }
+
+    // An empty result still shows the results view ("Filter Result: 0 storms" + the query)
     filterDispatch(filterActions.setFilterQuery(updatedParams));
-
-    const stormResult = await processFilterRequest(updatedParams, setLoading);
-
-    filterDispatch(filterActions.setFilterResult(stormResult));
+    filterDispatch(filterActions.setFilterResult(storms));
     router.push(`/?page=historical`);
 
     dispatch(mapActions.setDrawerOpen(true));
@@ -180,6 +189,12 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
             </span>
           </Tooltip>
 
+          {applyFailed && (
+            <Alert severity="error" className="filter-group" onClose={() => setApplyFailed(false)}>
+              Couldn&apos;t load storms. Please try again.
+            </Alert>
+          )}
+
         </Stack>
       )}
     </>
@@ -187,9 +202,11 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
 }
 
 
+// Returns { storms, error }: `error` is set when the request fails; an empty `storms` just means no matches
 export async function processFilterRequest(filterParameters, setLoading) {
 
   let uniqueList = [];
+  let error = null;
   const stormCategory = formatStormCategory(filterParameters['stormCategory']);
   const stormNames = formatStormName(filterParameters['stormName']);
   const startDate = formatFilterDate(filterParameters['startDate']);
@@ -212,20 +229,18 @@ export async function processFilterRequest(filterParameters, setLoading) {
   setLoading(true);
   try {
     const resource = await fetch(`${basePath}/api/filter_storms?${query}`);
+    if (!resource.ok) throw new Error(`filter_storms returned ${resource.status}`);
     const storm_data = await resource.json();
 
     console.debug(`historical Storm Data for ${stormCategory} Between  ${startDate} and ${endDate}: `, storm_data);
     // Create a set to track unique IDs and add objects to the result list
     uniqueList = makeStormList(storm_data)
-    setLoading(false);
 
-    if (uniqueList.length === 0) {
-      alert("No result found for this search, please try again...")
-    }
-
-  } catch (error) {
+  } catch (fetchError) {
+    error = fetchError;
+    console.error('Error fetching storm or station data:', fetchError);
+  } finally {
     setLoading(false);
-    console.error('Error fetching storm or station data:', error);
   }
-  return uniqueList
+  return { storms: uniqueList, error }
 }
