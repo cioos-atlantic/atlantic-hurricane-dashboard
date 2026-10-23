@@ -58,6 +58,7 @@
     "swr": "^2.3.2"
   },
   "devDependencies": {
+    "@types/node": "20.17.6",
     "typescript": "^5.9.3"
   }
 }
