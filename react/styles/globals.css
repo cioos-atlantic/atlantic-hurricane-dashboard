@@ -1411,3 +1411,45 @@ position: absolute !important;
   padding: 8px 16px;
   border-radius: 6px;
 }
+/* Storm Name panel (inputFilter.js): search box with the name list right under it */
+.storm-name-panel{
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+
+/* Red focus outline instead of MUI's blue */
+.storm-name-search .MuiOutlinedInput-root{
+  font-size: 14px;
+  border-radius: 6px;
+}
+.storm-name-search .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline{
+  border-color: #e55162;
+}
+.storm-name-search .MuiInputAdornment-root{
+  color: #9e9e9e;
+}
+
+.storm-name-option{
+  font-size: 14px;
+  min-height: 34px !important;
+  padding: 0 8px 0 2px !important;
+  border-radius: 4px;
+}
+.storm-name-option--selected{
+  background-color: #fdecef !important;
+  font-weight: 500;
+}
+
+.storm-name-checkbox{
+  padding: 4px !important;
+  margin-right: 6px;
+  color: #bdbdbd !important;
+}
+.storm-name-checkbox.Mui-checked{
+  color: #e55162 !important;
+}
