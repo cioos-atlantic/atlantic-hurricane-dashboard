@@ -7,6 +7,18 @@ import { storm_cat } from "@/lib/storm_cat";
 export const MIN_DATE = dayjs('1851-06-23');
 export const MAX_DATE = dayjs().endOf('day');
 
+// The date pickers store whatever was typed, so the field, the summary and the query always agree.
+// Returns why the typed dates can't be applied ('' when they can, or when no date is set):
+// incomplete or impossible, outside MIN_DATE..MAX_DATE, or an end before the start.
+export function getDateRangeError(startDate, endDate) {
+  const isUnusable = (date) => date != null &&
+    (!date.isValid() || date.isBefore(MIN_DATE, 'day') || date.isAfter(MAX_DATE, 'day'));
+
+  if (isUnusable(startDate) || isUnusable(endDate)) return 'Enter dates between 23/06/1851 and today';
+  if (startDate && endDate && endDate.isBefore(startDate, 'day')) return 'End date is before the start date';
+  return '';
+}
+
 // Short text for a filter's current value, shown on the filter buttons and with the results.
 // Each returns '' when that filter is not set.
 export function formatStormNamesSummary(names = []) {
@@ -76,11 +88,11 @@ export function makeStormNameList(storm_data){
 }
 
 // Number of filters with a value (0-4): storm names, date (either end; open-ended ranges are
-// allowed), a full category range, and a drawn polygon
+// allowed; a mistyped date still counts, see getDateRangeError), a full category range, and a drawn polygon
 export function countActiveFilters({ filterStormName, startDate, endDate, startCategory, endCategory, polyFilterCoords }) {
   return [
     filterStormName?.length > 0,
-    Boolean(startDate?.isValid?.() || endDate?.isValid?.()),
+    startDate != null || endDate != null,
     startCategory != null && endCategory != null,
     Boolean(polyFilterCoords),
   ].filter(Boolean).length;
@@ -146,8 +158,8 @@ export async function queryStormName(startDate = null, endDate = null, polyCoord
 
 
 export function formatFilterDate(date) {
-  if (!date) {
-    return ""; // Return an empty string if no date is provided
+  if (!date?.isValid?.()) {
+    return ""; // No date, or a half-typed one (the storm name list skips it until it is complete)
   }
   const formattedDate = date.format("YYYY-MM-DD").trim();
   return formattedDate;

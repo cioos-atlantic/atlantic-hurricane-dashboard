@@ -54,6 +54,9 @@ function StormNamePicker({input_filter, filterStormName, setFilterStormName, sta
   const [stormNameList, setStormNameList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
+  // Search text is kept when a name is picked or the box loses focus, so several names sharing a
+  // term can be picked without retyping it; only typing changes it
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     let ignore = false; // a response that arrives after the panel closed or the filters changed is dropped
@@ -89,6 +92,8 @@ function StormNamePicker({input_filter, filterStormName, setFilterStormName, sta
         value={filterStormName}
         size='small'
         onChange={(event, newValue) => setFilterStormName(newValue)}
+        inputValue={searchText}
+        onInputChange={(event, newText, reason) => { if (reason === 'input') setSearchText(newText); }}
         loading={loading}
         loadingText="Loading storm names…"
         noOptionsText={loadFailed ? "Couldn't load storm names. Close and reopen to try again." : "No storms match"}

@@ -7,7 +7,7 @@ import {  Box,  Button,  CardContent, Card } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {Slider} from '@mui/material';
 import { FilterPanel } from './FilterPanel';
-import { MIN_DATE, MAX_DATE, formatDateRangeSummary } from './filter_utils';
+import { MIN_DATE, MAX_DATE, formatDateRangeSummary, getDateRangeError } from './filter_utils';
 import { filterActions } from "@/components/Filter/filterReducer";
 
 
@@ -62,16 +62,18 @@ export const shortcutsItems = [
 ];
 
 export function RenderDateFilter({ filterDispatch, startDate, endDate }) {
-  // Either date on its own is a filter (open-ended range)
-  const hasValidDates = Boolean(startDate?.isValid?.() || endDate?.isValid?.());
+  // Either date on its own is a filter (open-ended range). A mistyped date shows as invalid here
+  // instead of the last valid one, and Apply stays disabled until it is fixed or cleared.
+  const hasDates = startDate != null || endDate != null;
+  const dateError = getDateRangeError(startDate, endDate);
 
   return (
     <FilterPanel
       name="date"
       label="Filter by Date"
       Icon={CalendarMonthOutlinedIcon}
-      isActive={hasValidDates}
-      summary={formatDateRangeSummary(startDate, endDate)}
+      isActive={hasDates}
+      summary={dateError ? 'Invalid date' : formatDateRangeSummary(startDate, endDate)}
       placeholder="Any date"
       ariaLabel="filter button for date selection"
       onClear={() => {
@@ -125,17 +127,10 @@ export function DateDisplay({setStartDate, setEndDate, startDate, endDate}){
     setEndDate(newEndDate.isAfter(MAX_DATE) ? MAX_DATE : newEndDate);}
 
   // Each picker is limited by the other date, so end can never be before start
-  const isValidDate = (date) => date?.isValid?.();
-  const startMaxDate = isValidDate(endDate) ? endDate : MAX_DATE;
-  const endMinDate = isValidDate(startDate) ? startDate : MIN_DATE;
-
-  // Keyboard entry can still produce an out-of-range or incomplete date: MUI shows the field as
-  // invalid and we keep the last valid value instead of storing it
-  const handlePickerChange = (setDate) => (date, context) => {
-    if (date === null || (isValidDate(date) && !context?.validationError)) {
-      setDate(date);
-    }
-  };
+  // (only when the other date is itself usable, so one mistyped date doesn't mark both invalid)
+  const isUsableDate = (date) => date?.isValid?.() && !getDateRangeError(date, null);
+  const startMaxDate = isUsableDate(endDate) ? endDate : MAX_DATE;
+  const endMinDate = isUsableDate(startDate) ? startDate : MIN_DATE;
 
   return(
     <Card
@@ -174,7 +169,8 @@ export function DateDisplay({setStartDate, setEndDate, startDate, endDate}){
             label='Start Date'
             className='filter-time-input'
             value={startDate}
-            onChange={handlePickerChange(setStartDate)}
+            onChange={setStartDate} // stores incomplete/out-of-range dates too (see getDateRangeError)
+            format='DD/MM/YYYY' // same order as the summaries
             minDate={MIN_DATE}
             maxDate={startMaxDate}
             referenceDate={MIN_DATE} // an empty start picker opens at the earliest date, not today
@@ -184,7 +180,8 @@ export function DateDisplay({setStartDate, setEndDate, startDate, endDate}){
             label='End Date'
             className='filter-time-input'
             value={endDate}
-            onChange={handlePickerChange(setEndDate)}
+            onChange={setEndDate}
+            format='DD/MM/YYYY'
             minDate={endMinDate}
             maxDate={MAX_DATE}
             slotProps={slotProps}

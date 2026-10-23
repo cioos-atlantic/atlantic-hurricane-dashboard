@@ -14,7 +14,7 @@ import { basePath } from "@/next.config";
 import LoadingScreen from "../loading_screen";
 import { RenderCategoryFilter } from "./categorySlider";
 import { empty_station_obj } from "../point_defaults";
-import { formatFilterDate, formatStormCategory, formatStormName, formatCategoryRange, countActiveFilters } from "./filter_utils";
+import { formatFilterDate, formatStormCategory, formatStormName, formatCategoryRange, countActiveFilters, getDateRangeError } from "./filter_utils";
 import { mapActions } from "@/components/mapReducer";
 import { filterActions } from "@/components/Filter/filterReducer";
 import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
@@ -31,6 +31,8 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
   // Apply needs a filter value; "Clear all" also has work to do while a submitted query or its results are shown
   const activeFilterCount = countActiveFilters({ filterStormName, startDate, endDate, startCategory, endCategory, polyFilterCoords });
   const filtersSelected = activeFilterCount > 0;
+  const dateError = getDateRangeError(startDate, endDate); // a mistyped date blocks Apply
+  const applyBlockedReason = !filtersSelected ? "Select a filter first" : dateError;
   const hasSubmittedQuery = returnFilterResult || Object.keys(filterQuery).length > 0;
   const canClear = filtersSelected || hasSubmittedQuery;
 
@@ -55,7 +57,6 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
 
 
   async function handleFilterSubmit() {
-    dispatch(mapActions.setDrawerButtonClicked(''));
     filterDispatch(filterActions.closePanel());
 
     const updatedParams = {
@@ -70,13 +71,14 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
     setApplyFailed(false);
     const { storms, error } = await processFilterRequest(updatedParams, setLoading);
 
-    // On a failed request keep whatever was showing and report it under Apply
+    // On a failed request keep whatever was showing (including the highlighted storm) and report it under Apply
     if (error) {
       setApplyFailed(true);
       return;
     }
 
     // An empty result still shows the results view ("Filter Result: 0 storms" + the query)
+    dispatch(mapActions.setDrawerButtonClicked(''));
     filterDispatch(filterActions.setFilterQuery(updatedParams));
     filterDispatch(filterActions.setFilterResult(storms));
     router.push(`/?page=historical`);
@@ -174,14 +176,14 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
             </Box>
           )}
 
-          {/* Disabled (not hidden) when nothing is selected, so the tour can still point at Submit.
-              The span lets the tooltip work on a disabled button. */}
-          <Tooltip title={filtersSelected ? "" : "Select a filter first"}>
+          {/* Disabled (not hidden) when nothing is selected or a date is invalid, so the tour can
+              still point at Submit. The span lets the tooltip work on a disabled button. */}
+          <Tooltip title={applyBlockedReason}>
             <span className="filter-group">
               <Button
                 id="filter-submit-button"
                 className="filter-badge"
-                disabled={!filtersSelected}
+                disabled={Boolean(applyBlockedReason)}
                 onClick={handleFilterSubmit}
                 startIcon={<PublishRoundedIcon />}>
                 Apply filters

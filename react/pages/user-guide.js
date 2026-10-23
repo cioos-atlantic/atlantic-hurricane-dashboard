@@ -59,10 +59,10 @@ export default function UserGuide() {
             <li>Clicking a storm from the list will display the storm track available station data on the map.</li>
             <li>Hover over the storm marker to see storm type, category, windspeed and time.</li>
             <li>Clicking on a storm or station marker will open a storm and or station dashboard with panels for more detailed information about that storm or station. Both dashboards can be viewed simultaneously.</li>
-            <li>Currently, the tool allows filtering by storm name, category, location, and date range.</li>
-            <li>The filter panel is located on the top center of the screen on desktop devices and on the bottom right of the screen on mobile devices.</li>
-            <li>To filter storms, hit the submit button after selecting your criteria.</li>
-            <li>To clear the criteria , click the (X) button.</li>
+            <li>Currently, the tool allows filtering by storm name, date range, category, and an area drawn on the map.</li>
+            <li>The filters are at the top of the left side panel.</li>
+            <li>To filter storms, click <b>Apply filters</b> after selecting your criteria.</li>
+            <li>To clear one filter, click the (X) on that filter; to clear every filter, click <b>Clear all</b>.</li>
 
           </ol>
         </section>

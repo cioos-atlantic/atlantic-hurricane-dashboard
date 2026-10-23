@@ -59,7 +59,12 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, startCat
     </>
   ) : (
         <>
-          You&apos;ve selected storms from <strong>{storm_cat[startLabel]?.name.en}</strong> to <strong>{storm_cat[endLabel]?.name.en}</strong>. <br />
+          {/* Both thumbs on one category: name and describe it once */}
+          {startLabel === endLabel ? (
+            <>You&apos;ve selected <strong>{storm_cat[startLabel]?.name.en}</strong> storms. <br /></>
+          ) : (
+            <>You&apos;ve selected storms from <strong>{storm_cat[startLabel]?.name.en}</strong> to <strong>{storm_cat[endLabel]?.name.en}</strong>. <br /></>
+          )}
           {' '}
 
           <a href={storm_cat[startLabel]?.more_info_link}
@@ -67,14 +72,19 @@ export function CategoryRangeSlider({ setStartCategory, setEndCategory, startCat
              rel="noopener noreferrer">
             <strong>{storm_cat[startLabel]?.name.en}</strong>
           </a>
-            - {storm_cat[startLabel]?.sub_info}. 
+            - {storm_cat[startLabel]?.sub_info}.
             {' '}
 
-          <a href={storm_cat[endLabel]?.more_info_link}
-            target="_blank"
-            rel="noopener noreferrer">
-            <strong>{storm_cat[endLabel]?.name.en}</strong>
-          </a> - {storm_cat[endLabel]?.sub_info}. <br />
+          {startLabel !== endLabel && (
+            <>
+              <a href={storm_cat[endLabel]?.more_info_link}
+                target="_blank"
+                rel="noopener noreferrer">
+                <strong>{storm_cat[endLabel]?.name.en}</strong>
+              </a> - {storm_cat[endLabel]?.sub_info}.
+            </>
+          )}
+          <br />
           [See more details{' '}
           <a href={stormCategoryLink}
              target="_blank"
