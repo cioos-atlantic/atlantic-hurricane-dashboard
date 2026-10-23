@@ -48,8 +48,6 @@ export default function CombinedStationStormDash({stationData, stationValues, st
 
 
 	const variablePresence = createVarPresenceDict(alignedMergedData, stormCategory, stormType, stationData );
-	//const allStationData =stationValues?.properties?.station_data;
-	const timeData = get_station_field_data(stationData, "time", "column_std_names").data;
 	const directionData = get_station_field_data(stationData, 'wind_from_direction', "column_std_names").data;
 	const windSpeedData = processWindSpeeds(stationData);
 	
@@ -99,7 +97,7 @@ export default function CombinedStationStormDash({stationData, stationValues, st
 								<RenderPlotlyRose 
 									windData={windSpeedData[key]}
 									directionData={directionData}
-										timeData={timeData}/>
+										timeData={stationTimes}/>
 							</section>
 
 							)})
