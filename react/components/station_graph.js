@@ -34,7 +34,6 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
         hour12: false,
     
       });
-
       
       const chartData = parseChartData(sourceData, varCategory, hoverPointTime);
       const datasets = chartData.datasets;
@@ -121,6 +120,7 @@ function RenderChart({ sourceData, position, stationName, varCategory, hoverPoin
       chartRef.current.chart = new Chart(ctx, chartConfig);
 
       setTimeout(() => {
+        if(chartRef.current === null) return;
         const chart = chartRef.current.chart;
         if (!chart || !hoverPointTime) return; 
   

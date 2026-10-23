@@ -6,6 +6,7 @@ import { RenderPlotlyRose } from "./plotly_rose";
 import { get_station_field_data } from "../utils/station_data_format_util";
 import { processWindSpeeds } from "./wind_rose_utils";
 
+// This class deals with the mobiel view for station data - not the combined view
 export default function StationDataLayout({stationName, sourceDataLink, stationData, setSelectedStation, stationSummaryText, variablePresence, hoverPointTime}){
 
   if (stationData === undefined) {
@@ -43,7 +44,9 @@ export default function StationDataLayout({stationName, sourceDataLink, stationD
       )
   }
 
-  const dataLink = "https://cioosatlantic.ca/erddap/tabledap/" + stationName + ".html"
+  //const erddapSource = stationValues?.properties?.source_url || ""
+  //const datasetId = stationValues?.properties?.dataset || ""
+  //const dataLink = erddapSource + "/tabledap/" + datasetId 
 
   return (
     <Box sx={{ width: "100%",
