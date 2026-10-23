@@ -17,7 +17,6 @@ Chart.register(LineController, LineElement, LinearScale, PointElement, CategoryS
  * Renders a line chart using Chart.js to display station data.
  */
 function RenderCombinedChart({ sourceData, varCategory, timeData, hoverPointTime }) {
-  console.log(sourceData)
   const chartRef = useRef(null); // Reference to the canvas element
   const chartInstance = useRef(null); // Store Chart.js instance
 
