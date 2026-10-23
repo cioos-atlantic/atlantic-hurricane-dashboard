@@ -13,7 +13,6 @@ export const initialFilterState = {
 
   // Filter UI
   openPanel: null, // 'stormName' | 'date' | 'category' | null; only one panel is open at a time
-  showFilterSelected: true,
 
   // Submitted query and its results
   filterQuery: {},
@@ -37,7 +36,6 @@ export const filterActions = {
   // Filter UI
   togglePanel: (panel) => ({ type: 'TOGGLE_PANEL', payload: panel }),
   closePanel: () => ({ type: 'CLOSE_PANEL' }),
-  setShowFilterSelected: (show) => ({ type: 'SHOW_FILTER_SELECTED', payload: show }),
 
   // Filter results
   setFilterQuery: (query) => ({ type: 'SET_FILTER_QUERY', payload: query }),
@@ -63,8 +61,6 @@ export function filterReducer(state, action) {
       return { ...state, openPanel: state.openPanel === action.payload ? null : action.payload };
     case 'CLOSE_PANEL':
       return { ...state, openPanel: null };
-    case 'SHOW_FILTER_SELECTED':
-      return { ...state, showFilterSelected: action.payload };
     case 'SET_FILTER_QUERY':
       return { ...state, filterQuery: action.payload };
     case 'SET_FILTER_RESULT':

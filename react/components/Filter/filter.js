@@ -15,7 +15,6 @@ import LoadingScreen from "../loading_screen";
 import { RenderCategoryFilter } from "./categorySlider";
 import { empty_station_obj } from "../point_defaults";
 import { formatFilterDate, formatStormCategory, formatStormName, formatCategoryRange, countActiveFilters } from "./filter_utils";
-import { FiltersSubmitted } from "./viewFilters";
 import { mapActions } from "@/components/mapReducer";
 import { filterActions } from "@/components/Filter/filterReducer";
 import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext";
@@ -54,7 +53,6 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
 
 
   async function handleFilterSubmit() {
-    filterDispatch(filterActions.setShowFilterSelected(false));
     dispatch(mapActions.setDrawerButtonClicked(''));
     filterDispatch(filterActions.closePanel());
 
@@ -181,12 +179,6 @@ export function RenderFilter({ clearShapesRef, dispatch, setStationPoints }) {
               </Button>
             </span>
           </Tooltip>
-
-          {hasSubmittedQuery && (
-            <div className="filter-group">
-              <FiltersSubmitted filterQuery={filterQuery} />
-            </div>
-          )}
 
         </Stack>
       )}

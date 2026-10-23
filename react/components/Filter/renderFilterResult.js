@@ -1,10 +1,12 @@
 import { memo } from "react";
 import {  Box, Typography, Paper, Stack, Button } from "@mui/material";
 import { handleStormButtonClick } from "../historical_storm/historical_storm_utils";
+import { FiltersSubmitted } from "./viewFilters";
 
 
 // Memoized: the parent re-renders on every filter change, but this list only needs to when its props change
-export const RenderFilterResult = memo(function RenderFilterResult({filterResult, router, drawerButtonClicked,  cancelFilters, setDrawerButtonClicked}){
+// (filterQuery only changes on submit)
+export const RenderFilterResult = memo(function RenderFilterResult({filterResult, filterQuery, router, drawerButtonClicked,  cancelFilters, setDrawerButtonClicked}){
  
   return( 
     
@@ -22,7 +24,9 @@ export const RenderFilterResult = memo(function RenderFilterResult({filterResult
           <>
           <Box
           className='filter_page_drawer_subheader'>
-          Filter Result: ({filterResult.length} result(s) found)</Box >
+          Filter Result: {filterResult.length} {filterResult.length === 1 ? 'storm' : 'storms'}
+          <FiltersSubmitted filterQuery={filterQuery} />
+          </Box >
           
           <Stack sx={{overflowX: 'hidden', 
                     paddingLeft: '7px', 

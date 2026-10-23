@@ -7,7 +7,6 @@ import { RenderRecentStorms } from './render_recent_storms.js';
 import { RenderFilterResult } from '../Filter/renderFilterResult.js';
 import LoadingScreen from '../loading_screen.js';
 import { empty_station_obj } from '../point_defaults.js';
-import {  FiltersSelected, FiltersSubmitted } from '../Filter/viewFilters.js';
 import { RenderFilter } from '../Filter/filter.js';
 import { mapActions } from "@/components/mapReducer";
 import { filterActions } from "@/components/Filter/filterReducer";
@@ -22,7 +21,7 @@ import { useFilters, useFilterDispatch } from "@/components/Filter/FilterContext
  
  */
 export default function HistoricalStormList({ setStationPoints, map, Leaflet, dispatch, drawerButtonClicked, clearShapesRef, isDrawerOpen }) {
-  const { filterResult, returnFilterResult } = useFilters();
+  const { filterResult, filterQuery, returnFilterResult } = useFilters();
   const filterDispatch = useFilterDispatch();
 
   const [loading, setLoading] = useState(false);
@@ -149,25 +148,6 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
 
 
           
-      {/*(showFilterSelected )  ? (
-        <>
-          <FiltersSelected
-          startDate={startDate}
-          endDate={endDate}
-          startCategory={startCategory}
-          endCategory={endCategory}
-          polyFilterCoords={polyFilterCoords}
-          filterStormName={filterStormName}/>
-          <hr style={{ height: '4px', backgroundColor: 'black', border: 'none' }}/>
-        </>
-        ): (
-          <>
-          <FiltersSubmitted 
-        filterQuery={filterQuery}/>
-
-        
-          </>
-        )*/}
       
        <hr style={{ height: '4px', backgroundColor: 'black', border: 'none', margin: '5px' }}/>
 
@@ -178,6 +158,7 @@ export default function HistoricalStormList({ setStationPoints, map, Leaflet, di
         
         <RenderFilterResult 
           filterResult={filterResult}
+          filterQuery={filterQuery}
           router={router}
           drawerButtonClicked={drawerButtonClicked}
           cancelFilters={cancelFilters}

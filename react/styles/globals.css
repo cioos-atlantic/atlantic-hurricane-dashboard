@@ -1453,3 +1453,12 @@ position: absolute !important;
 .storm-name-checkbox.Mui-checked{
   color: #e55162 !important;
 }
+
+/* Submitted query under "Filter Result: N storms" (viewFilters.js FiltersSubmitted) */
+.filter-result-query{
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}

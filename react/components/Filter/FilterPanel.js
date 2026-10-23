@@ -17,11 +17,6 @@ export function FilterPanel({ name, label, Icon, isActive, ariaLabel, summary, p
   const isOpen = openPanel === name;
   const canClear = Boolean(isActive && onClear);
 
-  function handleClick() {
-    filterDispatch(filterActions.setShowFilterSelected(true));
-    filterDispatch(filterActions.togglePanel(name));
-  }
-
   return (
     <>
       {/* The wrapper draws the box. The ✕ section is a sibling of the toggle button, not inside it
@@ -31,7 +26,7 @@ export function FilterPanel({ name, label, Icon, isActive, ariaLabel, summary, p
           className="filter-field"
           aria-label={ariaLabel}
           aria-expanded={isOpen}
-          onClick={handleClick}>
+          onClick={() => filterDispatch(filterActions.togglePanel(name))}>
           <span className="filter-field-text">
             <span className="filter-field-label">
               {Icon && <Icon fontSize="inherit" />}
